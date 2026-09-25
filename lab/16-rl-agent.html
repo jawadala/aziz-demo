@@ -285,9 +285,9 @@ new ResizeObserver(fit).observe(stage);
 function heat(v){
 if(v<=-0.999)return '#2e2320';
 const t=clamp((v+1)/2,0,1);
-if(t<0.5){const k=t/0.5;return `rgb(${(34+22*k)|0},${(30+18*k)|0},${(27+16*k)|0})`;}
+if(t<0.5){const k=t/0.5;return `rgb(${(32+16*k)|0},${(29+14*k)|0},${(26+13*k)|0})`;}
 const k=(t-0.5)/0.5;
-return `rgb(${(56+128*k)|0},${(58+130*k)|0},${(60+130*k)|0})`;}
+return `rgb(${(46+54*k)|0},${(48+56*k)|0},${(50+58*k)|0})`;}
 function draw(now){
 const W=cv.width/dpr,H=cv.height/dpr;
 ctx.setTransform(dpr,0,0,dpr,0,0);
