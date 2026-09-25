@@ -3,74 +3,95 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#05060f">
-<title>STUDY 16 · RL AGENT</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='4' fill='%2305060f'/><rect x='2' y='9' width='3' height='3' fill='%232fd6ff'/><rect x='7' y='4' width='3' height='3' fill='%234ade80'/><rect x='12' y='9' width='2' height='3' fill='%23a78bfa'/></svg>">
+<meta name="theme-color" content="#0b0b0b">
+<title>STUDY No. 16 · Tabular Q-Learning — JAWAD, Computational Studies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230b0b0b'/><rect x='3' y='9' width='3' height='3' fill='%23c2c8cc'/><rect x='10' y='4' width='3' height='3' fill='%23777f85'/></svg>">
 <style>
-:root{--bg:#05060f;--panel:#0a0e1e;--panel2:#0d1328;--line:#1b2340;--txt:#e8f2ff;--mut:#7f93b8;--cyan:#2fd6ff;--vio:#a78bfa;--grn:#4ade80}
+:root{--onyx:#0b0b0b;--panel:rgba(18,18,19,.92);--line:rgba(200,207,213,.14);--line2:rgba(200,207,213,.30);--ag:#c2c8cc;--ag-hi:#eef1f3;--ag-dim:rgba(200,207,213,.55);--txt:#e6e8ea;--dim:#8d9499;--faint:#61676c}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:var(--bg);color:var(--txt);font:13px/1.5 ui-monospace,ui-monospace,monospace;display:flex;flex-direction:column;overflow:hidden}
-header{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);background:#0a0e1e;flex-wrap:wrap;z-index:5}
-.brand{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:.14em;font-size:13px;white-space:nowrap}
-.logo{width:15px;height:15px;border-radius:4px;background:conic-gradient(from 210deg,var(--cyan),var(--vio),var(--grn),var(--cyan));;flex:none}
-.brand .sub{color:var(--mut);font-weight:400;letter-spacing:.08em;font-size:10px}
-.badge{font-size:10px;color:#051018;background:linear-gradient(90deg,var(--cyan),#7ee7ff);padding:2px 8px;border-radius:99px;font-weight:700;letter-spacing:.1em}
-.tabs{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
-.tabs button{background:var(--panel2);border:1px solid var(--line);color:var(--mut);padding:6px 12px;border-radius:8px;cursor:pointer;font:inherit;font-size:11px;letter-spacing:.1em}
-.tabs button.on{color:#051018;background:linear-gradient(90deg,var(--cyan),#7ee7ff);border-color:var(--cyan);font-weight:700}
-main{flex:1;display:grid;grid-template-columns:296px 1fr;min-height:0}
-aside{border-right:1px solid var(--line);background:var(--panel);padding:12px;overflow:auto;display:flex;flex-direction:column;gap:12px}
-.grp{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--panel2);display:flex;flex-direction:column;gap:7px}
-.lab{font-size:10px;letter-spacing:.14em;color:var(--mut)}
-.lab b{color:var(--cyan)}
+body{background:var(--onyx);color:var(--txt);font:13px/1.55 Georgia,'Times New Roman',serif;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#151617,#0b0b0b);flex-wrap:wrap;z-index:5}
+.gem{width:9px;height:9px;background:linear-gradient(135deg,#eef1f3,#79828a);transform:rotate(45deg);flex:none}
+.brand{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.brand .name{font:italic 700 19px Didot,'Bodoni MT','Playfair Display','Times New Roman',serif;color:var(--ag-hi);letter-spacing:.04em}
+.brand .sub{font:700 8px 'Courier New',monospace;letter-spacing:.34em;color:var(--dim);text-transform:uppercase}
+.badge{font:700 9px 'Courier New',monospace;color:var(--ag);border:1px solid var(--line2);padding:4px 10px;letter-spacing:.3em;text-transform:uppercase;background:rgba(200,207,213,.05)}
+.tabs{margin-left:auto;display:flex;gap:2px}
+.tabs button{background:none;border:none;border-bottom:1px solid transparent;color:var(--dim);padding:6px 12px;cursor:pointer;font:700 9px 'Courier New',monospace;letter-spacing:.3em;text-transform:uppercase}
+.tabs button:hover{color:var(--ag)}
+.tabs button.on{color:var(--ag);border-bottom-color:var(--ag)}
+main{flex:1;display:grid;grid-template-columns:288px 1fr;min-height:0}
+aside{border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(21,22,23,.55),rgba(11,11,11,.25));padding:14px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.grp{border:1px solid var(--line);padding:12px;background:var(--panel);display:flex;flex-direction:column;gap:8px;position:relative}
+.grp::before{content:"";position:absolute;top:-1px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(238,241,243,.36),transparent)}
+.lab{font:700 8.5px 'Courier New',monospace;letter-spacing:.28em;color:var(--faint);text-transform:uppercase}
+.lab b{color:var(--ag);font-variant-numeric:tabular-nums}
 .lab.sm{margin-top:2px}
-.row{display:flex;gap:6px;flex-wrap:wrap}
-button{background:#111a38;border:1px solid var(--line);color:var(--txt);padding:7px 10px;border-radius:8px;cursor:pointer;font:inherit;font-size:11px;letter-spacing:.06em}
-button:hover{border-color:var(--cyan);color:#fff}
-button.pri{background:linear-gradient(90deg,#0e4a63,#0e6a63);border-color:var(--cyan);font-weight:700}
+.row{display:flex;gap:4px;flex-wrap:wrap}
+.row button{flex:1}
+button{background:transparent;border:1px solid var(--line);color:var(--dim);padding:7px 10px;cursor:pointer;font:700 9px 'Courier New',monospace;letter-spacing:.2em;text-transform:uppercase}
+button:hover{border-color:var(--ag-dim);color:var(--ag-hi)}
+button.pri{background:linear-gradient(180deg,#e7ebee,#98a1a8);border-color:#7d868d;color:#121517}
+button.pri:hover{color:#121517;filter:brightness(1.06)}
 button.wide{width:100%}
 select,input[type=range]{width:100%}
-select{background:#0a1024;border:1px solid var(--line);color:var(--txt);padding:6px;border-radius:8px;font:inherit;font-size:12px}
-input[type=range]{accent-color:var(--cyan);height:22px}
-input[type=checkbox]{accent-color:var(--grn);width:15px;height:15px}
+select{background:#141516;border:1px solid var(--line);color:var(--txt);padding:6px;font:12px Georgia,serif}
+input[type=range]{-webkit-appearance:none;appearance:none;height:16px;background:transparent;cursor:ew-resize}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--line2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height:8px;margin-top:-4px;background:linear-gradient(135deg,#eef1f3,#79828a);border:0;transform:rotate(45deg)}
+input[type=range]::-moz-range-track{height:1px;background:var(--line2)}
+input[type=range]::-moz-range-thumb{width:7px;height:7px;background:linear-gradient(135deg,#eef1f3,#79828a);border:0;border-radius:0;transform:rotate(45deg)}
+input[type=checkbox]{accent-color:#c2c8cc;width:14px;height:14px}
 .ck{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--txt);cursor:pointer}
-.note{font-size:10px;color:var(--mut)}
-.stage{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;background:#04050c}
+.note{font:italic 11.5px/1.6 Georgia,serif;color:var(--dim)}
+.stage{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;background:#090909}
 canvas.view{flex:1;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
-.hud{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.stage::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;background:radial-gradient(120% 92% at 50% 42%,transparent 52%,rgba(0,0,0,.55) 100%)}
+.stage::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;opacity:.45;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E")}
+.hud{position:absolute;top:12px;left:14px;display:flex;flex-direction:column;gap:6px;pointer-events:none;z-index:3}
 .chiprow{display:flex;gap:6px;flex-wrap:wrap}
-.chip{background:#070d1ecc;border:1px solid var(--line);border-radius:7px;padding:3px 8px;font-size:10px;color:var(--mut);letter-spacing:.06em}
-.chip b{color:var(--cyan);font-size:11px}
-.chip b.g{color:var(--grn)} .chip b.v{color:var(--vio)}
-.hint{position:absolute;right:10px;bottom:8px;font-size:10px;color:#5c6f92;text-align:right;pointer-events:none}
-footer{padding:7px 14px;border-top:1px solid var(--line);color:var(--mut);font-size:10px;letter-spacing:.12em;display:flex;gap:8px;flex-wrap:wrap;background:#070a16}
-footer b{color:var(--cyan)}
-.doc{padding:22px;overflow:auto;max-width:900px}
-.doc h2{color:var(--cyan);letter-spacing:.16em;font-size:15px;margin:18px 0 8px}
-.doc h2:first-child{margin-top:0}
-.doc h3{color:var(--vio);font-size:12px;letter-spacing:.12em;margin:14px 0 6px}
-.doc p,.doc li{color:#c4d4ee;font-size:13px}
+.chip{background:rgba(13,13,14,.78);border:1px solid var(--line);padding:4px 9px;font:700 8.5px 'Courier New',monospace;color:var(--faint);letter-spacing:.22em}
+.chip b{color:var(--ag);font-size:11px;font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.chip b.g{color:var(--ag-hi)} .chip b.v{color:#ccd4d9}
+.hint{position:absolute;right:14px;bottom:10px;font:700 8.5px/1.9 'Courier New',monospace;color:var(--faint);letter-spacing:.18em;text-align:right;pointer-events:none;z-index:3;text-transform:uppercase}
+footer{padding:9px 18px;border-top:1px solid var(--line);color:var(--faint);font:700 8.5px 'Courier New',monospace;letter-spacing:.3em;text-transform:uppercase;display:flex;gap:10px;flex-wrap:wrap;background:#0e0e0f}
+footer b{color:var(--ag)}
+.doc{padding:30px;overflow:auto;max-width:860px}
+.doc h2{font:italic 400 26px Didot,'Bodoni MT','Playfair Display',Georgia,serif;color:var(--ag-hi);letter-spacing:.02em;margin:6px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.doc h3{font:700 9px 'Courier New',monospace;letter-spacing:.32em;color:var(--ag);margin:22px 0 8px;text-transform:uppercase}
+.doc p,.doc li{font:14px/1.75 Georgia,serif;color:#b0b5ba}
+.doc b{color:var(--ag-hi);font-weight:400}
 .doc ul{margin:6px 0 6px 18px}
-.doc .f{background:#070d1f;border:1px solid var(--line);border-left:3px solid var(--grn);border-radius:8px;padding:10px 12px;margin:8px 0;font-size:13px;color:#d9ffe9;overflow-x:auto;white-space:pre}
-.doc table{border-collapse:collapse;margin:8px 0;font-size:12px}
-.doc td,.doc th{border:1px solid var(--line);padding:5px 9px;text-align:left}
-.doc th{color:var(--mut);letter-spacing:.1em;font-weight:400;font-size:10px}
-.doc td k{color:var(--grn);font-style:normal}
+.doc .f{font:12.5px/2 'Courier New',monospace;color:var(--ag);background:rgba(200,207,213,.05);border:1px solid var(--line);border-left:2px solid var(--ag);padding:11px 14px;margin:10px 0;overflow-x:auto;white-space:pre}
+.doc table{border-collapse:collapse;margin:10px 0;font-size:12.5px}
+.doc td,.doc th{border:1px solid var(--line);padding:5px 10px;text-align:left;color:#b0b5ba}
+.doc th{color:var(--faint);font:700 8.5px 'Courier New',monospace;letter-spacing:.24em;text-transform:uppercase}
+.doc td k{color:var(--ag);font-style:normal;font-family:'Courier New',monospace;font-size:11px}
 @media(max-width:880px){main{grid-template-columns:1fr;grid-template-rows:minmax(320px,52vh) minmax(0,1fr)}aside{order:2;border-right:0;border-top:1px solid var(--line)}}
-#toast{position:fixed;left:50%;bottom:52px;transform:translateX(-50%);background:#0c2a24;border:1px solid var(--grn);color:#c9ffe2;padding:8px 16px;border-radius:9px;font-size:11px;letter-spacing:.1em;opacity:0;transition:opacity .25s;pointer-events:none;z-index:99}
+#toast{position:fixed;left:50%;bottom:52px;transform:translateX(-50%);background:#121517;border:1px solid var(--ag);color:var(--ag-hi);padding:8px 16px;font:700 9px 'Courier New',monospace;letter-spacing:.26em;text-transform:uppercase;opacity:0;transition:opacity .25s;pointer-events:none;z-index:99}
 #toast.show{opacity:1}
 [hidden]{display:none!important}
+.qbox{position:absolute;top:12px;right:14px;background:rgba(13,13,14,.9);border:1px solid var(--line);padding:11px 13px;font-size:11px;min-width:210px;z-index:4;backdrop-filter:blur(3px)}
+.qbox .qt{color:var(--dim);font:700 8.5px 'Courier New',monospace;letter-spacing:.22em;text-transform:uppercase;margin-bottom:7px}
+.qbox .qt b{color:var(--ag-hi)}
+.qbox .qr{display:flex;align-items:center;gap:8px;margin:4px 0;color:#b0b5ba;font-size:11.5px}
+.qbox .qr span{width:60px;flex:none}
+.qbox .qr i{display:block;height:4px;background:linear-gradient(90deg,#77828a,#c2c8cc);flex:1;max-width:92px}
+.qbox .qr em{font-style:normal;color:var(--dim);min-width:52px;text-align:right;font-variant-numeric:tabular-nums}
+.qbox .qr.hot{color:var(--ag-hi)}
+.qbox .qr.hot i{background:linear-gradient(90deg,#c2c8cc,#eef1f3)}
 </style>
 </head>
 <body>
 <header>
-<div class="brand"><span class="logo"></span>SYSTEMS LABORATORY <span class="sub">/ COMPUTATIONAL STUDIES</span></div>
-<span class="badge">STUDY 16 · RL AGENT</span>
+<span class="gem"></span>
+<div class="brand"><span class="name">JAWAD</span><span class="sub">Systems Laboratory · Computational Studies</span></div>
+<span class="badge">STUDY No. 16 · TABULAR Q-LEARNING</span>
 <nav class="tabs">
-<button data-tab="viz" class="on">DEMO</button>
-<button data-tab="concept">CONCEPT</button>
-<button data-tab="about">NOTES</button>
+<button data-tab="viz" class="on">PLATE</button>
+<button data-tab="concept">NOTES</button>
+<button data-tab="about">RECORD</button>
 </nav>
 </header>
 <main>
@@ -79,8 +100,8 @@ footer b{color:var(--cyan)}
 <div class="lab">WORLD MAP</div>
 <select id="map">
 <option value="classic">classic — simple corridor</option>
-<option value="rooms">four rooms — doors & walls</option>
-<option value="cliff">cliff — danger along the edge</option>
+<option value="rooms">four rooms — doors &amp; walls</option>
+<option value="cliff">cliff — hazard along the edge</option>
 <option value="maze">winding maze</option>
 </select>
 </div>
@@ -88,7 +109,7 @@ footer b{color:var(--cyan)}
 <div class="lab">VIEW</div>
 <select id="view">
 <option value="both">values + policy arrows</option>
-<option value="value">values only (heat)</option>
+<option value="value">values only (wash)</option>
 <option value="policy">policy only (arrows)</option>
 </select>
 <label class="ck"><input type="checkbox" id="qtip" checked> tap a cell for its Q-table</label>
@@ -109,14 +130,14 @@ footer b{color:var(--cyan)}
 <input type="range" id="rg" min="0" max="300" value="100">
 <div class="lab sm">STEP · <b id="vRs">−0.04</b></div>
 <input type="range" id="rs" min="0" max="50" value="4">
-<div class="lab sm">TRAP · <b id="vRt">−1.0</b></div>
+<div class="lab sm">HAZARD · <b id="vRt">−1.0</b></div>
 <input type="range" id="rt" min="0" max="300" value="100">
 </div>
 <div class="grp">
 <div class="row">
 <button id="bPlay" class="pri">PAUSE</button>
 <button id="bStep">STEP</button>
-<button id="bReset">RESET Q</button>
+<button id="bReset">RESET TABLE</button>
 </div>
 <div class="row">
 <button id="bWalls">WALLS</button>
@@ -137,25 +158,25 @@ footer b{color:var(--cyan)}
 <div class="chip"><span id="hStat">training</span></div>
 </div>
 <div class="qbox" id="qbox" hidden></div>
-<div class="hint">drag = paint wall · shift/right-drag = erase<br>drag ◎ goal · SPACE pause · S step · R reset · Q toggle Q-box · 1-4 maps</div>
+<div class="hint">drag = paint wall · shift/right-drag = erase<br>drag ◎ goal · space hold · s step · r reset · q toggle Q-box · 1-4 maps</div>
 </div>
 </main>
 <section id="tab-concept" class="doc" hidden>
-<h2>TABULAR Q-LEARNING</h2>
+<h2>Tabular Q-Learning</h2>
 <p>No teacher. Q starts at zero. Act, observe reward, update one entry. Repeated updates turn the table into a value map.</p>
 <h3>1 · STATES, ACTIONS, REWARDS</h3>
 <div class="f">state  s  = current cell (24×16 = 384 states)
 action a  = ↓ up ← right   (4 actions)
-reward r  = goal (+1.0) · trap (−1.0) · step (−0.04)</div>
-<p>r_step &lt; 0: longer routes cost more; optimal policy prefers short routes.</p>
+reward r  = goal (+1.0) · hazard (−1.0) · step (−0.04)</div>
+<p>r_step &lt; 0: longer routes cost more; the optimal policy prefers short routes.</p>
 <h3>2 · THE UPDATE RULE</h3>
 <div class="f">Q(s,a) ← Q(s,a) + α · [ r + γ · max Q(s′,·) − Q(s,a) ]
 └────── TD error δ ──────┘</div>
-<p>δ = outcome (r plus discounted max at s′) minus prediction. α scales the correction, γ the credit back:</p>
+<p>δ = outcome (r plus the discounted max at s′) minus the prediction. α scales the correction, γ the credit back:</p>
 <ul>
 <li><b>α</b> — 0.05: slow, stable. 0.99: values oscillate.</li>
 <li><b>γ</b> — 0.5: value spreads ~2-3 cells. 0.99: across the map.</li>
-<li><b>ε</b> — probability ε: uniform random action; else argmax Q.</li>
+<li><b>ε</b> — with probability ε: uniform random action; otherwise argmax Q.</li>
 </ul>
 <div class="f">π(s) = argmax Q(s,·)     ← greedy policy, drawn as arrows</div>
 <h3>3 · FAILURE MODES</h3>
@@ -164,23 +185,22 @@ reward r  = goal (+1.0) · trap (−1.0) · step (−0.04)</div>
 <li><b>α at max</b> — values oscillate. <b>γ near 0.5</b> — value stops spreading beyond 2-3 cells.</li>
 <li><b>Wall painted across a learned route</b> — stale Q-values persist until re-training reroutes.</li>
 </ul>
+<h3>4 · READING THE PLATE</h3>
+<p>The value wash is poured in burnished silver: deep oxide for cells that expect loss, bright silver where value concentrates around the goal. Policy arrows are etched in pale chrome. The agent is the bright bead trailing a hairline path; the goal rings in white gold.</p>
 </section>
 <section id="tab-about" class="doc" hidden>
-<h2>BUILD RECORD</h2>
-<p>Single self-contained HTML file. No frameworks, no CDNs, no fonts, no build step. Tabular RL stack: agent, environment, reward function, display.</p>
+<h2>Build Record</h2>
+<p>Single self-contained sheet. No frameworks, no fonts, no build step. Tabular RL stack: agent, environment, reward function, display.</p>
 <h3>ENGINEERING NOTES</h3>
 <ul>
-<li>Q-table: <b>Float32Array</b> cells×4. Env returns (s′, r, done); terminals: goal, trap, cliff, step cap.</li>
-<li>Per frame: up to <b>60 env steps</b> (speed slider), ε-greedy, one-line Q update. Walls editable live.</li>
+<li>Q-table: <b>Float32Array</b> cells×4. The environment returns (s′, r, done); terminals: goal, hazard, cliff, step cap.</li>
+<li>Per frame: up to <b>60 environment steps</b> (speed slider), ε-greedy, one-line Q update. Walls editable live.</li>
 <li><b>Reduced motion:</b> static frame after 40 pre-trained episodes; STEP still advances.</li>
 </ul>
-
-<h3>SOURCES</h3>
-<p>Watkins, PhD thesis, Cambridge 1989; Watkins &amp; Dayan, ML 8:279, 1992. Code: github.com/openai/gym; tensorflow/agents.</p>
-<h3>PERF</h3>
+<h3>PERFORMANCE</h3>
 <p>One step: table lookup, max of 4, one multiply-add; thousands per frame. Canvas repaint (384 cells) dominates; 60 fps integrated.</p>
 </section>
-<footer><b>SYSTEMS LABORATORY</b> · STUDY 16 · rl agent · single file</footer>
+<footer><b>JAWAD — SYSTEMS LABORATORY</b><span>STUDY No. 16 · TABULAR Q-LEARNING</span><span>COMPUTATIONAL STUDIES</span><span>SINGLE FILE</span></footer>
 <script>
 'use strict';
 window.__errors__=[];addEventListener('error',e=>window.__errors__.push(String(e&&e.message||e)));
@@ -207,7 +227,7 @@ rect(11,0,12,6,1);rect(11,10,12,ROWS-1,1);
 rect(5,0,6,ROWS-1,1);rect(5,7,6,8,0);
 rect(17,0,18,ROWS-1,1);rect(17,7,18,8,0);},
 cliff(){rect(0,0,COLS-1,0,1);rect(0,ROWS-1,COLS-1,ROWS-1,1);rect(0,0,0,ROWS-1,1);rect(COLS-1,0,COLS-1,ROWS-1,1);
-rect(1,ROWS-2,COLS-3,ROWS-2,2); 
+rect(1,ROWS-2,COLS-3,ROWS-2,2);
 goal={x:COLS-2,y:ROWS-2};start={x:1,y:ROWS-2};},
 maze(){rect(0,0,COLS-1,0,1);rect(0,ROWS-1,COLS-1,ROWS-1,1);rect(0,0,0,ROWS-1,1);rect(COLS-1,0,COLS-1,ROWS-1,1);
 rect(3,1,3,13,1);rect(3,1,9,1,0);
@@ -261,16 +281,17 @@ const stage=$('#stage'),cv=$('#cv'),ctx=cv.getContext('2d');
 let cs=20,ox=0,oy=0;
 function fit(){const r=stage.getBoundingClientRect();cv.width=Math.max(2,(r.width*dpr)|0);cv.height=Math.max(2,(r.height*dpr)|0);if(RM)draw();}
 new ResizeObserver(fit).observe(stage);
+/* oxide-silver value wash: loss = deep oxide, gain = bright silver */
 function heat(v){
-if(v<=-0.999)return '#3a1a4a';
+if(v<=-0.999)return '#2e2320';
 const t=clamp((v+1)/2,0,1);
-if(t<0.5){const k=t/0.5;return `rgb(${(20+40*k)|0},${(28+60*k)|0},${(60+120*k)|0})`;}
+if(t<0.5){const k=t/0.5;return `rgb(${(34+22*k)|0},${(30+18*k)|0},${(27+16*k)|0})`;}
 const k=(t-0.5)/0.5;
-return `rgb(${(60+90*k)|0},${(88+80*k)|0},${(180+60*k)|0})`;}
+return `rgb(${(56+128*k)|0},${(58+130*k)|0},${(60+130*k)|0})`;}
 function draw(now){
 const W=cv.width/dpr,H=cv.height/dpr;
 ctx.setTransform(dpr,0,0,dpr,0,0);
-ctx.fillStyle='#04050c';ctx.fillRect(0,0,W,H);
+ctx.fillStyle='#090909';ctx.fillRect(0,0,W,H);
 cs=Math.min(W/COLS,H/ROWS);ox=(W-cs*COLS)/2;oy=(H-cs*ROWS)/2;
 const mode=viewSel.value;
 if(mode!=='policy'){
@@ -279,21 +300,21 @@ for(let i=0;i<NC;i++)if(!walls[i]){const v=maxQ(i);if(v<vmin)vmin=v;if(v>vmax)vm
 if(vmax-vmin<1e-6)vmax=vmin+1;
 for(let i=0;i<NC;i++){
 const x=i%COLS,y=(i/COLS)|0;
-if(walls[i]){ctx.fillStyle='#22315e';ctx.fillRect(ox+x*cs+0.5,oy+y*cs+0.5,cs-1,cs-1);continue;}
+if(walls[i]){ctx.fillStyle='#242220';ctx.fillRect(ox+x*cs+0.5,oy+y*cs+0.5,cs-1,cs-1);continue;}
 const v=(maxQ(i)-vmin)/(vmax-vmin)*2-1;
 ctx.fillStyle=heat(v);
 ctx.fillRect(ox+x*cs+0.5,oy+y*cs+0.5,cs-1,cs-1);
 }
 }else{
 for(let i=0;i<NC;i++){const x=i%COLS,y=(i/COLS)|0;
-ctx.fillStyle=walls[i]?'#22315e':'#0a1024';
+ctx.fillStyle=walls[i]?'#242220':'#121314';
 ctx.fillRect(ox+x*cs+0.5,oy+y*cs+0.5,cs-1,cs-1);}
 }
 for(const ti of trapCells){const x=ti%COLS,y=(ti/COLS)|0;
-ctx.fillStyle='rgba(255,80,120,0.55)';ctx.fillRect(ox+x*cs+1,oy+y*cs+1,cs-2,cs-2);
-ctx.fillStyle='#05060f';ctx.font=`${Math.max(7,cs*0.5)|0}px ui-monospace`;ctx.fillText('×',ox+x*cs+cs*0.28,oy+(y+0.72)*cs);}
+ctx.fillStyle='rgba(158,84,64,0.6)';ctx.fillRect(ox+x*cs+1,oy+y*cs+1,cs-2,cs-2);
+ctx.fillStyle='#0b0b0b';ctx.font=`${Math.max(7,cs*0.5)|0}px Georgia,serif`;ctx.fillText('×',ox+x*cs+cs*0.28,oy+(y+0.72)*cs);}
 if(mode!=='value'){
-ctx.fillStyle='rgba(234,255,242,0.92)';
+ctx.fillStyle='rgba(238,241,243,0.85)';
 const ar=cs*0.22;
 for(let i=0;i<NC;i++){
 if(walls[i])continue;
@@ -313,17 +334,17 @@ ctx.closePath();ctx.fill();
 }
 const gx=ox+(goal.x+0.5)*cs,gy=oy+(goal.y+0.5)*cs;
 const pr=cs*0.42*((RM||paused)?1:1+0.1*Math.sin(now/300));
-ctx.save();ctx.shadowColor='#4ade80';ctx.shadowBlur=14;
-ctx.strokeStyle='#4ade80';ctx.lineWidth=2.5;
+ctx.save();ctx.shadowColor='rgba(238,241,243,0.6)';ctx.shadowBlur=14;
+ctx.strokeStyle='#eef1f3';ctx.lineWidth=2.5;
 ctx.beginPath();ctx.arc(gx,gy,pr,0,6.2832);ctx.stroke();
 ctx.beginPath();ctx.arc(gx,gy,pr*0.45,0,6.2832);ctx.stroke();ctx.restore();
-ctx.strokeStyle='rgba(47,214,255,0.4)';ctx.lineWidth=2;ctx.beginPath();
+ctx.strokeStyle='rgba(194,200,204,0.4)';ctx.lineWidth=2;ctx.beginPath();
 for(let k=0;k<trail.length;k+=2){const px=ox+trail[k]*cs,py=oy+trail[k+1]*cs;k?ctx.lineTo(px,py):ctx.moveTo(px,py);}
 ctx.stroke();
 if(trail.length>=2){const ax2=ox+trail[trail.length-2]*cs,ay2=oy+trail[trail.length-1]*cs;
-ctx.save();ctx.shadowColor='#2fd6ff';ctx.shadowBlur=16;
-ctx.fillStyle='#2fd6ff';ctx.beginPath();ctx.arc(ax2,ay2,cs*0.3,0,6.2832);ctx.fill();ctx.restore();}
-ctx.fillStyle='rgba(127,147,184,0.9)';ctx.font=`${Math.max(8,cs*0.4)|0}px ui-monospace`;
+ctx.save();ctx.shadowColor='#eef1f3';ctx.shadowBlur=16;
+ctx.fillStyle='#eef1f3';ctx.beginPath();ctx.arc(ax2,ay2,cs*0.3,0,6.2832);ctx.fill();ctx.restore();}
+ctx.fillStyle='rgba(141,148,153,0.9)';ctx.font=`${Math.max(8,cs*0.4)|0}px Georgia,serif`;
 ctx.fillText('●',ox+(start.x+0.3)*cs,oy+(start.y+0.7)*cs);
 }
 const trail=[];
@@ -332,9 +353,9 @@ let qCell=-1;
 function showQ(i){
 qCell=i;
 const x=i%COLS,y=(i/COLS)|0;
-if(walls[i]){qbox.innerHTML='cell ('+x+','+y+') — wall';qbox.hidden=false;return;}
+if(walls[i]){qbox.textContent='cell ('+x+','+y+') — wall';qbox.hidden=false;return;}
 const names=['↓ down','↑ up','← left','→ right'];
-let html='<div class="qt">Q(' + x + ',' + y + ') · best = <b>'+names[0]+'</b></div>';
+let html='<div class="qt">Q(' + x + ',' + y + ') · greedy = <b>'+names[0]+'</b></div>';
 let ba=0,m=-Infinity;
 for(let a=0;a<NA;a++){const v=Q[i*NA+a];if(v>m){m=v;ba=a;}}
 html='<div class="qt">Q('+x+','+y+') · greedy = <b>'+names[ba].slice(2)+'</b></div>';
@@ -438,7 +459,7 @@ hEps.textContent=eps.toFixed(2);
 hBest.textContent=isFinite(best)?best.toFixed(2):'–';
 const recent=epReturns.slice(-20);
 const avg=recent.length?recent.reduce((a2,b2)=>a2+b2,0)/recent.length:0;
-hStat.textContent=paused?'paused':(episodes<3?'exploring: no goal found yet':(avg>best*0.9&&best>-0.5?'converged: recent returns within 10% of best':'training: mean return climbing')); }
+hStat.textContent=paused?'held':(episodes<3?'exploring: no goal found yet':(avg>best*0.9&&best>-0.5?'converged: recent returns within 10% of best':'training: mean return climbing')); }
 }
 loadHash();
 loadMap(mapName);
@@ -459,16 +480,5 @@ if(typeof fit==='function')fit();
 }));
 </script>
 <div id="toast"></div>
-<style>
-.qbox{position:absolute;top:10px;right:10px;background:#070d1eee;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:11px;min-width:210px;backdrop-filter:blur(4px)}
-.qbox .qt{color:var(--mut);letter-spacing:.08em;margin-bottom:6px}
-.qbox .qt b{color:var(--grn)}
-.qbox .qr{display:flex;align-items:center;gap:8px;margin:3px 0;color:#c4d4ee}
-.qbox .qr span{width:64px;flex:none}
-.qbox .qr i{display:block;height:5px;background:linear-gradient(90deg,var(--cyan),var(--vio));border-radius:3px;flex:1;max-width:90px}
-.qbox .qr em{font-style:normal;color:var(--mut);min-width:52px;text-align:right}
-.qbox .qr.hot{color:#fff}
-.qbox .qr.hot i{background:linear-gradient(90deg,var(--grn),#eafff2)}
-</style>
 </body>
 </html>
