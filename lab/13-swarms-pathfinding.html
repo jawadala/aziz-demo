@@ -13,16 +13,16 @@ html,body{height:100%}
 body{background:var(--onyx);color:var(--txt);font:13px/1.55 Georgia,'Times New Roman',serif;display:flex;flex-direction:column;overflow:hidden}
 header{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#14110c,#0a0908);flex-wrap:wrap;z-index:5}
 .gem{width:9px;height:9px;background:linear-gradient(135deg,#f0e2b8,#a8834a);transform:rotate(45deg);flex:none}
-.brand{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.brand{min-width:0;display:block;overflow:hidden}
 .brand .name{font:italic 700 19px Didot,'Bodoni MT','Playfair Display','Times New Roman',serif;color:var(--gold-hi);letter-spacing:.04em}
-.brand .sub{font:700 8px 'Courier New',monospace;letter-spacing:.34em;color:var(--dim);text-transform:uppercase}
+.brand .sub{font:700 8px 'Courier New',monospace;letter-spacing:.34em;color:var(--dim);text-transform:uppercase;text-overflow:ellipsis;max-width:60vw}
 .badge{font:700 9px 'Courier New',monospace;color:var(--gold);border:1px solid var(--line2);padding:4px 10px;letter-spacing:.3em;text-transform:uppercase;background:rgba(212,184,120,.05)}
 .tabs{margin-left:auto;display:flex;gap:2px}
 .tabs button{background:none;border:none;border-bottom:1px solid transparent;color:var(--dim);padding:6px 12px;cursor:pointer;font:700 9px 'Courier New',monospace;letter-spacing:.3em;text-transform:uppercase}
 .tabs button:hover{color:var(--gold)}
 .tabs button.on{color:var(--gold);border-bottom-color:var(--gold)}
 main{flex:1;display:grid;grid-template-columns:288px 1fr;min-height:0}
-aside{border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(20,17,12,.55),rgba(10,9,8,.25));padding:14px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+aside{border-right:1px solid var(--line);background:linear-gradient(180deg,#141109,#0a0908);padding:14px;overflow:auto;display:flex;flex-direction:column;gap:14px}
 .grp{border:1px solid var(--line);padding:12px;background:var(--panel);display:flex;flex-direction:column;gap:8px;position:relative}
 .grp::before{content:"";position:absolute;top:-1px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(240,226,184,.38),transparent)}
 .lab{font:700 8.5px 'Courier New',monospace;letter-spacing:.28em;color:var(--faint);text-transform:uppercase}
@@ -74,6 +74,13 @@ footer b{color:var(--gold)}
 #toast{position:fixed;left:50%;bottom:52px;transform:translateX(-50%);background:#141109;border:1px solid var(--gold);color:var(--gold-hi);padding:8px 16px;font:700 9px 'Courier New',monospace;letter-spacing:.26em;text-transform:uppercase;opacity:0;transition:opacity .25s;pointer-events:none;z-index:99}
 #toast.show{opacity:1}
 [hidden]{display:none!important}
+
+@media(max-width:900px){
+  aside{height:auto;max-height:none;overflow:visible}
+  .brand .name{display:block}
+  .brand .sub{display:block;max-width:100%;margin-top:2px}
+  footer{position:static}
+}
 </style>
 </head>
 <body>
