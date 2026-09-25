@@ -3,75 +3,87 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#05060f">
-<title>STUDY No. 15 · CELLULAR MUSIC</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='4' fill='%2305060f'/><rect x='3' y='3' width='4' height='4' fill='%234ade80'/><rect x='9' y='9' width='4' height='4' fill='%232fd6ff'/><rect x='9' y='3' width='4' height='4' fill='%23a78bfa'/></svg>">
+<meta name="theme-color" content="#0b0a08">
+<title>STUDY No. 15 · Cellular Music — JAWAD, Computational Studies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230b0a08'/><rect x='3' y='3' width='4' height='4' fill='%23c9a35c'/><rect x='9' y='9' width='4' height='4' fill='%238f7a4b'/></svg>">
 <style>
-:root{--bg:#05060f;--panel:#0a0e1e;--panel2:#0d1328;--line:#1b2340;--txt:#e8f2ff;--mut:#7f93b8;--cyan:#2fd6ff;--vio:#a78bfa;--grn:#4ade80}
+:root{--onyx:#0b0a08;--panel:rgba(19,16,12,.92);--line:rgba(201,163,92,.15);--line2:rgba(201,163,92,.32);--brass:#c9a35c;--brass-hi:#eed9a4;--brass-dim:rgba(201,163,92,.55);--txt:#eae2cf;--dim:#948b76;--faint:#665f4e}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:var(--bg);color:var(--txt);font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:flex;flex-direction:column;overflow:hidden}
-header{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0a0e1e,#05060f);flex-wrap:wrap;z-index:5}
-.brand{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:.14em;font-size:13px;white-space:nowrap}
-.logo{width:15px;height:15px;border-radius:4px;background:conic-gradient(from 210deg,var(--cyan),var(--vio),var(--grn),var(--cyan));box-shadow:0 0 14px #2fd6ff77;flex:none}
-.brand .sub{color:var(--mut);font-weight:400;letter-spacing:.08em;font-size:10px}
-.badge{font-size:10px;color:#051018;background:linear-gradient(90deg,var(--cyan),#7ee7ff);padding:2px 8px;border-radius:99px;font-weight:700;letter-spacing:.1em}
-.tabs{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
-.tabs button{background:var(--panel2);border:1px solid var(--line);color:var(--mut);padding:6px 12px;border-radius:8px;cursor:pointer;font:inherit;font-size:11px;letter-spacing:.1em}
-.tabs button.on{color:#051018;background:linear-gradient(90deg,var(--cyan),#7ee7ff);border-color:var(--cyan);font-weight:700}
-main{flex:1;display:grid;grid-template-columns:296px 1fr;min-height:0}
-aside{border-right:1px solid var(--line);background:var(--panel);padding:12px;overflow:auto;display:flex;flex-direction:column;gap:12px}
-.grp{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--panel2);display:flex;flex-direction:column;gap:7px}
-.lab{font-size:10px;letter-spacing:.14em;color:var(--mut)}
-.lab b{color:var(--cyan)}
+body{background:var(--onyx);color:var(--txt);font:13px/1.55 Georgia,'Times New Roman',serif;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#161209,#0b0a08);flex-wrap:wrap;z-index:5}
+.gem{width:9px;height:9px;background:linear-gradient(135deg,#eed9a4,#96773d);transform:rotate(45deg);flex:none}
+.brand{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.brand .name{font:italic 700 19px Didot,'Bodoni MT','Playfair Display','Times New Roman',serif;color:var(--brass-hi);letter-spacing:.04em}
+.brand .sub{font:700 8px 'Courier New',monospace;letter-spacing:.34em;color:var(--dim);text-transform:uppercase}
+.badge{font:700 9px 'Courier New',monospace;color:var(--brass);border:1px solid var(--line2);padding:4px 10px;letter-spacing:.3em;text-transform:uppercase;background:rgba(201,163,92,.05)}
+.tabs{margin-left:auto;display:flex;gap:2px}
+.tabs button{background:none;border:none;border-bottom:1px solid transparent;color:var(--dim);padding:6px 12px;cursor:pointer;font:700 9px 'Courier New',monospace;letter-spacing:.3em;text-transform:uppercase}
+.tabs button:hover{color:var(--brass)}
+.tabs button.on{color:var(--brass);border-bottom-color:var(--brass)}
+main{flex:1;display:grid;grid-template-columns:288px 1fr;min-height:0}
+aside{border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(22,18,9,.55),rgba(11,10,8,.25));padding:14px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.grp{border:1px solid var(--line);padding:12px;background:var(--panel);display:flex;flex-direction:column;gap:8px;position:relative}
+.grp::before{content:"";position:absolute;top:-1px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(238,217,164,.38),transparent)}
+.lab{font:700 8.5px 'Courier New',monospace;letter-spacing:.28em;color:var(--faint);text-transform:uppercase}
+.lab b{color:var(--brass);font-variant-numeric:tabular-nums}
 .lab.sm{margin-top:2px}
-.row{display:flex;gap:6px;flex-wrap:wrap}
-button{background:#111a38;border:1px solid var(--line);color:var(--txt);padding:7px 10px;border-radius:8px;cursor:pointer;font:inherit;font-size:11px;letter-spacing:.06em}
-button:hover{border-color:var(--cyan);color:#fff}
-button.pri{background:linear-gradient(90deg,#0e4a63,#0e6a63);border-color:var(--cyan);font-weight:700}
+.row{display:flex;gap:4px;flex-wrap:wrap}
+.row button{flex:1}
+button{background:transparent;border:1px solid var(--line);color:var(--dim);padding:7px 10px;cursor:pointer;font:700 9px 'Courier New',monospace;letter-spacing:.2em;text-transform:uppercase}
+button:hover{border-color:var(--brass-dim);color:var(--brass-hi)}
+button.pri{background:linear-gradient(180deg,#ecd8a2,#b18f4b);border-color:#96773d;color:#181205}
+button.pri:hover{color:#181205;filter:brightness(1.06)}
 button.wide{width:100%}
 select,input[type=range]{width:100%}
-select{background:#0a1024;border:1px solid var(--line);color:var(--txt);padding:6px;border-radius:8px;font:inherit;font-size:12px}
-input[type=range]{accent-color:var(--cyan);height:22px}
-input[type=checkbox]{accent-color:var(--grn);width:15px;height:15px}
+select{background:#151109;border:1px solid var(--line);color:var(--txt);padding:6px;font:12px Georgia,serif}
+input[type=range]{-webkit-appearance:none;appearance:none;height:16px;background:transparent;cursor:ew-resize}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--line2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height:8px;margin-top:-4px;background:linear-gradient(135deg,#eed9a4,#96773d);border:0;transform:rotate(45deg)}
+input[type=range]::-moz-range-track{height:1px;background:var(--line2)}
+input[type=range]::-moz-range-thumb{width:7px;height:7px;background:linear-gradient(135deg,#eed9a4,#96773d);border:0;border-radius:0;transform:rotate(45deg)}
+input[type=checkbox]{accent-color:#c9a35c;width:14px;height:14px}
 .ck{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--txt);cursor:pointer}
-.note{font-size:10px;color:var(--mut)}
-.stage{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;background:#04050c}
+.note{font:italic 11.5px/1.6 Georgia,serif;color:var(--dim)}
+.stage{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;background:#090806}
 canvas.view{flex:1;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
-.hud{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.stage::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;background:radial-gradient(120% 92% at 50% 42%,transparent 52%,rgba(0,0,0,.54) 100%)}
+.stage::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;opacity:.45;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E")}
+.hud{position:absolute;top:12px;left:14px;display:flex;flex-direction:column;gap:6px;pointer-events:none;z-index:3}
 .chiprow{display:flex;gap:6px;flex-wrap:wrap}
-.chip{background:#070d1ecc;border:1px solid var(--line);border-radius:7px;padding:3px 8px;font-size:10px;color:var(--mut);letter-spacing:.06em}
-.chip b{color:var(--cyan);font-size:11px}
-.chip b.g{color:var(--grn)} .chip b.v{color:var(--vio)}
-#spark1{background:#070d1ecc;border:1px solid var(--line);border-radius:7px;width:196px;height:38px}
-.hint{position:absolute;right:10px;bottom:8px;font-size:10px;color:#5c6f92;text-align:right;pointer-events:none}
-footer{padding:7px 14px;border-top:1px solid var(--line);color:var(--mut);font-size:10px;letter-spacing:.12em;display:flex;gap:8px;flex-wrap:wrap;background:#070a16}
-footer b{color:var(--cyan)}
-.doc{padding:22px;overflow:auto;max-width:900px}
-.doc h2{color:var(--cyan);letter-spacing:.16em;font-size:15px;margin:18px 0 8px}
-.doc h2:first-child{margin-top:0}
-.doc h3{color:var(--vio);font-size:12px;letter-spacing:.12em;margin:14px 0 6px}
-.doc p,.doc li{color:#c4d4ee;font-size:13px}
+.chip{background:rgba(14,11,7,.78);border:1px solid var(--line);padding:4px 9px;font:700 8.5px 'Courier New',monospace;color:var(--faint);letter-spacing:.22em}
+.chip b{color:var(--brass);font-size:11px;font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.chip b.g{color:var(--brass-hi)} .chip b.v{color:#d3b980}
+#spark1{background:rgba(14,11,7,.78);border:1px solid var(--line);width:196px;height:38px}
+.hint{position:absolute;right:14px;bottom:10px;font:700 8.5px/1.9 'Courier New',monospace;color:var(--faint);letter-spacing:.18em;text-align:right;pointer-events:none;z-index:3;text-transform:uppercase}
+footer{padding:9px 18px;border-top:1px solid var(--line);color:var(--faint);font:700 8.5px 'Courier New',monospace;letter-spacing:.3em;text-transform:uppercase;display:flex;gap:10px;flex-wrap:wrap;background:#0e0c08}
+footer b{color:var(--brass)}
+.doc{padding:30px;overflow:auto;max-width:860px}
+.doc h2{font:italic 400 26px Didot,'Bodoni MT','Playfair Display',Georgia,serif;color:var(--brass-hi);letter-spacing:.02em;margin:6px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.doc h3{font:700 9px 'Courier New',monospace;letter-spacing:.32em;color:var(--brass);margin:22px 0 8px;text-transform:uppercase}
+.doc p,.doc li{font:14px/1.75 Georgia,serif;color:#b6ad97}
+.doc b{color:var(--brass-hi);font-weight:400}
 .doc ul{margin:6px 0 6px 18px}
-.doc .f{background:#070d1f;border:1px solid var(--line);border-left:3px solid var(--grn);border-radius:8px;padding:10px 12px;margin:8px 0;font-size:13px;color:#d9ffe9;overflow-x:auto;white-space:pre}
-.doc table{border-collapse:collapse;margin:8px 0;font-size:12px}
-.doc td,.doc th{border:1px solid var(--line);padding:5px 9px;text-align:left}
-.doc th{color:var(--mut);letter-spacing:.1em;font-weight:400;font-size:10px}
-.doc td k{color:var(--grn);font-style:normal}
+.doc .f{font:12.5px/2 'Courier New',monospace;color:var(--brass);background:rgba(201,163,92,.05);border:1px solid var(--line);border-left:2px solid var(--brass);padding:11px 14px;margin:10px 0;overflow-x:auto;white-space:pre}
+.doc table{border-collapse:collapse;margin:10px 0;font-size:12.5px}
+.doc td,.doc th{border:1px solid var(--line);padding:5px 10px;text-align:left;color:#b6ad97}
+.doc th{color:var(--faint);font:700 8.5px 'Courier New',monospace;letter-spacing:.24em;text-transform:uppercase}
+.doc td k{color:var(--brass);font-style:normal;font-family:'Courier New',monospace;font-size:11px}
 @media(max-width:880px){main{grid-template-columns:1fr;grid-template-rows:minmax(320px,52vh) minmax(0,1fr)}aside{order:2;border-right:0;border-top:1px solid var(--line)}}
-#toast{position:fixed;left:50%;bottom:52px;transform:translateX(-50%);background:#0c2a24;border:1px solid var(--grn);color:#c9ffe2;padding:8px 16px;border-radius:9px;font-size:11px;letter-spacing:.1em;opacity:0;transition:opacity .25s;pointer-events:none;z-index:99}
+#toast{position:fixed;left:50%;bottom:52px;transform:translateX(-50%);background:#171205;border:1px solid var(--brass);color:var(--brass-hi);padding:8px 16px;font:700 9px 'Courier New',monospace;letter-spacing:.26em;text-transform:uppercase;opacity:0;transition:opacity .25s;pointer-events:none;z-index:99}
 #toast.show{opacity:1}
 [hidden]{display:none!important}
 </style>
 </head>
 <body>
 <header>
-<div class="brand"><span class="logo"></span>SYSTEMS LABORATORY <span class="sub">/ COMPUTATIONAL STUDIES</span></div>
+<span class="gem"></span>
+<div class="brand"><span class="name">JAWAD</span><span class="sub">Systems Laboratory · Computational Studies</span></div>
 <span class="badge">STUDY No. 15 · CELLULAR MUSIC</span>
 <nav class="tabs">
-<button data-tab="viz" class="on">DEMO</button>
-<button data-tab="concept">CONCEPT</button>
-<button data-tab="about">NOTES</button>
+<button data-tab="viz" class="on">PLATE</button>
+<button data-tab="concept">NOTES</button>
+<button data-tab="about">RECORD</button>
 </nav>
 </header>
 <main>
@@ -108,7 +120,7 @@ footer b{color:var(--cyan)}
 <div class="row">
 <button id="bPlay" class="pri">PAUSE</button>
 <button id="bStep">STEP</button>
-<button id="bMute">🔊 ON</button>
+<button id="bMute">SOUND ON</button>
 </div>
 <div class="row">
 <button id="bSoup">SOUP</button>
@@ -123,7 +135,7 @@ footer b{color:var(--cyan)}
 </div>
 <div class="grp">
 <div class="lab">HOW IT SINGS</div>
-<div class="note">each simulation tick = one beat. rows are the 8 pitch lanes shown on the left edge. every cell born in a column plays that lane's note — dense columns ring as chords. paint cells with your finger to play the grid like an instrument.</div>
+<div class="note">each simulation tick is one beat. rows fall into the eight pitch lanes marked on the left edge; every cell born in a column sounds its lane's note — dense columns ring as chords. paint cells with your finger to play the grid like an instrument.</div>
 </div>
 </aside>
 <div class="stage" id="stage">
@@ -139,14 +151,14 @@ footer b{color:var(--cyan)}
 <canvas id="spark1" width="392" height="76"></canvas>
 <div class="chip"><span id="hStat">running</span></div>
 </div>
-<div class="hint">drag = paint / erase cells (each birth plays its pitch)<br>SPACE pause · N step · C clear · G gliders · M mute · 1-4 rules</div>
+<div class="hint">drag = paint / erase cells (each birth sounds its pitch)<br>space pause · n step · c clear · g gliders · m mute · 1-4 rules</div>
 </div>
 </main>
 <section id="tab-concept" class="doc" hidden>
-<h2>CELLULAR AUTOMATON SONIFICATION</h2>
+<h2>Cellular Automaton Sonification</h2>
 <p>The grid runs a cellular automaton. Each tick: count neighbours, apply the rulebook, swap buffers. Sonification is deterministic: birth = note, column = beat, row = pitch. No random generators in the audio path.</p>
 <h3>1 · THE RULE</h3>
-<p>Each cell counts its 8 neighbours. The rulebook, written <b>B3/S23</b>, lists birth counts (dead cell with those counts turns on) and survival counts (live cell with those counts stays on):</p>
+<p>Each cell counts its 8 neighbours. The rulebook, written <b>B3/S23</b>, lists birth counts (a dead cell with those counts turns on) and survival counts (a live cell with those counts stays on):</p>
 <div class="f">n(x,y) = Σ  alive(x+dx, y+dy)   over the 8 neighbours
 next(x,y) = n ∈ B ? 1 : ( alive(x,y) && n ∈ S ? 1 : 0 )</div>
 <p>Four rulebooks, one machine:</p>
@@ -162,7 +174,7 @@ next(x,y) = n ∈ B ? 1 : ( alive(x,y) && n ∈ S ? 1 : 0 )</div>
 <div class="f">lane(r)  = ⌊ r · 8 / rows ⌋                    (top = highest degree)
 f(lane)  = 220 Hz · 2^( degree(lane) / 12 )     (A-based, octaves folded)
 beat k   = column k · (cols / 8)                (left → right, wraps)</div>
-<p>Per tick, each of the 8 voice columns checks for births; each birth plays its lane's note, 220-300 ms pluck. Simultaneous births sound together.</p>
+<p>Per tick, each of the 8 voice columns checks for births; each birth sounds its lane's note, a 220–300 ms pluck. Simultaneous births sound together.</p>
 <h3>3 · THE ENVELOPE</h3>
 <div class="f">gain(t) = e^( −t/τ )  after a 5 ms attack ramp     τ ≈ 80 ms
 osc → lowpass (saw/square) → master (−14 dB headroom)</div>
@@ -172,24 +184,26 @@ osc → lowpass (saw/square) → master (−14 dB headroom)</div>
 <li><b>Pattern-to-structure mapping:</b> gliders repeat a pitch sequence per column-crossing; oscillators become repeating rhythm; still lifes hold a constant note or silence.</li>
 <li><b>Rule changes texture:</b> Seeds gives short percussive events; Life gives sparse sustained notes; Day &amp; Night gives dense clusters.</li>
 </ul>
+<h3>5 · THE FINISH</h3>
+<p>Cells are stamped as burnished metal: newborn cells flash pale brass, age through the mid tones, and settle into dark oxide. The beat leaves a faint wash down its voice column; the sounding lane glows once and fades.</p>
 </section>
 <section id="tab-about" class="doc" hidden>
-<h2>BUILD RECORD</h2>
-<p>Single self-contained HTML file. No frameworks, CDNs, fonts, samples. Synth: raw WebAudio; composer: byte-grid automaton.</p>
+<h2>Build Record</h2>
+<p>Single self-contained sheet. No frameworks, no fonts, no samples. Synth: raw WebAudio; composer: byte-grid automaton.</p>
 <h3>ENGINEERING NOTES</h3>
 <ul>
 <li>Boards: two <b>Uint8Array</b>s, double-buffered; neighbour counts per tick, edge wrapping (torus) or hard borders.</li>
-<li>Audio per tick: births spawn <b>oscillator + gain</b> voices with exponential decay; GC after release. Master at −14 dB. AudioContext on first gesture.</li>
+<li>Audio per tick: births spawn <b>oscillator + gain</b> voices with exponential decay; collected after release. Master at −14 dB. AudioContext on first gesture.</li>
 <li>Timing: fixed-step accumulator; tempo changes beat length, frame-rate independent.</li>
-<li>Rendering: one canvas; age-coloured batched rects; per-column birth flashes; 8 lane markers.</li>
-<li>Presets: SOUP (30% Bernoulli), GLIDERS, PUDDLES, CLEAR. Pointer paints; painted births play.</li>
+<li>Rendering: one canvas; age-toned batched rects; per-column birth flashes; 8 lane markers.</li>
+<li>Presets: SOUP (30% Bernoulli), GLIDERS, PUDDLES, CLEAR. Pointer paints; painted births sound.</li>
 <li><b>State sharing:</b> rule + scale + voice + tempo + pattern RLE-encoded into the URL hash. Reload restores the exact state.</li>
 <li><b>Reduced motion:</b> autoplay disabled; static frame; STEP advances.</li>
 </ul>
 <h3>CONTROLS</h3>
 <table>
 <tr><th>INPUT</th><th>ACTION</th></tr>
-<tr><td><k>drag</k></td><td>paint cells (births play their pitch); drag on a live cell erases</td></tr>
+<tr><td><k>drag</k></td><td>paint cells (births sound their pitch); drag on a live cell erases</td></tr>
 <tr><td><k>SPACE</k></td><td>pause / resume the sequencer</td></tr>
 <tr><td><k>N</k></td><td>single step</td></tr>
 <tr><td><k>C</k></td><td>clear board</td></tr>
@@ -198,12 +212,10 @@ osc → lowpass (saw/square) → master (−14 dB headroom)</div>
 <tr><td><k>1 / 2 / 3 / 4</k></td><td>Life / HighLife / Seeds / Day &amp; Night</td></tr>
 <tr><td><k>+</k> / <k>−</k></td><td>tempo up / down</td></tr>
 </table>
-<h3>SOURCES</h3>
-<p>Gardner, Scientific American 223(4):120, 1970 (Life B3/S23). Sonification per algorithmic composition; W3C WebAudio.</p>
-<h3>PERF</h3>
-<p>One tick: 1232 neighbour votes. One beat: max 12 oscillators. A few hundred fillRects/frame. 60 fps on phones.</p>
+<h3>PERFORMANCE</h3>
+<p>One tick: 1,232 neighbour votes. One beat: at most 12 oscillator voices. A few hundred painted cells per frame; 60 fps on modest hardware.</p>
 </section>
-<footer><b>SYSTEMS LABORATORY</b> · COMPUTATIONAL STUDIES · STUDY No. 15 · cellular music · single file · zero dependencies</footer>
+<footer><b>JAWAD — SYSTEMS LABORATORY</b><span>STUDY No. 15 · CELLULAR MUSIC</span><span>COMPUTATIONAL STUDIES</span><span>SINGLE FILE</span></footer>
 <script>
 'use strict';
 window.__errors__=[];addEventListener('error',e=>window.__errors__.push(String(e&&e.message||e)));
@@ -300,35 +312,34 @@ let cw=10,ox=0,oy=0;
 const flash=new Float32Array(COLS);
 function fit(){const r=stage.getBoundingClientRect();cv.width=Math.max(2,(r.width*dpr)|0);cv.height=Math.max(2,(r.height*dpr)|0);draw();}
 new ResizeObserver(fit).observe(stage);
+/* brass age ramp: fresh pale, aged dark oxide */
+const AGECOLS=['#eed9a4','#dbba74','#c9a35c','#96773d','#6b5426','#4a3a1a','#37301c','#2c2717'];
 function draw(now){
 const W=cv.width/dpr,H=cv.height/dpr;
 ctx.setTransform(dpr,0,0,dpr,0,0);
-ctx.fillStyle='#04050c';ctx.fillRect(0,0,W,H);
+ctx.fillStyle='#090806';ctx.fillRect(0,0,W,H);
 cw=Math.min(W/COLS,H/ROWS);ox=(W-cw*COLS)/2;oy=(H-cw*ROWS)/2;
 for(let l=0;l<LANES;l++){
 const ly=oy+((LANES-1-l)+0.5)*(ROWS/LANES)*cw;
-ctx.fillStyle='rgba(127,147,184,0.5)';
+ctx.fillStyle='rgba(201,163,92,0.5)';
 ctx.fillRect(ox-14,ly-1,8,2);
 }
 for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
 const i=idx(x,y);
 if(!cur[i])continue;
 const a=Math.min(1,age[i]/14);
-if(a<0.25)ctx.fillStyle='#eafff2';
-else if(a<0.6)ctx.fillStyle='#4ade80';
-else if(a<0.9)ctx.fillStyle='#2fd6ff';
-else ctx.fillStyle='#3d5ea8';
+ctx.fillStyle=AGECOLS[Math.min(AGECOLS.length-1,(a*AGECOLS.length)|0)];
 ctx.fillRect(ox+x*cw+0.5,oy+y*cw+0.5,cw-1,cw-1);
 }
-for(let x=0;x<COLS;x++)if(flash[x]>0.02){ctx.fillStyle=`rgba(47,214,255,${(flash[x]*0.10).toFixed(3)})`;ctx.fillRect(ox+x*cw,oy,cw,cw*ROWS);}
+for(let x=0;x<COLS;x++)if(flash[x]>0.02){ctx.fillStyle=`rgba(238,217,164,${(flash[x]*0.10).toFixed(3)})`;ctx.fillRect(ox+x*cw,oy,cw,cw*ROWS);}
 const laneH=ROWS/LANES*cw;
 for(let l=0;l<LANES;l++){
 const ly=oy+(LANES-1-l)*laneH;
-if(glowLane[l]>0.02){ctx.fillStyle=`rgba(167,139,250,${(glowLane[l]*0.18).toFixed(3)})`;ctx.fillRect(ox,ly,cw*COLS,laneH);}
+if(glowLane[l]>0.02){ctx.fillStyle=`rgba(201,163,92,${(glowLane[l]*0.18).toFixed(3)})`;ctx.fillRect(ox,ly,cw*COLS,laneH);}
 }
 const vc=lastVoiceCol;
-if(vc>=0){const bx=ox+vc*(cw*COLS/8);ctx.fillStyle='rgba(74,222,128,0.10)';ctx.fillRect(bx,oy,cw*COLS/8,cw*ROWS);}
-ctx.strokeStyle='rgba(127,147,184,0.05)';ctx.lineWidth=1;ctx.beginPath();
+if(vc>=0){const bx=ox+vc*(cw*COLS/8);ctx.fillStyle='rgba(150,119,61,0.10)';ctx.fillRect(bx,oy,cw*COLS/8,cw*ROWS);}
+ctx.strokeStyle='rgba(201,163,92,0.05)';ctx.lineWidth=1;ctx.beginPath();
 for(let x=0;x<=COLS;x+=4){ctx.moveTo(ox+x*cw,oy);ctx.lineTo(ox+x*cw,oy+ROWS*cw);}
 ctx.stroke();
 }
@@ -356,10 +367,10 @@ draw(){const c=this.c,w=this.cv.width,h=this.cv.height;c.clearRect(0,0,w,h);
 if(this.d.length<2)return;let mn=Infinity,mx=-Infinity;
 for(const v of this.d){if(v<mn)mn=v;if(v>mx)mx=v;}
 if(mx-mn<1e-9)mx=mn+1;
-c.strokeStyle=this.color;c.lineWidth=2.5;c.beginPath();
+c.strokeStyle=this.color;c.lineWidth=2;c.beginPath();
 for(let i=0;i<this.d.length;i++){const x=i/(this.cap-1)*w,y=h-5-((this.d[i]-mn)/(mx-mn))*(h-10);i?c.lineTo(x,y):c.moveTo(x,y);}
 c.stroke();}}
-const spark1=new Spark($('#spark1'),'#a78bfa');
+const spark1=new Spark($('#spark1'),'#c9a35c');
 let hudAcc=0,sparkAcc=0,lastT=performance.now(),fpsV=60;
 const elRule=$('#rule'),elScale=$('#scale'),elWave=$('#wave'),elBpm=$('#bpm'),elWrap=$('#wrap');
 elRule.onchange=()=>{rule=elRule.value;};
@@ -370,7 +381,7 @@ const bPlay=$('#bPlay');
 bPlay.onclick=()=>{running=!running;bPlay.textContent=running?'PAUSE':'PLAY';};
 $('#bStep').onclick=()=>{beat();};
 const bMute=$('#bMute');
-bMute.onclick=()=>{muted=!muted;bMute.textContent=muted?'🔇 OFF':'🔊 ON';mutedChip.querySelector?0:0;$('#hMute').textContent=muted?'OFF':'ON';};
+bMute.onclick=()=>{muted=!muted;bMute.textContent=muted?'SOUND OFF':'SOUND ON';mutedChip.querySelector?0:0;$('#hMute').textContent=muted?'OFF':'ON';};
 $('#bSoup').onclick=()=>{soup();};
 $('#bGliders').onclick=()=>{gliders();};
 $('#bPuddles').onclick=()=>{puddles();};
