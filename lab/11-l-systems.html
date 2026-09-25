@@ -1,0 +1,250 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b0a08"><meta name="description" content="STYDYS No. 11. L-system specimen on a gilded turntable: drag to turn, wheel to tilt. Single file, no network."><title>STYDYS No. 11 — Encre — JAWAD</title>
+<style>
+:root{--bg:#0b0a08;--pan:#12100d;--gold:#c9a25e;--goldb:#e6cfa0;--goldd:#8f7238;--ink:#eae4d4;--faint:#867e6b;--line:rgba(201,162,94,.30);--line2:rgba(201,162,94,.14)}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:14px/1.55 Georgia,'Times New Roman',serif;display:flex;flex-direction:column;min-height:100dvh}
+button,select,input,textarea,kbd,.lb,.org,.spec,#keys,footer,#st,.step b{font-family:"Courier New",ui-monospace,Menlo,monospace}
+main{flex:1;display:flex;min-height:0}
+#stage{flex:1;position:relative;min-width:0;min-height:44dvh;background:radial-gradient(ellipse at 50% 38%,#171410 0%,#0b0a08 68%)}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+#hud{position:absolute;bottom:12px;right:16px;font:italic 11px/1.7 Georgia,serif;color:var(--faint);pointer-events:none;white-space:pre;text-align:right}
+#toast{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(18,16,13,.96);border:1px solid var(--gold);color:var(--goldb);padding:7px 14px;font:700 10px "Courier New",monospace;letter-spacing:.16em;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9}
+#wm{position:absolute;top:24px;left:28px;border-left:1px solid var(--line);padding:2px 0 4px 16px;z-index:6;pointer-events:none}
+#wm .org{font-weight:700;font-size:9px;letter-spacing:.34em;color:var(--goldd)}
+#wm h1{font:italic 700 40px/1 Didot,'Bodoni MT','Playfair Display','Times New Roman',serif;margin:8px 0 2px;color:var(--ink)}
+#wm .no{font:700 11px/1 "Courier New",monospace;letter-spacing:.42em;color:var(--gold)}
+.spec{position:absolute;top:26px;right:28px;text-align:right;font-size:9px;line-height:2;letter-spacing:.22em;color:var(--faint);z-index:6;pointer-events:none}
+#keys{position:absolute;bottom:12px;left:28px;font-weight:700;font-size:8.5px;line-height:2;letter-spacing:.18em;color:var(--faint);z-index:6;pointer-events:none}
+#panel{width:302px;border-left:1px solid var(--line2);padding:14px;overflow:auto;background:linear-gradient(180deg,var(--pan),#0e0d0a);display:flex;flex-direction:column;gap:11px}
+.lb{display:flex;flex-direction:column;gap:4px;font-size:8.5px;color:var(--goldd);letter-spacing:.26em;font-weight:700}
+.lb b{color:var(--goldb);font-variant-numeric:tabular-nums;text-align:right;font-size:12px}
+.row{display:flex;align-items:center;gap:8px}
+.row label{flex:1;letter-spacing:.22em;font-size:8.5px;color:var(--goldd);font-weight:700}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:18px;height:18px;padding:0;line-height:1;background:transparent;border:1px solid var(--line);color:var(--gold);font:700 11px "Courier New",monospace;cursor:pointer}
+.step button:hover{background:var(--gold);color:#141310}
+.step b{font-weight:700;font-size:12px;min-width:36px;text-align:center;color:var(--goldb)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:14px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--line2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;background:var(--gold);border:1px solid #141310;margin-top:-5px}
+input[type=range]::-moz-range-track{height:1px;background:var(--line2)}
+input[type=range]::-moz-range-thumb{width:8px;height:8px;background:var(--gold);border:1px solid #141310;border-radius:0}
+input[type=text],textarea{background:#0c0b09;color:var(--goldb);border:1px solid var(--line2);padding:6px 8px;font:12px "Courier New",monospace;width:100%}
+textarea{resize:vertical;min-height:60px}
+select,button{background:transparent;color:var(--ink);border:1px solid var(--line);padding:6px 9px;font-weight:700;font-size:10px;letter-spacing:.14em;cursor:pointer}
+select:hover,button:hover{border-color:var(--gold);color:var(--goldb)}
+button.on{background:var(--gold);color:#141310;border-color:var(--gold)}
+button.sec{border-style:dashed}
+.btns{display:flex;flex-wrap:wrap;gap:7px}
+.chk{display:flex;align-items:center;gap:9px;font-size:9px;letter-spacing:.2em;font-weight:700;color:var(--faint);cursor:pointer;user-select:none}
+.chk input{-webkit-appearance:none;appearance:none;width:26px;height:14px;border:1px solid var(--line);background:transparent;position:relative;cursor:pointer;margin:0}
+.chk input::after{content:"";position:absolute;top:2px;left:2px;width:8px;height:8px;background:var(--goldd)}
+.chk input.on{border-color:var(--gold)}
+.chk input.on::after{left:14px;background:var(--gold)}
+.chk i{font-style:normal}
+.chk:hover{color:var(--gold)}
+nav#tabs{display:flex;border-top:1px solid var(--line2);background:var(--pan);position:relative;z-index:8}
+#tabs button{border:0;border-right:1px solid var(--line2);background:transparent;color:var(--faint);padding:10px 22px;font-size:10px;letter-spacing:.26em}
+#tabs button.on{color:var(--goldb);border-bottom:1px solid var(--gold)}
+.pane{display:none;background:var(--pan);border:1px solid var(--line2);margin:20px 30px 22px;max-width:730px;padding:6px 28px 22px;font-size:13.5px}
+.pane.show{display:block}
+.pane h3{font-size:9.5px;font-weight:700;letter-spacing:.3em;color:var(--gold);margin:16px 0 7px}
+.pane p{margin:7px 0;color:#cfc8b6}
+.pane b{color:var(--goldb)}
+.pane .m{display:block;font-size:12px;background:#0c0b09;border:1px solid var(--line2);padding:8px 11px;margin:9px 0;overflow-x:auto;white-space:nowrap;color:var(--goldb)}
+.pane ul{padding-left:18px}
+.pane li{margin:3px 0;color:#cfc8b6}
+kbd{border:1px solid var(--line);padding:0 5px;font-weight:700;font-size:10px;color:var(--goldb)}
+footer{border-top:1px solid var(--line2);padding:9px 30px;font-weight:700;font-size:8.5px;letter-spacing:.3em;color:var(--goldd);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;position:relative;z-index:8}
+.vig{position:absolute;inset:0;pointer-events:none;z-index:30;background:radial-gradient(ellipse at 50% 40%,transparent 44%,rgba(0,0,0,.5) 100%)}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:40;opacity:.42;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E")}
+@media(max-width:840px){main{flex-direction:column}#panel{width:auto;border-left:0;border-top:1px solid var(--line2);max-height:46dvh}#stage{min-height:42dvh}.spec{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<main>
+<div id="stage"><canvas id="c"></canvas><div id="hud"></div><div id="toast"></div>
+<header id="wm">
+<div class="org">JAWAD · SYSTEMS LABORATORY</div>
+<h1>Encre</h1>
+<div class="no">STYDYS No. 11</div>
+</header>
+<div class="spec">L-SYSTEM GRAMMAR · TURTLE NIB<br>DRAG = TURN THE PRESSED PLATE<br>AUTO-TURN AFTER 3.2 S IDLE</div>
+<div id="keys">SPACE HALT/RESUME · G GROW · R RESET · N SHUFFLE · E PANEL<br>[ ] GENERATIONS · 1-0 SPECIMENS · WHEEL = TILT</div>
+<span id="st" style="position:absolute;top:12px;right:28px;font-weight:700;font-size:9px;letter-spacing:.18em;color:#c9a25e;z-index:6;pointer-events:none">booting</span>
+<div class="vig"></div>
+</div>
+<div id="panel">
+<label class="lb">SPECIMEN<select id="preset">
+<option value="plant">PLANT — BRACKETING WEED</option><option value="bush">BUSH</option><option value="bramble">BRAMBLE</option>
+<option value="tree">TREE</option><option value="seaweed">SEAWEED FAN</option><option value="dragon">DRAGON CURVE</option>
+<option value="koch">KOCH SNOWFLAKE</option><option value="sierpinski">SIERPINSKI TRIANGLE</option>
+<option value="hilbert">HILBERT CURVE</option><option value="levy">LEVY C-CURVE</option>
+</select></label>
+<label class="lb">AXIOM<input id="ax" type="text" spellcheck="false" autocomplete="off"></label>
+<label class="lb">SUCCESSION — ONE PER LINE, SYMBOL=REPLACEMENT<textarea id="rl" rows="4" spellcheck="false" autocomplete="off"></textarea></label>
+<div class="row"><label>GENERATIONS</label><span class="step"><button id="iD" type="button">−</button><b id="itv">5</b><button id="iU" type="button">+</button></span><input id="it" type="range" min="1" max="8" value="5"></div>
+<div class="row"><label>ANGLE δ</label><span class="step"><button id="nD" type="button">−</button><b id="anv">22.5</b><button id="nU" type="button">+</button></span><input id="an" type="range" min="2" max="120" step="0.5" value="22.5"></div>
+<div class="row"><label>MAGNIFY</label><input id="zm" type="range" min="0.4" max="3" step="0.05" value="1"><b class="lb" style="flex-direction:row"><b id="zmv">1.0</b></b></div>
+<div class="row"><label>NIB</label><input id="w" type="range" min="0.4" max="5" step="0.1" value="1.6"><b class="lb" style="flex-direction:row"><b id="wv">1.6</b></b></div>
+<div class="row"><label>METAL TINT</label><input id="h" type="range" min="0" max="359" value="44"><b class="lb" style="flex-direction:row"><b id="hv">44</b></b></div>
+<label class="chk"><input id="bl" type="checkbox" checked class="on"><i>TIP BLOOM</i></label>
+<div class="btns">
+<button id="gw">GROW</button><button id="pz">HALT</button><button id="rs">RESET</button><button id="rn" class="sec">SHUFFLE</button><button id="cp" title="copy state link">LINK</button>
+</div>
+<span class="lb" style="letter-spacing:.1em">EDIT AXIOM OR RULES — GRAMMAR REBUILDS LIVE.</span>
+</div>
+</main>
+<nav id="tabs"><button class="tab on" data-t="c">FIELD NOTES</button><button class="tab" data-t="a">SERVICE DATA</button></nav>
+<section id="pane-c" class="pane show">
+<h3>PRINCIPLE</h3>
+<p>A plant is a <b>sentence</b>. Small alphabet, start word, a handful of rewrite rules; the string replaces itself generation by generation. The turtle reads the final word with a nib. Iteration depth plays the role of time. Nothing is drawn until the language stops expanding.</p>
+<h3>FORMULATION</h3>
+<p>A grammar is the tuple <span class="m">G = (V, ω, P, δ)</span></p>
+<ul>
+<li><b>V</b> — alphabet (F, X, +, −, [, ] …)</li>
+<li><b>ω</b> — axiom, the starting string, e.g. <span class="m">X</span></li>
+<li><b>P</b> — productions: <span class="m">X → F+[[X]−X]−F[−FX]+X</span>, applied to every symbol in parallel each generation</li>
+<li><b>δ</b> — the turn angle applied to + and −</li>
+</ul>
+<p>One generation rewrites every symbol simultaneously: <span class="m">ω ⇒ g₁ ⇒ g₂ ⇒ … ⇒ g_n</span>. Symbols with no production survive untouched — leaves (X) mark spots for future growth while wood (F) accumulates behind them.</p>
+<p>The turtle carries a state <span class="m">(x, y, α)</span>:</p>
+<div class="m">F : (x,y) → (x + L·cos α, y + L·sin α)  — draw
++ : α ← α + δ        − : α ← α − δ
+[ : push state       ] : pop state</div>
+<p>Brackets give the turtle a <b>memory of the branch point</b>; one string encodes an entire tree topology. The finished sheet is mounted on a tilted turntable — drag turns it, the wheel tilts it. Strokes pale and thin by bracket depth: trunk dark and wide, twigs bright and fine. Space-filling curves are plants with no brackets.</p>
+</section>
+<section id="pane-a" class="pane">
+<h3>SERVICE DATA</h3>
+<ul>
+<li>Single file. No dependencies, no fonts, no images, no network calls.</li>
+<li>Deterministic parallel string rewriting, plain JS. Turtle walk emits segments bucketed by bracket depth.</li>
+<li>Pseudo-3D: planar rotation plus tilt projection, ordered by depth bucket.</li>
+<li>Renderer batches one canvas path per depth level — 50k+ segments stroke in a few draw calls.</li>
+<li>Growth reveals segments in depth order: trunk before twigs. Auto-turn after 3.2 s idle.</li>
+<li>Auto-fit: turtle bounding box mapped to viewport; MAGNIFY multiplies on top.</li>
+<li>Editors are live; state persists in the URL hash via <b>LINK</b>, turntable included.</li>
+<li>String and segment caps with a notice keep hostile rule sets from locking a tab.</li>
+<li><b>prefers-reduced-motion</b> skips the growth animation and shows the full specimen.</li>
+</ul>
+<h3>KEYS</h3>
+<ul>
+<li><kbd>SPACE</kbd> halt / resume · <kbd>G</kbd> re-grow · <kbd>R</kbd> reset · <kbd>N</kbd> shuffle · <kbd>E</kbd> panel</li>
+<li><kbd>[</kbd> / <kbd>]</kbd> fewer / more generations · <kbd>1</kbd>–<kbd>9</kbd>,<kbd>0</kbd> specimens</li>
+</ul>
+<h3>PROVENANCE</h3>
+<p>STYDYS plate No. 11. Concept, code, press work: JAWAD.</p>
+</section>
+<footer><span>JAWAD · SYSTEMS LABORATORY</span><span>STYDYS No. 11 · SINGLE FILE · NO NETWORK</span></footer>
+<div class="grain"></div>
+<script>
+addEventListener('error',e=>{window.__err=(window.__err||[]).concat(String(e.message))});
+const $=i=>document.getElementById(i),cv=$('c'),X=cv.getContext('2d'),st=$('st'),hud=$('hud');
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W=0,H=0;
+function size(){const d=Math.min(devicePixelRatio||1,2);W=cv.clientWidth||innerWidth;H=cv.clientHeight||innerHeight;cv.width=Math.round(W*d);cv.height=Math.round(H*d);X.setTransform(d,0,0,d,0,0);dirty=true}
+const PRESETS={
+plant:{ax:'X',rl:'X=F+[[X]-X]-F[-FX]+X\nF=FF',an:22.5,it:5,cap:6,draw:'F'},
+bush:{ax:'X',rl:'X=F[+X][-X]+X\nF=FF',an:20.5,it:6,cap:7,draw:'F'},
+bramble:{ax:'X',rl:'X=F[+X]F[-X]+X\nF=FF',an:25,it:6,cap:7,draw:'F'},
+tree:{ax:'F',rl:'F=F[+F]F[-F]F',an:25.7,it:5,cap:8,draw:'F'},
+seaweed:{ax:'F',rl:'F=FF-[-F+F+F]+[+F-F-F]',an:22.5,it:4,cap:5,draw:'F'},
+dragon:{ax:'X',rl:'X=X+YF+\nY=-FX-Y',an:90,it:11,cap:14,draw:'F'},
+koch:{ax:'F++F++F',rl:'F=F-F++F-F',an:60,it:4,cap:6,draw:'F'},
+sierpinski:{ax:'A',rl:'A=B-A-B\nB=A+B+A',an:60,it:7,cap:9,draw:'AB'},
+hilbert:{ax:'A',rl:'A=-BF+AFA+FB-\nB=+AF-BFB-FA+',an:90,it:5,cap:6,draw:'F'},
+levy:{ax:'F',rl:'F=+F--F+',an:45,it:12,cap:15,draw:'F'}};
+const ORDER=['plant','bush','bramble','tree','seaweed','dragon','koch','sierpinski','hilbert','levy'];
+const CAP_STR=260000,CAP_SEG=130000;
+let preset='plant',axiom='X',rules={},drawSet=new Set(['F']),angle=22.5,iter=5,zoom=1,lw=1.6,hue=44,bloom=true;
+let segsByD=[],dots=[],mnx=0,mny=0,mxx=1,mxy=1,segTotal=0,strLen=0,maxD=0;
+let grow=0,paused=false,dirty=true,anim=true;
+let rot=.35,tilt=.34,vro=0,dragT=null,idleT=0;
+function P2(x,y){const sx=x*Math.cos(rot);const sy=y*Math.cos(tilt)-x*Math.sin(rot)*Math.sin(tilt);return[sx,sy]}
+function parseRules(txt){const r={};for(const ln of txt.split(/\n+/)){const m=/^\s*([A-Za-z])\s*=\s*(.+?)\s*$/.exec(ln);if(m)r[m[1]]=m[2]}return r}
+function expand(){let s=axiom;const rs=rules;for(let g=0;g<iter;g++){let o='';for(let i=0;i<s.length;i++){const ch=s[i];o+=(rs[ch]!==undefined?rs[ch]:ch);if(o.length>CAP_STR){toast('string cap hit — lowering iterations is wise');return o}}s=o}return s}
+function walk(s){segsByD=[];dots=[];let x=0,y=0,a=-Math.PI/2,d=0;const stack=[];mnx=mny=0;mxx=mxy=1;segTotal=0;maxD=0;
+for(let i=0;i<s.length;i++){const ch=s[i];
+if(drawSet.has(ch)){const nx=x+Math.cos(a),ny=y+Math.sin(a);(segsByD[d]||(segsByD[d]=[])).push(x,y,nx,ny);segTotal++;if(segTotal>=CAP_SEG){toast('segment cap hit — drawing truncated');break}
+x=nx;y=ny;if(x<mnx)mnx=x;if(x>mxx)mxx=x;if(y<mny)mny=y;if(y>mxy)mxy=y}
+else if(ch==='+')a+=angle*Math.PI/180;else if(ch==='-')a-=angle*Math.PI/180;
+else if(ch==='['){stack.push(x,y,a,d);d++;if(d>maxD)maxD=d}
+else if(ch===']'){if(bloom&&d>=2&&dots.length<6000)dots.push(x,y,d);const p=stack.pop();if(p){x=p[0];y=p[1];a=p[2];d=p[3]}}}}
+function rebuild(){rules=parseRules($('rl').value);drawSet=new Set((PRESETS[preset]&&preset!=='custom'?PRESETS[preset].draw:'F'));const s=expand();strLen=s.length;walk(s);dirty=true;hudSync()}
+function toast(msg){const t=$('toast');t.textContent=msg;t.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.opacity=0,2600)}
+function draw(){X.fillStyle='#0d0b09';X.fillRect(0,0,W,H);
+const bw=mxx-mnx||1,bh=mxy-mny||1,fit=Math.min((W-50)/bw,(H-50)/bh)*zoom;
+const ox=W/2-(mnx+mxx)/2*fit,oy=H/2+(mny+mxy)/2*fit;
+let consumed=0;const limit=grow*segTotal;
+for(let d=0;d<segsByD.length;d++){const arr=segsByD[d];if(!arr)continue;const nSeg=arr.length/4,take=Math.max(0,Math.min(nSeg,limit-consumed));consumed+=nSeg;
+X.strokeStyle=`hsla(${(hue+d*4)|0},46%,${Math.min(76,50+d*4)|0}%,.93)`;X.lineWidth=Math.max(.4,lw*Math.pow(.74,d));X.lineCap='round';X.beginPath();
+const m=Math.floor(take)*4;for(let i=0;i<m;i+=4){const A=P2(arr[i],arr[i+1]),B=P2(arr[i+2],arr[i+3]);X.moveTo(ox+A[0]*fit,oy-A[1]*fit);X.lineTo(ox+B[0]*fit,oy-B[1]*fit)}
+X.stroke();if(consumed>=limit)break}
+if(bloom&&dots.length){const nd=Math.min(dots.length,Math.floor(limit*(dots.length/Math.max(1,segTotal))*1.4));X.fillStyle='rgba(232,208,158,.85)';
+for(let i=0;i<nd;i+=1){const x=dots[i*3],y=dots[i*3+1],r=Math.max(1.1,1.8-dots[i*3+2]*.12);const PP=P2(x,y);X.beginPath();X.arc(ox+PP[0]*fit,oy-PP[1]*fit,r,0,6.2832);X.fill()}}}
+cv.addEventListener('pointerdown',e=>{try{cv.setPointerCapture(e.pointerId)}catch(err){}dragT=[e.clientX,e.clientY];cv.style.cursor='grabbing';idleT=0});
+cv.addEventListener('pointermove',e=>{if(!dragT)return;const dx=e.clientX-dragT[0],dy=e.clientY-dragT[1];rot+=dx*.006;tilt=Math.max(-.5,Math.min(.6,tilt+dy*.004));vro=dx*.0031;dragT=[e.clientX,e.clientY];idleT=0;dirty=true});
+const dupT=()=>{dragT=null;cv.style.cursor='crosshair'};cv.addEventListener('pointerup',dupT);cv.addEventListener('pointercancel',dupT);
+cv.addEventListener('wheel',e=>{e.preventDefault();tilt=Math.max(-.5,Math.min(.6,tilt+(e.deltaY>0?-.03:.03)));idleT=0;dirty=true},{passive:false});
+let last=0,fc=0,ft=0,fps=0,growing=false;
+function frame(ts){requestAnimationFrame(frame);const dt=Math.min(50,ts-last||16);last=ts;
+if(!paused&&grow<1){grow=Math.min(1,grow+dt*.00030);dirty=true}
+ vro*=.94;rot+=vro;idleT+=dt;if(!dragT&&idleT>3200){rot+=dt*4.6e-5;dirty=true}
+if(dirty){draw();dirty=false}
+fc++;ft+=dt;if(ft>500){fps=Math.round(fc*1000/ft);fc=0;ft=0;hudSync(fps)}}
+function hudSync(f){hud.textContent=`${f||fps} FPS\nSTRING ${strLen.toLocaleString()} CH\nSEGMENTS ${segTotal.toLocaleString()} · GROWN ${(grow*100|0)}%\nDEPTH ${maxD} · GEN ${iter} · δ ${angle}°`}
+function loadPreset(id,silent){preset=id;const p=PRESETS[id];axiom=p.ax;$('ax').value=p.ax;$('rl').value=p.rl;angle=p.an;$('an').value=p.an;$('anv').textContent=p.an;
+iter=Math.min(p.it,p.cap);$('it').max=p.cap;$('it').value=iter;$('itv').textContent=iter;$('preset').value=id;
+grow=RM?1:0;paused=false;$('pz').textContent='HALT';$('pz').classList.remove('on');rebuild();saveHash()}
+function randomize(){const tmpl=['F[+F]F[-F]F','FF-[-F+F+F]+[+F-F-F]','F[+F+F][-F-F]F','FF+[+F-F]-[-F+F]','F[+F][-F][+F]F'?'F[+F][-F]FF':'F[+F][-F]FF'];
+const pick=tmpl[Math.random()*4|0];$('ax').value='F';$('rl').value='F='+pick;preset='custom';
+angle=14+Math.random()*22;$('an').value=angle;$('anv').textContent=angle.toFixed(1);
+iter=4+(Math.random()*2|0);$('it').max=6;$('it').value=iter;$('itv').textContent=iter;hue=(26+Math.random()*44)|0;$('h').value=hue;$('hv').textContent=hue;
+grow=RM?1:0;rebuild();saveHash()}
+$('preset').onchange=e=>loadPreset(e.target.value);
+let deb=null;
+function liveEdit(){clearTimeout(deb);deb=setTimeout(()=>{axiom=$('ax').value.trim()||'F';preset='custom';grow=RM?1:grow;rebuild();saveHash()},380)}
+$('ax').oninput=liveEdit;$('rl').oninput=liveEdit;
+$('it').oninput=e=>{iter=+e.target.value;$('itv').textContent=iter;grow=RM?1:0;rebuild();saveHash()};
+$('an').oninput=e=>{angle=+e.target.value;$('anv').textContent=angle.toFixed(1);rebuild();saveHash()};
+$('zm').oninput=e=>{zoom=+e.target.value;$('zmv').textContent=zoom.toFixed(2);dirty=true;saveHash()};
+$('w').oninput=e=>{lw=+e.target.value;$('wv').textContent=lw.toFixed(1);dirty=true;saveHash()};
+$('h').oninput=e=>{hue=+e.target.value;$('hv').textContent=hue;dirty=true;saveHash()};
+$('bl').onchange=e=>{bloom=e.target.checked;rebuild();saveHash()};
+$('gw').onclick=()=>{grow=0;$('pz').textContent='HALT';$('pz').classList.remove('on');paused=false};
+$('pz').onclick=()=>{paused=!paused;$('pz').textContent=paused?'RESUME':'HALT';$('pz').classList.toggle('on',paused)};
+$('rs').onclick=()=>loadPreset(ORDER.includes(preset)?preset:'plant');
+$('rn').onclick=randomize;
+$('cp').onclick=async()=>{saveHash();try{await navigator.clipboard.writeText(location.href);toast('LINK COPIED')}catch(e){toast('LINK IS IN THE URL BAR')}};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===b));$('pane-c').classList.toggle('show',b.dataset.t==='c');$('pane-a').classList.toggle('show',b.dataset.t==='a')});
+addEventListener('keydown',e=>{const tag=document.activeElement&&document.activeElement.tagName;if(/INPUT|TEXTAREA|SELECT/.test(tag||''))return;
+if(e.code==='Space'){e.preventDefault();$('pz').click()}
+else if(e.key==='g'||e.key==='G')$('gw').click();
+else if(e.key==='r'||e.key==='R')$('rs').click();
+else if(e.key==='n'||e.key==='N')randomize();
+else if(e.key==='e'||e.key==='E'){const p=$('panel');p.style.display=p.style.display==='none'?'flex':'none';size()}
+else if(e.key==='['){iter=Math.max(1,iter-1);$('it').value=iter;$('itv').textContent=iter;rebuild();saveHash()}
+else if(e.key===']'){iter=Math.min(+$('it').max,iter+1);$('it').value=iter;$('itv').textContent=iter;rebuild();saveHash()}
+else if(/^[0-9]$/.test(e.key))loadPreset(ORDER[(+e.key+9)%10])});
+function saveHash(){try{const q=new URLSearchParams();
+if(preset==='custom'){q.set('ax',axiom);q.set('rl',$('rl').value)}else q.set('p',preset);
+q.set('an',angle);q.set('it',iter);q.set('zm',zoom.toFixed(2));q.set('w',lw.toFixed(1));q.set('ro',rot.toFixed(2));q.set('ti',tilt.toFixed(2));q.set('h',hue);if(!bloom)q.set('bl','0');
+history.replaceState(null,'','#'+q.toString())}catch(e){}}
+function loadHash(){try{const q=new URLSearchParams(location.hash.slice(1));if(![...q].length)return;
+if(q.get('p')&&PRESETS[q.get('p')]){loadPreset(q.get('p'),true)}
+else{preset='custom';axiom=q.get('ax')||'F';$('ax').value=axiom;$('rl').value=q.get('rl')||'F=F[+F]F[-F]F';
+rules=parseRules($('rl').value);iter=Math.max(1,Math.min(8,+q.get('it')||5));$('it').value=iter;$('itv').textContent=iter;$('preset').selectedIndex=-1}
+angle=Math.max(2,Math.min(120,+q.get('an')||22.5));$('an').value=angle;$('anv').textContent=angle;
+zoom=Math.max(.4,Math.min(3,+q.get('zm')||1));$('zm').value=zoom;$('zmv').textContent=zoom.toFixed(2);
+lw=Math.max(.4,Math.min(5,+q.get('w')||1.6));$('w').value=lw;$('wv').textContent=lw.toFixed(1);
+hue=Math.max(0,Math.min(359,+q.get('h')||44));$('h').value=hue;$('hv').textContent=hue;
+bloom=q.get('bl')!=='0';$('bl').checked=bloom;rot=+q.get('ro')||.35;tilt=Math.max(-.5,Math.min(.6,+q.get('ti')||.34));grow=RM?1:0;rebuild()}catch(e){}}
+size();addEventListener('resize',size);
+loadHash();if(![...new URLSearchParams(location.hash.slice(1))].length)loadPreset('plant');
+if(RM){grow=1;draw();st.textContent='REDUCED MOTION — FULL SPECIMEN'}else requestAnimationFrame(frame);
+setInterval(()=>{if(!RM)st.textContent=`${fps} FPS · ${segTotal.toLocaleString()} SEG · GROWN ${(grow*100|0)}%`},500);
+
+function stepBind11(inpId,dec,inc,by,fix){const inp=$(inpId);const bump=d=>{const v=Math.max(+inp.min,Math.min(+inp.max,+inp.value+d*by));inp.value=+v.toFixed(fix||0);inp.dispatchEvent(new Event('input'))};$(dec).onclick=()=>bump(-1);$(inc).onclick=()=>bump(1)}
+stepBind11('it','iD','iU',1);stepBind11('an','nD','nU',2.5,1);
+
+</script></body></html>

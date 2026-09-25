@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fdf6ec">
+<link rel="icon" href="data:,">
+<title>BENCH 23 — pKa LAB</title>
+<style>
+:root{--paper:#fdf6ec;--ink:#21201c;--dim:#8d8577;--ox:#b7410e;--line:#e2d5bd;--cel:#f1e7d2}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font:13px/1.5 Georgia,"Times New Roman",serif;overflow:hidden}
+#grain{position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.5;background:
+ repeating-linear-gradient(0deg,rgba(33,32,28,.03) 0 1px,transparent 1px 3px),
+ repeating-linear-gradient(90deg,rgba(183,65,14,.03) 0 1px,transparent 1px 4px)}
+.reg{position:fixed;width:20px;height:20px;z-index:12;pointer-events:none;border:0 solid var(--ink)}
+.reg.tl{top:9px;left:9px;border-left:1px solid;border-top:1px solid}
+.reg.tr{top:9px;right:9px;border-right:1px solid;border-top:1px solid}
+.reg.bl{bottom:9px;left:9px;border-left:1px solid;border-bottom:1px solid}
+.reg.br{bottom:9px;right:9px;border-right:1px solid;border-bottom:1px solid}
+.plate{position:fixed;background:rgba(253,246,236,.96);border:1px solid var(--ink);z-index:15}
+#idplate{top:18px;left:20px;padding:9px 14px;max-width:360px}
+#idplate h1{font:italic 700 20px/1.15 Georgia,serif;color:var(--ink)}
+#idplate h1 span{color:var(--ox)}
+#idplate p{font:9.5px/1.7 "Courier New",monospace;color:var(--dim);letter-spacing:.16em;margin-top:4px}
+#panel{top:112px;left:20px;bottom:20px;width:262px;padding:12px 14px;overflow-y:auto;scrollbar-width:thin}
+#panel h2{font:bold 9.5px/1 "Courier New",monospace;color:var(--ox);letter-spacing:.24em;margin:13px 0 8px;border-bottom:1px solid var(--line);padding-bottom:4px}
+#panel h2:first-child{margin-top:0}
+.grp{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:7px 0;font:13px Georgia,serif}
+.grp label{flex:1;cursor:pointer;display:flex;align-items:center;gap:8px}
+.grp label input{display:none}
+.grp label input+span{display:inline-block;width:13px;height:13px;border:1.5px solid var(--ink);background:var(--paper);vertical-align:-2px;position:relative}
+.grp label input:checked+span{background:var(--ox);border-color:var(--ox)}
+.grp label input:checked+span::after{content:"";position:absolute;inset:2px;background:var(--paper)}
+.grp .pka{font:11px "Courier New",monospace;color:var(--dim)}
+.grp output{font:11px "Courier New",monospace;color:var(--ox)}
+.grp input[type=range]{width:78px;-webkit-appearance:none;appearance:none;height:2px;background:var(--line);outline:none}
+.grp input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height:14px;background:var(--ox);border:0;cursor:ew-resize}
+.btns{display:flex;flex-wrap:wrap;gap:5px;margin-top:11px}
+.btns button{flex:1 1 46%;background:none;border:1px solid var(--ink);color:var(--ink);font:10px "Courier New",monospace;letter-spacing:.1em;padding:7px 2px;cursor:pointer}
+.btns button:hover{background:var(--ink);color:var(--paper)}
+#out{position:fixed;top:18px;right:18px;bottom:20px;left:302px;overflow-y:auto;scrollbar-width:thin;z-index:14;padding-right:14px}
+canvas{background:var(--cel);border:1px solid var(--ink);width:100%;display:block}
+.plabel{font:bold 10px "Courier New",monospace;color:var(--ox);letter-spacing:.2em;margin:6px 0 6px}
+.big{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 16px}
+.cell{border:1px solid var(--ink);padding:8px 16px;background:var(--cel);min-width:130px}
+.cell b{display:block;font:italic 700 26px/1.1 Georgia,serif;color:var(--ox)}
+.cell span{font:9px/1.6 "Courier New",monospace;color:var(--dim);letter-spacing:.16em}
+#note{font:italic 12.5px/1.65 Georgia,serif;color:var(--dim);margin:12px 0;max-width:640px}
+table.res{width:100%;border-collapse:collapse;font:11px/1.7 "Courier New",monospace;max-width:640px}
+table.res th{font:bold 9px "Courier New",monospace;color:var(--ox);letter-spacing:.18em;text-align:left;border-bottom:1px solid var(--ink);padding:3px 8px}
+table.res td{border-bottom:1px solid var(--line);padding:3px 8px}
+#toast{position:fixed;left:50%;top:20px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:6px 14px;font:11px "Courier New",monospace;letter-spacing:.12em;opacity:0;transition:.2s;z-index:60;pointer-events:none}
+#toast.on{opacity:1}
+#mob{display:none}
+@media(max-width:920px){
+ #panel{top:auto;bottom:0;left:0;right:0;width:auto;max-height:44vh;transform:translateY(112%);transition:transform .25s}
+ #panel.open{transform:none}
+ #mob{display:block;position:fixed;right:10px;bottom:10px;z-index:46;background:var(--ox);color:var(--paper);border:0;font:10px "Courier New",monospace;letter-spacing:.12em;padding:6px 12px}
+ #out{left:18px;top:120px}
+ #idplate{max-width:250px}
+}
+</style>
+</head>
+<body>
+<div id="grain"></div>
+<div class="reg tl"></div><div class="reg tr"></div><div class="reg bl"></div><div class="reg br"></div>
+<div class="plate" id="idplate">
+ <h1>pKa <span>LAB</span> — TITRATION PLATES</h1>
+ <p>BENCH 23 · IONIZABLE GROUPS · HENDERSON-HASSELBALCH<br>JAWAD — COMPUTATIONAL STUDIES</p>
+</div>
+<div class="plate" id="panel">
+ <h2>SUBUNIT</h2>
+ <div class="grp"><label><input type="radio" name="aa" value="Glycine" checked><span></span> Glycine</label><span class="pka">2.34 / 9.60</span></div>
+ <div class="grp"><label><input type="radio" name="aa" value="Alanine"><span></span> Alanine</label><span class="pka">2.34 / 9.69</span></div>
+ <div class="grp"><label><input type="radio" name="aa" value="Leucine"><span></span> Leucine</label><span class="pka">2.36 / 9.60</span></div>
+ <div class="grp"><label><input type="radio" name="aa" value="Aspartic acid"><span></span> Asp</label><span class="pka">1.88 / 3.65 / 9.60</span></div>
+ <div class="grp"><label><input type="radio" name="aa" value="Glutamic acid"><span></span> Glu</label><span class="pka">2.19 / 4.25 / 9.67</span></div>
+ <div class="grp"><label><input type="radio" name="aa" value="Histidine"><span></span> His</label><span class="pka">1.80 / 6.00 / 9.33</span></div>
+ <div class="grp"><label><input type="radio" name="aa" value="Cysteine"><span></span> Cys</label><span class="pka">1.96 / 8.18 / 10.28</span></div>
+ <div class="grp"><label><input type="radio" name="aa" value="Tyrosine"><span></span> Tyr</label><span class="pka">2.20 / 9.11 / 10.07</span></div>
+ <div class="grp"><label><input type="radio" name="aa" value="Lysine"><span></span> Lys</label><span class="pka">2.18 / 8.95 / 10.53</span></div>
+ <div class="grp"><label><input type="radio" name="aa" value="Arginine"><span></span> Arg</label><span class="pka">2.17 / 9.04 / 12.48</span></div>
+ <h2>GROUP TOGGLE ( Asp )</h2>
+ <div id="groups"></div>
+ <h2>OPERATE</h2>
+ <div class="btns">
+  <button id="b-pi">SOLVE pI</button>
+  <button id="b-spec">SPECIMEN</button>
+ </div>
+ <p class="note" style="font:italic 12px Georgia;color:var(--dim);margin-top:8px">Toggle a group to mute it: its curve contribution drops to zero. pI recomputes live.</p>
+</div>
+<div id="out">
+ <div class="big">
+  <div class="cell"><b id="v-pi">6.08</b><span>ISOELECTRIC pH</span></div>
+  <div class="cell"><b id="v-q">0.00</b><span>NET CHARGE AT pH 7.00</span></div>
+  <div class="cell"><b id="v-ng">3</b><span>ACTIVE GROUPS</span></div>
+ </div>
+ <div class="plabel">TITRATION CURVE, NET CHARGE vs pH (0-14)</div>
+ <canvas id="cv" width="1180" height="430"></canvas>
+ <table class="res" id="tbl">
+  <tr><th>pH</th><th>0</th><th>2</th><th>4</th><th>6</th><th>7</th><th>8</th><th>10</th><th>12</th><th>14</th></tr>
+ </tr></table>
+ <p id="note">Solid curve: full molecule. Dashed: with toggled groups muted. pI is where net charge crosses zero — interpolated on a 0.01 pH grid.</p>
+</div>
+<div id="toast"></div>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s);
+const AA={
+ 'Glycine':      {pKas:[2.34,9.60],            groups:['alpha-COOH','alpha-NH3+']},
+ 'Alanine':      {pKas:[2.34,9.69],            groups:['alpha-COOH','alpha-NH3+']},
+ 'Leucine':      {pKas:[2.36,9.60],            groups:['alpha-COOH','alpha-NH3+']},
+ 'Aspartic acid':{pKas:[1.88,3.65,9.60],groups:['alpha-COOH','side COOH','alpha-NH3+']},
+ 'Glutamic acid':{pKas:[2.19,4.25,9.67],groups:['alpha-COOH','side COOH','alpha-NH3+']},
+ 'Histidine':    {pKas:[1.80,6.00,9.33],groups:['alpha-COOH','imidazole','alpha-NH3+']},
+ 'Cysteine':     {pKas:[1.96,8.18,10.28],groups:['alpha-COOH','sulfhydryl','alpha-NH3+']},
+ 'Tyrosine':     {pKas:[2.20,9.11,10.07],groups:['alpha-COOH','phenol','alpha-NH3+']},
+ 'Lysine':       {pKas:[2.18,8.95,10.53],groups:['alpha-COOH','side NH3+','alpha-NH3+']},
+ 'Arginine':     {pKas:[2.17,9.04,12.48],groups:['alpha-COOH','guanidino','alpha-NH3+']}
+};
+// charge sign per group by role: first pKa ascending = COOH (-1), last = NH3 (+1), middle = side chain
+function groupSigns(aa){
+ const n=AA[aa].pKas.length;
+ if(n===2)return[-1,+1]; // COOH, NH3
+ const mid=AA[aa].groups[1];
+ let s=0;
+ if(/COOH|sulfhydryl|phenol/.test(mid))s=-1;      // acidic side chains
+ if(/imidazole|side NH3|guanidino/.test(mid))s=+1; // basic side chains
+ return[-1,s,+1];
+}
+let muted=new Set();
+function activeAAs(){
+ const name=document.querySelector('input[name=aa]:checked').value;
+ return{name,pkas:AA[name].pKas,groups:AA[name].groups};
+}
+function netCharge(pH){
+ const{name,pkas,groups}=activeAAs();
+ const signs=groupSigns(name);
+ let q=0;
+ pkas.forEach((pKa,i)=>{
+  if(muted.has(groups[i]))return;
+  q+=signs[i]/(1+Math.pow(10,(signs[i]>0?pH-pKa:pKa-pH)));
+ });
+ return q;
+}
+function solvePI(){
+ let lo=0,hi=14;
+ if(Math.abs(netCharge(0))<1e-9)return 0;
+ for(let i=0;i<60;i++){
+  const mid=(lo+hi)/2;
+  (netCharge(mid)>0)?lo=mid:hi=mid;
+ }
+ return (lo+hi)/2;
+}
+function draw(){
+ const{name,pkas}=activeAAs();
+ const signs=groupSigns(name);
+ const cv=$('#cv'),x=cv.getContext('2d');
+ const W=cv.width,H=cv.height;
+ x.fillStyle='#f1e7d2';x.fillRect(0,0,W,H);
+ // grid
+ x.strokeStyle='#e2d5bd';x.lineWidth=1;x.beginPath();
+ for(let p=0;p<=14;p+=1){const px=40+p*(W-60)/14;x.moveTo(px,16);x.lineTo(px,H-34)}
+ for(let q=-3;q<=3;q++){const py=H/2-q*(H-70)/6;x.moveTo(40,py);x.lineTo(W-20,py)}
+ x.stroke();
+ // axes labels
+ x.fillStyle='#8d8577';x.font='11px Courier New';
+ for(let p=0;p<=14;p+=2)x.fillText(p,40+p*(W-60)/14-3,H-18);
+ x.save();x.translate(14,H/2);x.rotate(-Math.PI/2);x.fillText('NET CHARGE',-40,0);x.restore();
+ // zero line
+ x.strokeStyle='rgba(33,32,28,.5)';x.beginPath();x.moveTo(40,H/2);x.lineTo(W-20,H/2);x.stroke();
+ // full curve
+ x.strokeStyle='#b7410e';x.lineWidth=2;x.beginPath();
+ for(let i=0;i<=1400;i++){
+  const pH=i*0.01;
+  const q=netCharge(pH);
+  const px=40+pH*(W-60)/14;
+  const py=H/2-q*(H-70)/6;
+  i?x.lineTo(px,py):x.moveTo(px,py);
+ }
+ x.stroke();
+ // muted (dashed) contributions
+ if(muted.size){
+  x.strokeStyle='rgba(33,32,28,.5)';x.setLineDash([6,4]);x.lineWidth=1.4;x.beginPath();
+  const saved=new Set(muted);
+  muted.forEach(g=>{}); // curve of muted-only removed is same as net minus each; draw net without muting:
+  muted.clear();
+  for(let i=0;i<=1400;i++){
+   const pH=i*0.01,q=netCharge(pH);
+   const px=40+pH*(W-60)/14,py=H/2-q*(H-70)/6;
+   i?x.lineTo(px,py):x.moveTo(px,py);
+  }
+  muted=window.__rebuild(saved);
+  x.stroke();x.setLineDash([]);
+ }
+ // pI marker
+ const pI=solvePI();
+ const px=40+pI*(W-60)/14;
+ x.strokeStyle='#21201c';x.setLineDash([3,4]);x.beginPath();x.moveTo(px,16);x.lineTo(px,H-34);x.stroke();x.setLineDash([]);
+ x.fillStyle='#21201c';x.font='bold 12px Courier New';
+ x.fillText('pI '+pI.toFixed(2),px+6,30);
+ // readouts
+ $('#v-pi').textContent=pI.toFixed(2);
+ $('#v-q').textContent=netCharge(7).toFixed(2);
+ $('#v-ng').textContent=activeAAs().pkas.length;
+ // table row
+ let row='<tr><td>NET</td>';
+ for(const p of [0,2,4,6,7,8,10,12,14])row+='<td>'+netCharge(p).toFixed(2)+'</td>';
+ row+='</tr>';
+ const tbl=$('#tbl');
+ if(tbl.rows.length>1)tbl.deleteRow(1);
+ tbl.insertRow().innerHTML=row;
+ window.__PI=pI;window.__Q7=netCharge(7);
+}
+window.__rebuild=s=>new Set(s);
+function buildGroups(){
+ const{name,groups}=activeAAs();
+ const host=$('#groups');host.innerHTML='';
+ document.querySelector('#panel h2:nth-of-type(2)').textContent='GROUP TOGGLE ( '+name.split(' ')[0].toUpperCase()+' )';
+ groups.forEach((g,i)=>{
+  const d=document.createElement('div');d.className='grp';
+  d.innerHTML='<label><input type="checkbox" checked data-g="'+g+'"><span></span> '+g+'</label>'+
+   '<span class="pka">pKa '+activeAAs().pkas[i].toFixed(2)+'</span>';
+  const cb=d.querySelector('input');
+  cb.addEventListener('change',()=>{
+   if(cb.checked)muted.delete(g);else muted.add(g);
+   draw();
+  });
+  host.appendChild(d);
+ });
+}
+function wire(){
+ document.querySelectorAll('input[name=aa]').forEach(r=>{
+  r.addEventListener('change',()=>{muted.clear();buildGroups();draw();toast(r.value.toUpperCase())});
+ });
+}
+function toast(m){const el=$('#toast');el.textContent=m;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),1400)}
+$('#b-pi').addEventListener('click',()=>{draw();toast('pI = '+solvePI().toFixed(3))});
+$('#b-spec').addEventListener('click',()=>{
+ document.querySelector('input[name=aa][value="Lysine"]').checked=true;
+ muted.clear();buildGroups();draw();toast('SPECIMEN: LYSINE, 3 GROUPS');
+});
+buildGroups();wire();draw();
+})();
+</script>
+</body>
+</html>

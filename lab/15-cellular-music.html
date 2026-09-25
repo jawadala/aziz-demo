@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05060f">
+<title>STUDY No. 15 · CELLULAR MUSIC</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='4' fill='%2305060f'/><rect x='3' y='3' width='4' height='4' fill='%234ade80'/><rect x='9' y='9' width='4' height='4' fill='%232fd6ff'/><rect x='9' y='3' width='4' height='4' fill='%23a78bfa'/></svg>">
+<style>
+:root{--bg:#05060f;--panel:#0a0e1e;--panel2:#0d1328;--line:#1b2340;--txt:#e8f2ff;--mut:#7f93b8;--cyan:#2fd6ff;--vio:#a78bfa;--grn:#4ade80}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0a0e1e,#05060f);flex-wrap:wrap;z-index:5}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:.14em;font-size:13px;white-space:nowrap}
+.logo{width:15px;height:15px;border-radius:4px;background:conic-gradient(from 210deg,var(--cyan),var(--vio),var(--grn),var(--cyan));box-shadow:0 0 14px #2fd6ff77;flex:none}
+.brand .sub{color:var(--mut);font-weight:400;letter-spacing:.08em;font-size:10px}
+.badge{font-size:10px;color:#051018;background:linear-gradient(90deg,var(--cyan),#7ee7ff);padding:2px 8px;border-radius:99px;font-weight:700;letter-spacing:.1em}
+.tabs{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{background:var(--panel2);border:1px solid var(--line);color:var(--mut);padding:6px 12px;border-radius:8px;cursor:pointer;font:inherit;font-size:11px;letter-spacing:.1em}
+.tabs button.on{color:#051018;background:linear-gradient(90deg,var(--cyan),#7ee7ff);border-color:var(--cyan);font-weight:700}
+main{flex:1;display:grid;grid-template-columns:296px 1fr;min-height:0}
+aside{border-right:1px solid var(--line);background:var(--panel);padding:12px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.grp{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--panel2);display:flex;flex-direction:column;gap:7px}
+.lab{font-size:10px;letter-spacing:.14em;color:var(--mut)}
+.lab b{color:var(--cyan)}
+.lab.sm{margin-top:2px}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+button{background:#111a38;border:1px solid var(--line);color:var(--txt);padding:7px 10px;border-radius:8px;cursor:pointer;font:inherit;font-size:11px;letter-spacing:.06em}
+button:hover{border-color:var(--cyan);color:#fff}
+button.pri{background:linear-gradient(90deg,#0e4a63,#0e6a63);border-color:var(--cyan);font-weight:700}
+button.wide{width:100%}
+select,input[type=range]{width:100%}
+select{background:#0a1024;border:1px solid var(--line);color:var(--txt);padding:6px;border-radius:8px;font:inherit;font-size:12px}
+input[type=range]{accent-color:var(--cyan);height:22px}
+input[type=checkbox]{accent-color:var(--grn);width:15px;height:15px}
+.ck{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--txt);cursor:pointer}
+.note{font-size:10px;color:var(--mut)}
+.stage{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;background:#04050c}
+canvas.view{flex:1;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.hud{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.chiprow{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:#070d1ecc;border:1px solid var(--line);border-radius:7px;padding:3px 8px;font-size:10px;color:var(--mut);letter-spacing:.06em}
+.chip b{color:var(--cyan);font-size:11px}
+.chip b.g{color:var(--grn)} .chip b.v{color:var(--vio)}
+#spark1{background:#070d1ecc;border:1px solid var(--line);border-radius:7px;width:196px;height:38px}
+.hint{position:absolute;right:10px;bottom:8px;font-size:10px;color:#5c6f92;text-align:right;pointer-events:none}
+footer{padding:7px 14px;border-top:1px solid var(--line);color:var(--mut);font-size:10px;letter-spacing:.12em;display:flex;gap:8px;flex-wrap:wrap;background:#070a16}
+footer b{color:var(--cyan)}
+.doc{padding:22px;overflow:auto;max-width:900px}
+.doc h2{color:var(--cyan);letter-spacing:.16em;font-size:15px;margin:18px 0 8px}
+.doc h2:first-child{margin-top:0}
+.doc h3{color:var(--vio);font-size:12px;letter-spacing:.12em;margin:14px 0 6px}
+.doc p,.doc li{color:#c4d4ee;font-size:13px}
+.doc ul{margin:6px 0 6px 18px}
+.doc .f{background:#070d1f;border:1px solid var(--line);border-left:3px solid var(--grn);border-radius:8px;padding:10px 12px;margin:8px 0;font-size:13px;color:#d9ffe9;overflow-x:auto;white-space:pre}
+.doc table{border-collapse:collapse;margin:8px 0;font-size:12px}
+.doc td,.doc th{border:1px solid var(--line);padding:5px 9px;text-align:left}
+.doc th{color:var(--mut);letter-spacing:.1em;font-weight:400;font-size:10px}
+.doc td k{color:var(--grn);font-style:normal}
+@media(max-width:880px){main{grid-template-columns:1fr;grid-template-rows:minmax(320px,52vh) minmax(0,1fr)}aside{order:2;border-right:0;border-top:1px solid var(--line)}}
+#toast{position:fixed;left:50%;bottom:52px;transform:translateX(-50%);background:#0c2a24;border:1px solid var(--grn);color:#c9ffe2;padding:8px 16px;border-radius:9px;font-size:11px;letter-spacing:.1em;opacity:0;transition:opacity .25s;pointer-events:none;z-index:99}
+#toast.show{opacity:1}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+<div class="brand"><span class="logo"></span>SYSTEMS LABORATORY <span class="sub">/ COMPUTATIONAL STUDIES</span></div>
+<span class="badge">STUDY No. 15 · CELLULAR MUSIC</span>
+<nav class="tabs">
+<button data-tab="viz" class="on">DEMO</button>
+<button data-tab="concept">CONCEPT</button>
+<button data-tab="about">NOTES</button>
+</nav>
+</header>
+<main>
+<aside id="side">
+<div class="grp">
+<div class="lab">CELLULAR RULE</div>
+<select id="rule">
+<option value="life">Conway's Life · B3/S23</option>
+<option value="highlife">HighLife · B36/S23</option>
+<option value="seeds">Seeds · B2/S–</option>
+<option value="daynight">Day &amp; Night · B3678/S34678</option>
+</select>
+<div class="lab">SCALE</div>
+<select id="scale">
+<option value="mPent">minor pentatonic</option>
+<option value="MPent">major pentatonic</option>
+<option value="blues">blues hexatonic</option>
+<option value="insen">in-sen (Japanese)</option>
+</select>
+<div class="lab">VOICE</div>
+<select id="wave">
+<option value="sine">sine — soft mallet</option>
+<option value="triangle">triangle — music box</option>
+<option value="square">square — chip chime</option>
+<option value="sawtooth">saw — glass pad</option>
+</select>
+</div>
+<div class="grp">
+<div class="lab">TEMPO · <b id="vBpm">180</b> steps/min</div>
+<input type="range" id="bpm" min="40" max="480" value="180">
+<label class="ck"><input type="checkbox" id="wrap" checked> wrapping (torus) universe</label>
+</div>
+<div class="grp">
+<div class="row">
+<button id="bPlay" class="pri">PAUSE</button>
+<button id="bStep">STEP</button>
+<button id="bMute">🔊 ON</button>
+</div>
+<div class="row">
+<button id="bSoup">SOUP</button>
+<button id="bGliders">GLIDERS</button>
+<button id="bPuddles">PUDDLES</button>
+<button id="bClear">CLEAR</button>
+</div>
+</div>
+<div class="grp">
+<button id="bShare" class="wide pri">SHARE THIS STATE</button>
+<div class="note">the URL hash carries rule, scale, voice, tempo and the whole pattern.</div>
+</div>
+<div class="grp">
+<div class="lab">HOW IT SINGS</div>
+<div class="note">each simulation tick = one beat. rows are the 8 pitch lanes shown on the left edge. every cell born in a column plays that lane's note — dense columns ring as chords. paint cells with your finger to play the grid like an instrument.</div>
+</div>
+</aside>
+<div class="stage" id="stage">
+<canvas id="cv" class="view"></canvas>
+<div class="hud">
+<div class="chiprow">
+<span class="chip">FPS <b id="hFps">–</b></span>
+<span class="chip">GEN <b id="hGen">0</b></span>
+<span class="chip">POP <b class="g" id="hPop">0</b></span>
+<span class="chip">NOTES <b class="v" id="hNotes">0</b></span>
+<span class="chip" id="chipMute">AUDIO <b id="hMute">ON</b></span>
+</div>
+<canvas id="spark1" width="392" height="76"></canvas>
+<div class="chip"><span id="hStat">running</span></div>
+</div>
+<div class="hint">drag = paint / erase cells (each birth plays its pitch)<br>SPACE pause · N step · C clear · G gliders · M mute · 1-4 rules</div>
+</div>
+</main>
+<section id="tab-concept" class="doc" hidden>
+<h2>CELLULAR AUTOMATON SONIFICATION</h2>
+<p>The grid runs a cellular automaton. Each tick: count neighbours, apply the rulebook, swap buffers. Sonification is deterministic: birth = note, column = beat, row = pitch. No random generators in the audio path.</p>
+<h3>1 · THE RULE</h3>
+<p>Each cell counts its 8 neighbours. The rulebook, written <b>B3/S23</b>, lists birth counts (dead cell with those counts turns on) and survival counts (live cell with those counts stays on):</p>
+<div class="f">n(x,y) = Σ  alive(x+dx, y+dy)   over the 8 neighbours
+next(x,y) = n ∈ B ? 1 : ( alive(x,y) && n ∈ S ? 1 : 0 )</div>
+<p>Four rulebooks, one machine:</p>
+<table>
+<tr><th>RULE</th><th>B</th><th>S</th><th>BEHAVIOUR</th></tr>
+<tr><td>Conway's Life</td><td>3</td><td>2,3</td><td>gliders, oscillators, long transients</td></tr>
+<tr><td>HighLife</td><td>3,6</td><td>2,3</td><td>Life + a 12-cell replicator</td></tr>
+<tr><td>Seeds</td><td>2</td><td>—</td><td>rapid growth, short-lived cells</td></tr>
+<tr><td>Day &amp; Night</td><td>3,6,7,8</td><td>3,4,6,7,8</td><td>self-complementary; noise-like</td></tr>
+</table>
+<h3>2 · THE SCORE MAPPING</h3>
+<p>28 rows map to 8 pitch lanes; lanes hold scale degrees, not fixed frequencies. Selecting a scale retunes the whole board:</p>
+<div class="f">lane(r)  = ⌊ r · 8 / rows ⌋                    (top = highest degree)
+f(lane)  = 220 Hz · 2^( degree(lane) / 12 )     (A-based, octaves folded)
+beat k   = column k · (cols / 8)                (left → right, wraps)</div>
+<p>Per tick, each of the 8 voice columns checks for births; each birth plays its lane's note, 220-300 ms pluck. Simultaneous births sound together.</p>
+<h3>3 · THE ENVELOPE</h3>
+<div class="f">gain(t) = e^( −t/τ )  after a 5 ms attack ramp     τ ≈ 80 ms
+osc → lowpass (saw/square) → master (−14 dB headroom)</div>
+<h3>4 · WHY PENTATONIC</h3>
+<ul>
+<li><b>No semitone pairs:</b> any set of simultaneous pentatonic degrees is consonant; arbitrary birth patterns stay musically stable.</li>
+<li><b>Pattern-to-structure mapping:</b> gliders repeat a pitch sequence per column-crossing; oscillators become repeating rhythm; still lifes hold a constant note or silence.</li>
+<li><b>Rule changes texture:</b> Seeds gives short percussive events; Life gives sparse sustained notes; Day &amp; Night gives dense clusters.</li>
+</ul>
+</section>
+<section id="tab-about" class="doc" hidden>
+<h2>BUILD RECORD</h2>
+<p>Single self-contained HTML file. No frameworks, CDNs, fonts, samples. Synth: raw WebAudio; composer: byte-grid automaton.</p>
+<h3>ENGINEERING NOTES</h3>
+<ul>
+<li>Boards: two <b>Uint8Array</b>s, double-buffered; neighbour counts per tick, edge wrapping (torus) or hard borders.</li>
+<li>Audio per tick: births spawn <b>oscillator + gain</b> voices with exponential decay; GC after release. Master at −14 dB. AudioContext on first gesture.</li>
+<li>Timing: fixed-step accumulator; tempo changes beat length, frame-rate independent.</li>
+<li>Rendering: one canvas; age-coloured batched rects; per-column birth flashes; 8 lane markers.</li>
+<li>Presets: SOUP (30% Bernoulli), GLIDERS, PUDDLES, CLEAR. Pointer paints; painted births play.</li>
+<li><b>State sharing:</b> rule + scale + voice + tempo + pattern RLE-encoded into the URL hash. Reload restores the exact state.</li>
+<li><b>Reduced motion:</b> autoplay disabled; static frame; STEP advances.</li>
+</ul>
+<h3>CONTROLS</h3>
+<table>
+<tr><th>INPUT</th><th>ACTION</th></tr>
+<tr><td><k>drag</k></td><td>paint cells (births play their pitch); drag on a live cell erases</td></tr>
+<tr><td><k>SPACE</k></td><td>pause / resume the sequencer</td></tr>
+<tr><td><k>N</k></td><td>single step</td></tr>
+<tr><td><k>C</k></td><td>clear board</td></tr>
+<tr><td><k>G</k></td><td>stamp gliders</td></tr>
+<tr><td><k>M</k></td><td>mute / unmute</td></tr>
+<tr><td><k>1 / 2 / 3 / 4</k></td><td>Life / HighLife / Seeds / Day &amp; Night</td></tr>
+<tr><td><k>+</k> / <k>−</k></td><td>tempo up / down</td></tr>
+</table>
+<h3>SOURCES</h3>
+<p>Gardner, Scientific American 223(4):120, 1970 (Life B3/S23). Sonification per algorithmic composition; W3C WebAudio.</p>
+<h3>PERF</h3>
+<p>One tick: 1232 neighbour votes. One beat: max 12 oscillators. A few hundred fillRects/frame. 60 fps on phones.</p>
+</section>
+<footer><b>SYSTEMS LABORATORY</b> · COMPUTATIONAL STUDIES · STUDY No. 15 · cellular music · single file · zero dependencies</footer>
+<script>
+'use strict';
+window.__errors__=[];addEventListener('error',e=>window.__errors__.push(String(e&&e.message||e)));
+const $=s=>document.querySelector(s);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+function RNG(seed){let s=seed>>>0;return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+let rnd=RNG((Math.random()*1e9)|0);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const dpr=Math.min(2,devicePixelRatio||1);
+const COLS=44,ROWS=28,NC=COLS*ROWS;
+let cur=new Uint8Array(NC),nxt=new Uint8Array(NC),age=new Uint16Array(NC);
+let gen=0,running=!RM,wrap=true;
+const idx=(x,y)=>y*COLS+x;
+const RULES={life:{b:[3],s:[2,3]},highlife:{b:[3,6],s:[2,3]},seeds:{b:[2],s:[]},daynight:{b:[3,6,7,8],s:[3,4,6,7,8]}};
+let rule='life';
+function ruleSets(){const r=RULES[rule];return{b:new Set(r.b),s:new Set(r.s)};}
+function stepCA(){
+const {b,s}=ruleSets();let births=0;
+for(let y=0;y<ROWS;y++){
+const ym=y===0?(wrap?ROWS-1:-1):y-1,yp=y===ROWS-1?(wrap?0:-1):y+1;
+for(let x=0;x<COLS;x++){
+const xm=x===0?(wrap?COLS-1:-1):x-1,xp=x===COLS-1?(wrap?0:-1):x+1;
+let n=0;
+if(ym>=0){if(xm>=0)n+=cur[idx(xm,ym)];n+=cur[idx(x,ym)];if(xp>=0)n+=cur[idx(xp,ym)];}
+if(xm>=0)n+=cur[idx(xm,y)];
+if(xp>=0)n+=cur[idx(xp,y)];
+if(yp>=0){if(xm>=0)n+=cur[idx(xm,yp)];n+=cur[idx(x,yp)];if(xp>=0)n+=cur[idx(xp,yp)];}
+const i=idx(x,y),alive=cur[i];
+const next=alive?(s.has(n)?1:0):(b.has(n)?1:0);
+nxt[i]=next;
+if(next&&!alive){births++;age[i]=0;}
+else if(next)age[i]=Math.min(60000,age[i]+1);
+else age[i]=0;
+}
+}
+const t=cur;cur=nxt;nxt=t;gen++;
+return births;
+}
+const SCALES={mPent:[0,3,5,7,10,12,15,17],MPent:[0,2,4,7,9,12,14,16],blues:[0,3,5,6,7,10,12,15],insen:[0,1,5,7,10,12,13,17]};
+let scaleName='mPent';
+function freq(lane){const semis=SCALES[scaleName];const d=semis[clamp(lane,0,semis.length-1)];return 220*Math.pow(2,d/12);}
+const LANES=8;
+function laneOfRow(r){return LANES-1-Math.min(LANES-1,(r*LANES/ROWS)|0);}
+let actx=null,master=null,muted=false;
+function ensureAudio(){if(actx)return;
+try{actx=new (window.AudioContext||window.webkitAudioContext)();
+master=actx.createGain();master.gain.value=0.16;master.connect(actx.destination);}catch(e){actx=null;}}
+function pluck(lane){
+if(muted)return;ensureAudio();if(!actx)return;
+if(actx.state==='suspended')actx.resume();
+const w=$('#wave').value,t=actx.currentTime;
+const o=actx.createOscillator(),g=actx.createGain();
+o.type=w;o.frequency.value=freq(lane);
+g.gain.setValueAtTime(0,t);
+g.gain.linearRampToValueAtTime(0.9,t+0.006);
+g.gain.exponentialRampToValueAtTime(0.001,t+(w==='sine'?0.30:0.22));
+let node=o;
+if(w==='square'||w==='sawtooth'){const f=actx.createBiquadFilter();f.type='lowpass';f.frequency.value=2000;f.Q.value=0.7;o.connect(f);node=f;}
+node.connect(g);g.connect(master);
+o.start(t);o.stop(t+0.36);
+}
+function chord(lanes){for(const l of lanes)pluck(l);}
+function soup(){const p=0.30;for(let i=0;i<NC;i++){cur[i]=Math.random()<p?1:0;age[i]=0;}gen=0;}
+function clearB(){cur.fill(0);age.fill(0);gen=0;}
+function puddles(){clearB();for(let k=0;k<12;k++){const cx=2+(rnd()*(COLS-4)|0),cy=2+(rnd()*(ROWS-4)|0);
+for(let dy=-2;dy<=2;dy++)for(let dx=-3;dx<=3;dx++)if(rnd()<0.6){const x=(cx+dx+COLS)%COLS,y=(cy+dy+ROWS)%ROWS;cur[idx(x,y)]=1;}}gen=0;}
+function glider(gx,gy,orient){
+const G=[[[0,1],[1,2],[2,0],[2,1],[2,2]],[[0,0],[0,1],[0,2],[1,2],[2,1]],[[0,0],[1,0],[1,2],[2,0],[2,2]],[[0,1],[1,1],[1,2],[2,0],[2,2]]];
+const cells=G[orient%4];
+for(const c of cells){const x=(gx+c[0]+COLS)%COLS,y=(gy+c[1]+ROWS)%ROWS;cur[idx(x,y)]=1;}}
+function gliders(){clearB();for(let k=0;k<7;k++)glider(2+(rnd()*(COLS-8)|0),2+(rnd()*(ROWS-8)|0),(rnd()*4)|0);gen=0;}
+function rseed(){clearB();const cx=COLS>>1,cy=ROWS>>1;
+[[0,1],[1,0],[2,1],[0,2],[1,2]].forEach(c=>cur[idx(cx+c[0]-1,cy+c[1]-1)]=1);gen=0;}
+let bpm=180,acc=0,mutedChip=$('#hMute');
+function beat(){
+const voiceCols=8,birthCols=[];
+const {b,s}=ruleSets();
+const births=stepCA();
+const lanesHit=new Set();
+for(let vc=0;vc<voiceCols;vc++){
+const x0=Math.floor(vc*COLS/voiceCols),x1=Math.floor((vc+1)*COLS/voiceCols);
+let hit=-1;
+for(let x=x0;x<x1&&hit<0;x++)for(let y=0;y<ROWS;y++){const i=idx(x,y);if(cur[i]&&age[i]===0){hit=Math.max(hit,laneOfRow(y));flash[x]=1;}}
+if(hit>=0)lanesHit.add(hit);
+}
+notesLast=lanesHit.size;
+if(lanesHit.size)chord([...lanesHit]);
+pop=0;for(let i=0;i<NC;i++)pop+=cur[i];
+return births;
+}
+let pop=0,notesLast=0;
+const stage=$('#stage'),cv=$('#cv'),ctx=cv.getContext('2d');
+let cw=10,ox=0,oy=0;
+const flash=new Float32Array(COLS);
+function fit(){const r=stage.getBoundingClientRect();cv.width=Math.max(2,(r.width*dpr)|0);cv.height=Math.max(2,(r.height*dpr)|0);draw();}
+new ResizeObserver(fit).observe(stage);
+function draw(now){
+const W=cv.width/dpr,H=cv.height/dpr;
+ctx.setTransform(dpr,0,0,dpr,0,0);
+ctx.fillStyle='#04050c';ctx.fillRect(0,0,W,H);
+cw=Math.min(W/COLS,H/ROWS);ox=(W-cw*COLS)/2;oy=(H-cw*ROWS)/2;
+for(let l=0;l<LANES;l++){
+const ly=oy+((LANES-1-l)+0.5)*(ROWS/LANES)*cw;
+ctx.fillStyle='rgba(127,147,184,0.5)';
+ctx.fillRect(ox-14,ly-1,8,2);
+}
+for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+const i=idx(x,y);
+if(!cur[i])continue;
+const a=Math.min(1,age[i]/14);
+if(a<0.25)ctx.fillStyle='#eafff2';
+else if(a<0.6)ctx.fillStyle='#4ade80';
+else if(a<0.9)ctx.fillStyle='#2fd6ff';
+else ctx.fillStyle='#3d5ea8';
+ctx.fillRect(ox+x*cw+0.5,oy+y*cw+0.5,cw-1,cw-1);
+}
+for(let x=0;x<COLS;x++)if(flash[x]>0.02){ctx.fillStyle=`rgba(47,214,255,${(flash[x]*0.10).toFixed(3)})`;ctx.fillRect(ox+x*cw,oy,cw,cw*ROWS);}
+const laneH=ROWS/LANES*cw;
+for(let l=0;l<LANES;l++){
+const ly=oy+(LANES-1-l)*laneH;
+if(glowLane[l]>0.02){ctx.fillStyle=`rgba(167,139,250,${(glowLane[l]*0.18).toFixed(3)})`;ctx.fillRect(ox,ly,cw*COLS,laneH);}
+}
+const vc=lastVoiceCol;
+if(vc>=0){const bx=ox+vc*(cw*COLS/8);ctx.fillStyle='rgba(74,222,128,0.10)';ctx.fillRect(bx,oy,cw*COLS/8,cw*ROWS);}
+ctx.strokeStyle='rgba(127,147,184,0.05)';ctx.lineWidth=1;ctx.beginPath();
+for(let x=0;x<=COLS;x+=4){ctx.moveTo(ox+x*cw,oy);ctx.lineTo(ox+x*cw,oy+ROWS*cw);}
+ctx.stroke();
+}
+const glowLane=new Float32Array(LANES);
+let lastVoiceCol=-1;
+let drag=null,dragVal=1,lastCell=null;
+function cellAt(e){const r=cv.getBoundingClientRect();
+const x=Math.floor((e.clientX-r.left-ox)/cw),y=Math.floor((e.clientY-r.top-oy)/cw);
+return x>=0&&y>=0&&x<COLS&&y<ROWS?{x,y}:null;}
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const p=cellAt(e);if(!p)return;
+ensureAudio();drag='paint';dragVal=cur[idx(p.x,p.y)]?0:1;lastCell=p;
+setCell(p.x,p.y,dragVal);});
+cv.addEventListener('pointermove',e=>{if(drag!=='paint')return;const p=cellAt(e);if(!p)return;
+if(lastCell){const steps=Math.max(1,Math.ceil(Math.hypot(p.x-lastCell.x,p.y-lastCell.y)));
+for(let k=0;k<=steps;k++){const x=Math.round(lastCell.x+(p.x-lastCell.x)*k/steps),y=Math.round(lastCell.y+(p.y-lastCell.y)*k/steps);setCell(x,y,dragVal);}}
+else{setCell(p.x,p.y,dragVal);lastCell=p;}});
+addEventListener('pointerup',()=>{drag=null;lastCell=null;});
+function setCell(x,y,v){x=((x%COLS)+COLS)%COLS;y=((y%ROWS)+ROWS)%ROWS;const i=idx(x,y);
+if(v&&!cur[i]){cur[i]=1;age[i]=0;pluck(laneOfRow(y));flash[x]=1;}
+else if(!v)cur[i]=0;}
+const hFps=$('#hFps'),hGen=$('#hGen'),hPop=$('#hPop'),hNotes=$('#hNotes'),hStat=$('#hStat');
+class Spark{constructor(cv2,color){this.cv=cv2;this.c=cv2.getContext('2d');this.d=[];this.cap=90;this.color=color;}
+push(v){this.d.push(v);if(this.d.length>this.cap)this.d.shift();this.draw();}
+draw(){const c=this.c,w=this.cv.width,h=this.cv.height;c.clearRect(0,0,w,h);
+if(this.d.length<2)return;let mn=Infinity,mx=-Infinity;
+for(const v of this.d){if(v<mn)mn=v;if(v>mx)mx=v;}
+if(mx-mn<1e-9)mx=mn+1;
+c.strokeStyle=this.color;c.lineWidth=2.5;c.beginPath();
+for(let i=0;i<this.d.length;i++){const x=i/(this.cap-1)*w,y=h-5-((this.d[i]-mn)/(mx-mn))*(h-10);i?c.lineTo(x,y):c.moveTo(x,y);}
+c.stroke();}}
+const spark1=new Spark($('#spark1'),'#a78bfa');
+let hudAcc=0,sparkAcc=0,lastT=performance.now(),fpsV=60;
+const elRule=$('#rule'),elScale=$('#scale'),elWave=$('#wave'),elBpm=$('#bpm'),elWrap=$('#wrap');
+elRule.onchange=()=>{rule=elRule.value;};
+elScale.onchange=()=>{scaleName=elScale.value;};
+elBpm.oninput=()=>{bpm=+elBpm.value;$('#vBpm').textContent=bpm;};
+elWrap.onchange=()=>{wrap=elWrap.checked;};
+const bPlay=$('#bPlay');
+bPlay.onclick=()=>{running=!running;bPlay.textContent=running?'PAUSE':'PLAY';};
+$('#bStep').onclick=()=>{beat();};
+const bMute=$('#bMute');
+bMute.onclick=()=>{muted=!muted;bMute.textContent=muted?'🔇 OFF':'🔊 ON';mutedChip.querySelector?0:0;$('#hMute').textContent=muted?'OFF':'ON';};
+$('#bSoup').onclick=()=>{soup();};
+$('#bGliders').onclick=()=>{gliders();};
+$('#bPuddles').onclick=()=>{puddles();};
+$('#bClear').onclick=()=>{clearB();};
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600);}
+$('#bShare').onclick=()=>{saveHash();try{navigator.clipboard.writeText(location.href).then(()=>toast('STATE COPIED TO URL'),()=>toast('STATE WRITTEN TO URL'));}catch(err){toast('STATE WRITTEN TO URL');}};
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+const k=e.key.toLowerCase();
+if(k===' '){e.preventDefault();running=!running;bPlay.textContent=running?'PAUSE':'PLAY';}
+else if(k==='n')beat();
+else if(k==='c')clearB();
+else if(k==='g')gliders();
+else if(k==='m')bMute.onclick();
+else if(k==='1'){rule='life';elRule.value='life';}
+else if(k==='2'){rule='highlife';elRule.value='highlife';}
+else if(k==='3'){rule='seeds';elRule.value='seeds';}
+else if(k==='4'){rule='daynight';elRule.value='daynight';}
+else if(k==='+'||k==='='){elBpm.value=clamp(bpm+20,40,480);elBpm.oninput();}
+else if(k==='-'){elBpm.value=clamp(bpm-20,40,480);elBpm.oninput();}});
+function rle(arr){let out='',i=0;while(i<arr.length){let j=i;while(j<arr.length&&arr[j]===arr[i])j++;out+=(j-i).toString(36)+arr[i];i=j;}return out;}
+function unrle(s,len){const bits=new Uint8Array(len);let i=0,p=0;
+while(i<s.length&&p<len){let j=i;while(j<s.length&&s[j]>='0'&&s[j]<='9')j++;
+const n=parseInt(s.slice(i,j),10)||1;const b=+(s[j]||0);
+for(let k=0;k<n&&p<len;k++)bits[p++]=b;i=j+1;}
+return bits;}
+function saveHash(){const o={r:rule,s:scaleName,w:elWave.value,b:bpm,wp:wrap?1:0,g:rle(cur)};
+history.replaceState(null,'','#'+Object.entries(o).map(([k2,v])=>k2+'='+v).join('&'));}
+function loadHash(){if(location.hash.length<3)return;
+const o={};location.hash.replace(/^#/,'').split('&').forEach(p=>{const kv=p.split('=');if(kv[0])o[kv[0]]=kv.slice(1).join('=');});
+try{
+if(o.r&&RULES[o.r]){rule=o.r;elRule.value=rule;}
+if(o.s&&SCALES[o.s]){scaleName=o.s;elScale.value=scaleName;}
+if(o.w&&['sine','triangle','square','sawtooth'].includes(o.w))elWave.value=o.w;
+if(o.b){bpm=clamp(+o.b,40,480);elBpm.value=bpm;$('#vBpm').textContent=bpm;}
+if(o.wp!==undefined)wrap=!!+o.wp,elWrap.checked=wrap;
+if(o.g){cur.set(unrle(o.g,NC));}
+}catch(err){}}
+setInterval(()=>{if(!RM)saveHash();},3000);
+function frame(now){if(!RM)requestAnimationFrame(frame);
+const dt=Math.min(50,now-lastT)||16.6;lastT=now;
+fpsV=fpsV*0.93+(1000/dt)*0.07;
+if(running){
+acc+=dt;
+const beatMs=60000/bpm;
+let guard=0;
+while(acc>=beatMs&&guard++<4){acc-=beatMs;
+lastVoiceCol=(lastVoiceCol+1)%8;
+const before=lastVoiceCol;
+beat();
+lastVoiceCol=before;}
+}
+for(let x=0;x<COLS;x++)flash[x]*=0.86;
+for(let l=0;l<LANES;l++)glowLane[l]*=0.90;
+draw(now);
+hudAcc+=dt/1000;sparkAcc+=dt/1000;
+if(hudAcc>0.15){hudAcc=0;
+hFps.textContent=Math.round(fpsV);
+hGen.textContent=gen;
+let p=0;for(let i=0;i<NC;i++)p+=cur[i];pop=p;
+hPop.textContent=p;
+hNotes.textContent=notesLast;
+hStat.textContent=running?(rule.toUpperCase()+' · '+bpm+' bpm'+(muted?' · muted':'')):'paused — press SPACE or STEP';}
+if(sparkAcc>0.12){sparkAcc=0;spark1.push(pop);}
+}
+loadHash();
+fit();
+if(location.hash.length<3)soup();
+if(RM){draw();hStat.textContent='reduced motion: use STEP (or SPACE) to advance';}
+else requestAnimationFrame(frame);
+window.__LAB_READY__=true;
+window.__LAB__={get gen(){return gen;},get pop(){return pop;}};
+
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+document.querySelectorAll('section.doc').forEach(el=>el.hidden=true);
+document.querySelectorAll('main,footer').forEach(el=>el.hidden=(b.dataset.tab!=='viz'));
+if(b.dataset.tab!=='viz'){document.querySelector('#tab-'+b.dataset.tab).hidden=false;}
+if(typeof fit==='function')fit();
+}));
+</script>
+<div id="toast"></div>
+</body>
+</html>

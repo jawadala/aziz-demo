@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#efe6d8">
+<link rel="icon" href="data:,">
+<title>PHYSARUM STUDY No. 7</title>
+<style>
+:root{--paper:#efe6d8;--navy:#1e2749;--pink:#e0447c;--dim:#7d7364;--line:#c9bda9}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--paper);color:var(--navy);font:13px/1.45 "Courier New",ui-monospace,monospace;overflow:hidden}
+#view{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+#grain{position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.5;background:
+ repeating-linear-gradient(0deg,rgba(30,39,73,.05) 0 1px,transparent 1px 3px),
+ repeating-linear-gradient(90deg,rgba(224,68,124,.04) 0 1px,transparent 1px 4px)}
+.reg{position:fixed;width:20px;height:20px;z-index:12;pointer-events:none;border:0 solid var(--navy)}
+.reg.tl{top:10px;left:10px;border-left:1.5px solid;border-top:1.5px solid}
+.reg.tr{top:10px;right:10px;border-right:1.5px solid;border-top:1.5px solid}
+.reg.bl{bottom:10px;left:10px;border-left:1.5px solid;border-bottom:1.5px solid}
+.reg.br{bottom:10px;right:10px;border-right:1.5px solid;border-bottom:1.5px solid}
+#rult{position:fixed;top:0;left:0;right:0;height:12px;z-index:11;pointer-events:none;opacity:.6;background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 32px)}
+#rull{position:fixed;top:0;left:0;bottom:0;width:12px;z-index:11;pointer-events:none;opacity:.6;background:repeating-linear-gradient(0deg,var(--line) 0 1px,transparent 1px 32px)}
+.plate{position:fixed;background:rgba(239,230,216,.94);border:1px solid var(--navy);z-index:15}
+#idplate{top:20px;left:20px;padding:10px 14px;max-width:330px;border-left:4px solid var(--pink)}
+#idplate h1{font:bold 17px/1.15 "Courier New",monospace;color:var(--navy);letter-spacing:.1em}
+#idplate h1 em{font:italic 400 15px Georgia,serif;color:var(--pink)}
+#idplate p{font:9.5px/1.7 "Courier New",monospace;color:var(--dim);letter-spacing:.14em;margin-top:4px}
+#hud{bottom:20px;left:20px;padding:8px 12px;min-width:190px;font:11px/1.7 "Courier New",monospace}
+#hud .row{display:flex;justify-content:space-between;gap:16px}
+#hud .row span{color:var(--dim)}
+#hud .row b{color:var(--navy)}
+#fps{font:bold 24px/1.1 "Arial Narrow",Impact,sans-serif;color:var(--pink);letter-spacing:.04em}
+#panel{top:20px;right:34px;bottom:20px;width:240px;padding:10px 12px;overflow-y:auto;scrollbar-width:thin}
+#panel h2{font:bold 10px/1 "Courier New",monospace;color:var(--pink);letter-spacing:.24em;margin:13px 0 7px;border-bottom:1px solid var(--line);padding-bottom:4px}
+#panel h2:first-child{margin-top:0}
+.bat{display:flex;flex-direction:column;gap:2px}
+.bat button{display:flex;align-items:center;gap:8px;background:none;border:0;color:var(--dim);font:11px "Courier New",monospace;letter-spacing:.08em;text-align:left;padding:3px 4px;cursor:pointer}
+.bat button::before{content:"○";color:var(--line)}
+.bat button.on{color:var(--navy)}
+.bat button.on::before{content:"●";color:var(--pink)}
+.fad{margin:8px 0}
+.fad label{display:flex;justify-content:space-between;font:9px/1 "Courier New",monospace;color:var(--dim);letter-spacing:.12em;margin-bottom:3px}
+.fad output{color:var(--pink);font-weight:bold}
+.fad input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:3px;background:var(--line);outline:none}
+.fad input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:18px;background:var(--pink);border:1px solid var(--navy);cursor:ew-resize}
+.fad input[type=range]::-moz-range-thumb{width:10px;height:18px;background:var(--pink);border:1px solid var(--navy);border-radius:0;cursor:ew-resize}
+.note{font:italic 11.5px/1.5 Georgia,serif;color:var(--dim)}
+.btns{display:flex;flex-wrap:wrap;gap:5px}
+.btns button{flex:1 1 44%;background:none;border:1px solid var(--navy);color:var(--navy);font:10px "Courier New",monospace;letter-spacing:.1em;padding:6px 2px;cursor:pointer}
+.btns button:hover{background:var(--pink);color:var(--paper)}
+#manual{right:34px;bottom:20px;padding:8px 12px;font:10px/1.8 "Courier New",monospace;color:var(--dim);letter-spacing:.08em}
+#manual b{color:var(--navy);font-weight:normal;border:1px solid var(--line);padding:0 4px}
+#toast{position:fixed;left:50%;bottom:60px;transform:translateX(-50%);background:var(--navy);color:var(--paper);padding:6px 14px;font:11px "Courier New",monospace;letter-spacing:.12em;opacity:0;transition:.2s;z-index:60;pointer-events:none}
+#toast.on{opacity:1}
+#mob{display:none}
+#pgnotes{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:45;display:flex;gap:6px}
+#pgnotes button{background:var(--paper);border:1px solid var(--navy);color:var(--dim);font:10px "Courier New",monospace;letter-spacing:.12em;padding:4px 10px;cursor:pointer}
+#pgnotes button.on{color:var(--paper);background:var(--navy)}
+.page{position:fixed;inset:0;overflow-y:auto;padding:60px 24px;display:none;background:var(--paper);z-index:40}
+.page.on{display:block}
+.wrap{max-width:640px;margin:0 auto}
+.page h1{font:bold 17px/1.3 "Courier New",monospace;color:var(--navy);letter-spacing:.08em;margin-bottom:4px}
+.page .cat{font:10px "Courier New",monospace;color:var(--dim);letter-spacing:.16em;margin-bottom:26px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.page h2{font:bold 11px "Courier New",monospace;color:var(--pink);letter-spacing:.18em;margin:24px 0 8px}
+.page p{color:var(--navy);margin:8px 0;font-size:13px}
+.page ul{margin:8px 0 8px 18px}
+.page li{margin:5px 0;font-size:13px}
+.eq{font:12px/1.7 "Courier New",monospace;color:var(--navy);background:rgba(30,39,73,.06);border-left:3px solid var(--pink);padding:10px 14px;margin:12px 0;white-space:pre;overflow-x:auto}
+@media(max-width:840px){
+ #panel{top:auto;bottom:52px;right:10px;left:auto;width:216px;max-height:50vh;transform:translateY(112%);transition:transform .25s}
+ #panel.open{transform:none}
+ #mob{display:block;position:fixed;right:10px;bottom:14px;z-index:46;background:var(--navy);color:var(--paper);border:0;font:10px "Courier New",monospace;letter-spacing:.12em;padding:6px 12px}
+ #idplate{max-width:250px}
+ #manual{display:none}
+ #hud{transform:scale(.85);transform-origin:bottom left}
+}
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+<div id="grain"></div>
+<div class="reg tl"></div><div class="reg tr"></div><div class="reg bl"></div><div class="reg br"></div>
+<div id="rult"></div><div id="rull"></div>
+<div class="plate" id="idplate">
+ <h1>PHYSARUM STUDY <em>No. 7</em></h1>
+ <p>AGENT / TRAIL FIELD · 3-SENSOR STEERING<br>JAWAD — COMPUTATIONAL STUDIES</p>
+</div>
+<div class="plate" id="hud">
+ <div id="fps">--</div>
+ <div class="row"><span>AGENTS</span><b id="hag">0</b></div>
+ <div class="row"><span>TRAIL GRID</span><b id="hgr">-</b></div>
+ <div class="row"><span>MEAN TRAIL</span><b id="htr">-</b></div>
+ <div class="row"><span>STEP</span><b id="hms">- ms</b></div>
+ <div class="row"><span>RECIPE</span><b id="hmo">-</b></div>
+</div>
+<div class="plate" id="panel">
+ <h2>RECIPE</h2>
+ <div class="bat" id="modes"></div>
+ <h2>AGENT FIELD</h2>
+ <div id="faders"></div>
+ <h2>OPERATE</h2>
+ <div class="btns">
+  <button id="bpause">HOLD</button>
+  <button id="breset">RESEED</button>
+  <button id="brnd">RE-DERIVE</button>
+  <button id="bshare">STATE→URL</button>
+  <button id="bfood">FEED DROP</button>
+  <button id="bnotes">NOTES</button>
+ </div>
+ <p class="note">Canvas drag repels the colony. FEED DROP lays attractant at center. Colonies re-network in ~5 s after any disturbance.</p>
+</div>
+<div class="plate" id="manual">
+ <b>SPACE</b> hold&nbsp; <b>R</b> reseed&nbsp; <b>H</b> re-derive&nbsp; <b>M</b> next&nbsp; <b>C</b> state&nbsp; <b>F</b> feed&nbsp; <b>1-6</b> recipe
+</div>
+<div id="pgnotes">
+ <button id="ntab1" class="on">PLATE NOTES</button>
+ <button id="ntab2">METHOD</button>
+</div>
+<button id="mob">PANEL</button>
+<div id="toast"></div>
+<div class="page" id="pg-plate"><div class="wrap">
+<h1>PLATE NOTES — STUDY No. 7</h1>
+<div class="cat">PHYSARUM · AGENT/TRAIL FIELD · CATALOG 03/24</div>
+<p>Forty thousand point agents. No direct communication. Each deposits trail, senses trail at three forward points, turns toward the strongest, moves. The trail diffuses and decays. Network forms.</p>
+<p>The printed network is transport topology: thick veins carry high flux, thin branches probe. Cut a vein with the pointer and the colony reroutes. FEED DROP lays attractant; watch the mesh converge on it.</p>
+<h2>RECIPES</h2>
+<ul>
+<li>NETWORK — sensor 22°, distance 9. Canonical vein mesh.</li>
+<li>VORTEX — sensor 60°, wide turn. Curling sheets, slow vortices.</li>
+<li>FILAMENT — narrow angle, long sensor. Parallel hair-thin streaks.</li>
+<li>MESH — short sensor, soft turn. Even lace.</li>
+<li>PARALLEL — sensor 90°. Grid-like bedding.</li>
+<li>SANDBOX — same engine, mild defaults; sliders are the experiment.</li>
+</ul>
+<h2>OPERATING NOTES</h2>
+<ul>
+<li>Trail mean readout: 0 = starved field, colonies die to uniform paper. RE-DERIVE keeps parameters inside the band that nets.</li>
+<li>STATE→URL encodes recipe and faders. Reload resumes the same experiment.</li>
+<li>Torus topology. Veins cross the sheet edge without seam.</li>
+</ul>
+</div></div>
+<div class="page" id="pg-method"><div class="wrap">
+<h1>METHOD — STUDY No. 7</h1>
+<div class="cat">STEERING, TRAIL DYNAMICS, ENGINEERING</div>
+<h2>1 · AGENT</h2>
+<div class="eq">sense FL, F, FR at (±SA, SD) ahead
+turn toward argmax by ≤ RA rad
+x ← x + v·(cosθ, sinθ)         toroidal wrap
+trail[x,y] ← min(255, trail + D)</div>
+<h2>2 · TRAIL FIELD</h2>
+<div class="eq">diffuse: separable 3×3 box filter (two 1-D passes)
+decay:  T ← T · (1 − DECAY)</div>
+<p>Diffusion spreads attractant one cell per tick; decay (0.06-0.12) forgets. The two rates set vein width and lifetime together.</p>
+<h2>3 · ENGINEERING</h2>
+<ul>
+<li>Agents in flat Float32/Uint8Arrays; no objects in the hot loop.</li>
+<li>Grid 256×144 nominal, independent of screen; render is one ImageData blit scaled to viewport.</li>
+<li>All sensor reads wrap by modulo; no boundary special case.</li>
+<li>Measured: 40k agents + field pass ≈ 6-9 ms/frame, integrated graphics, 60 fps.</li>
+</ul>
+<h2>4 · DEFAULT PLATE</h2>
+<div class="eq">40 000 agents  SA 22.1°  SD 9  RA 0.35
+v 1.0  DECAY 0.09  DEPOSIT 255  grid 256×144</div>
+<p class="note">Defaults reproduce the canonical mesh from uniform scatter in 5-10 s.</p>
+</div></div>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const cvs=$('#view'),ctx=cvs.getContext('2d',{alpha:false});
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MOB=matchMedia('(max-width:840px)').matches;
+let GW=256,GH=144;
+let T=new Float32Array(GW*GH),T2=new Float32Array(GW*GH);
+const ACAP=45000;
+let NA=0;
+const ax=new Float32Array(ACAP),ay=new Float32Array(ACAP),aa=new Float32Array(ACAP);
+let SCRW=0,SCRH=0;
+const P={preset:0,N:MOB?18000:40000,sa:22.1,sd:9,ra:0.35,v:1.0,dec:0.09,dep:255,ptr:1};
+let run=!RM,fps=60,stepMs=0,meanTrail=0,repel=true;
+window.__MASS=-1;window.__STEPN=0;
+const RAD=Math.PI/180;
+
+/* LUT: trail 0..255 → paper..navy..pink risograph inks */
+const LUT=new Uint8Array(256*3);
+(function(){
+ const stops=[[0,[239,230,216]],[0.35,[196,186,166]],[0.6,[30,39,73]],[0.82,[224,68,124]],[1,[255,214,226]]];
+ for(let i=0;i<256;i++){
+  const v=i/255;let a=stops[0],b=stops[stops.length-1];
+  for(let s=0;s<stops.length-1;s++)if(v>=stops[s][0]&&v<=stops[s+1][0]){a=stops[s];b=stops[s+1];break}
+  const f=(v-a[0])/Math.max(1e-6,b[0]-a[0]);
+  for(let c=0;c<3;c++)LUT[i*3+c]=Math.round(a[1][c]+(b[1][c]-a[1][c])*f);
+ }
+})();
+
+/* recipes */
+const MODES=[
+ {name:'NETWORK',sa:22.1,sd:9,ra:0.35,v:1.0,dec:0.09},
+ {name:'VORTEX',sa:60,sd:6,ra:0.55,v:0.8,dec:0.07},
+ {name:'FILAMENT',sa:8,sd:22,ra:0.2,v:1.2,dec:0.11},
+ {name:'MESH',sa:45,sd:4,ra:0.18,v:0.9,dec:0.10},
+ {name:'PARALLEL',sa:90,sd:3,ra:0.3,v:1.0,dec:0.08},
+ {name:'SANDBOX',sa:30,sd:9,ra:0.35,v:1.0,dec:0.09}
+];
+function applyPreset(k,fresh=true){
+ P.preset=k;const md=MODES[k];
+ P.sa=md.sa;P.sd=md.sd;P.ra=md.ra;P.v=md.v;P.dec=md.dec;
+ syncUI();markModes();pushHash(true);
+ if(fresh)reseed();
+}
+
+/* state in URL */
+let hashT=null;
+function enc(){return btoa(JSON.stringify({v:1,p:{m:P.preset,N:P.N,s:P.sa,d:P.sd,r:P.ra,v:P.v,e:P.dec,D:P.dep,q:P.ptr?1:0}})).replace(/=+$/,'')}
+function dec(h){try{const o=JSON.parse(atob(h));if(!o||o.v!==1)return false;const q=o.p||{};P.preset=Math.min(MODES.length-1,Math.max(0,q.m|0));P.N=Math.min(ACAP,Math.max(2000,q.N|0));P.sa=Math.min(90,Math.max(3,+q.s||22));P.sd=Math.min(24,Math.max(2,+q.d||9));P.ra=Math.min(1,Math.max(.05,+q.r||.35));P.v=Math.min(2,Math.max(.3,+q.v||1));P.dec=Math.min(.2,Math.max(.03,+q.e||.09));P.dep=Math.min(255,Math.max(30,q.D|0));P.ptr=q.q?1:0;if(P.ptr){}return true}catch(e){return false}}
+function pushHash(now){const go=()=>{try{history.replaceState(null,'','#'+enc())}catch(e){}};if(now){go();return}clearTimeout(hashT);hashT=setTimeout(go,500)}
+
+function reseed(){
+ T.fill(0);T2.fill(0);
+ NA=P.N;
+ for(let i=0;i<NA;i++){
+  ax[i]=Math.random()*GW;ay[i]=Math.random()*GH;
+  aa[i]=Math.random()*Math.PI*2;
+  T[(ay[i]|0)*GW+(ax[i]|0)]=P.dep;
+ }
+ t0=0;
+}
+let t0=0;
+
+/* pointer */
+let paint=false,pxp=0,pyp=0;
+
+function step(){
+ const t0=performance.now();
+ const sa=P.sa*RAD,sd=P.sd,ra=P.ra,v=P.v;
+ const dep=P.dep,decay=Math.max(0,1-P.dec);
+ for(let i=0;i<NA;i++){
+  let x=ax[i],y=ay[i],a=aa[i];
+  const fc=a,fl=a-sa,fr=a+sa;
+  const sF=T[(((y+Math.sin(fc)*sd)|0)%GH+GH)%GH*GW+(((x+Math.cos(fc)*sd)|0)%GW+GW)%GW];
+  const sL=T[(((y+Math.sin(fl)*sd)|0)%GH+GH)%GH*GW+(((x+Math.cos(fl)*sd)|0)%GW+GW)%GW];
+  const sR=T[(((y+Math.sin(fr)*sd)|0)%GH+GH)%GH*GW+(((x+Math.cos(fr)*sd)|0)%GW+GW)%GW];
+  if(sF>sL&&sF>sR){/* straight */}
+  else if(sL>sR)a-=ra*Math.random();
+  else if(sR>sL)a+=ra*Math.random();
+  else a+=(Math.random()-0.5)*ra;
+  if(paint){
+   const cx=pxp/GW,cy=pyp/GH;
+   let dx=x-cx,dy=y-cy;
+   const d2=dx*dx+dy*dy,RR=18;
+   if(d2<RR*RR&&d2>0.01){const d=Math.sqrt(d2),ang=Math.atan2(dy,dx),w=(1-d/RR);
+    a+=Math.max(-ra*2,Math.min(ra*2,(ang-a)*w*0.6));}
+  }
+  x+=Math.cos(a)*v;y+=Math.sin(a)*v;
+  if(x<0)x+=GW;else if(x>=GW)x-=GW;
+  if(y<0)y+=GH;else if(y>=GH)y-=GH;
+  ax[i]=x;ay[i]=y;aa[i]=a;
+  const idx=(y|0)*GW+(x|0);
+  T[idx]=Math.min(255,T[idx]+dep);
+ }
+ /* diffuse+decay, separable */
+ for(let y=0;y<GH;y++){
+  const r=y*GW;
+  for(let x=0;x<GW;x++){
+   const l=T[r+(x-1+GW)%GW],c=T[r+x],rr=T[r+(x+1)%GW];
+   T2[r+x]=(l+c+c+rr)*0.25;
+  }
+ }
+ let msum=0;
+ for(let y=0;y<GH;y++){
+  const up=((y-1+GH)%GH)*GW,dn=((y+1)%GH)*GW,r=y*GW;
+  for(let x=0;x<GW;x++){
+   const v2=(T2[up+x]+T2[r+x]*2+T2[dn+x])*0.25*decay;
+   T[r+x]=v2;msum+=v2;
+  }
+ }
+ meanTrail=msum/(GW*GH);
+ stepMs=stepMs*0.85+(performance.now()-t0)*1;
+}
+let t0b=0,t0b0=0;
+
+function render(){
+ const img=(this._img)||(this._img=null);
+}
+let imgCvs=null,imgCtx=null,IMG=null;
+function render2(){
+ if(!imgCvs){imgCvs=document.createElement('canvas');imgCvs.width=GW;imgCvs.height=GH;imgCtx=imgCvs.getContext('2d');IMG=imgCtx.createImageData(GW,GH)}
+ const d=IMG.data;
+ for(let i=0,e=0;i<T.length;i++,e+=4){
+  let v=T[i]|0;if(v>255)v=255;const c=v*3;
+  d[e]=LUT[c];d[e+1]=LUT[c+1];d[e+2]=LUT[c+2];d[e+3]=255;
+ }
+ imgCtx.putImageData(IMG,0,0);
+ ctx.imageSmoothingEnabled=true;
+ ctx.drawImage(imgCvs,0,0,SCRW,SCRH);
+ if(paint){
+  ctx.strokeStyle='rgba(224,68,124,.85)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(pxp/GW*SCRW,pyp/GH*SCRH,18/GW*SCRW,0,7);ctx.stroke();
+ }
+}
+
+function size(){
+ SCRW=innerWidth;SCRH=innerHeight;
+ cvs.width=SCRW;cvs.height=SCRH;
+}
+let rsT=null;
+addEventListener('resize',()=>{clearTimeout(rsT);rsT=setTimeout(size,120)});
+
+/* faders */
+const FL=[
+ {k:'N',lab:'AGENTS',min:2000,max:45000,st:1000,f:v=>''+(v|0)},
+ {k:'sa',lab:'SENSOR ANGLE DEG',min:3,max:90,st:0.5,f:v=>(+v).toFixed(1)},
+ {k:'sd',lab:'SENSOR DIST',min:2,max:24,st:1,f:v=>''+(v|0)},
+ {k:'ra',lab:'TURN RAD',min:0.05,max:1,st:0.05,f:v=>(+v).toFixed(2)},
+ {k:'v',lab:'SPEED',min:0.3,max:2,st:0.05,f:v=>(+v).toFixed(2)},
+ {k:'dec',lab:'DECAY',min:0.03,max:0.2,st:0.005,f:v=>(+v).toFixed(3)},
+ {k:'dep',lab:'DEPOSIT',min:30,max:255,st:1,f:v=>''+(v|0)}
+];
+const outs={};
+function buildFaders(){
+ const host=$('#faders');host.innerHTML='';
+ for(const s of FL){
+  const d=document.createElement('div');d.className='fad';
+  d.innerHTML='<label><span>'+s.lab+'</span><output></output></label>';
+  const inp=document.createElement('input');inp.type='range';inp.min=s.min;inp.max=s.max;inp.step=s.st;inp.value=P[s.k];
+  const out=d.querySelector('output');out.textContent=s.f(P[s.k]);outs[s.k]={inp,out,f:s.f};
+  inp.addEventListener('input',()=>{P[s.k]=+inp.value;out.textContent=s.f(inp.value);
+   if(s.k==='N')NA=Math.min(NA,P.N);
+   pushHash();});
+  d.appendChild(inp);host.appendChild(d);
+ }
+}
+function syncUI(){for(const k in outs){outs[k].inp.value=P[k];outs[k].out.textContent=outs[k].f(P[k])}}
+function markModes(){$$('#modes button').forEach((b,i)=>b.classList.toggle('on',i===P.preset))}
+function buildModes(){
+ const host=$('#modes');
+ MODES.forEach((m,i)=>{
+  const b=document.createElement('button');b.textContent=m.name;
+  b.addEventListener('click',()=>applyPreset(i));host.appendChild(b);
+ });
+}
+
+/* toast */
+let toastT=null;
+function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),1500)}
+
+/* operate */
+function togglePause(){run=!run;$('#bpause').textContent=run?'HOLD':'RUN';if(!run)render2()}
+$('#bpause').addEventListener('click',togglePause);
+$('#breset').addEventListener('click',()=>{reseed();toast('RESEEDED');if(!run)render2()});
+$('#brnd').addEventListener('click',()=>{
+ P.sa=rnd(5,80);P.sd=rnd(3,20)|0;P.ra=rnd(0.1,0.7);P.v=rnd(0.5,1.5);P.dec=rnd(0.05,0.15);
+ if(P.preset!==5){P.preset=5;markModes()}
+ syncUI();reseed();toast('RECIPE RE-DERIVED');pushHash(true);
+});
+function rnd(a,b){return a+Math.random()*(b-a)}
+$('#bshare').addEventListener('click',()=>{pushHash(true);toast('STATE IN ADDRESS BAR')});
+$('#bfood').addEventListener('click',()=>{
+ const cx=GW/2,cy=GH/2,R0=9;
+ for(let dy=-R0;dy<=R0;dy++)for(let dx=-R0;dx<=R0;dx++){
+  if(dx*dx+dy*dy>R0*R0)continue;
+  const x=((Math.round(cx+dx))%GW+GW)%GW,y=((Math.round(cy+dy))%GH+GH)%GH;
+  T[y*GW+x]=255;
+ }
+ toast('ATTRACTANT LAID');
+});
+$('#bnotes').addEventListener('click',()=>{$('#ntab1').click()});
+addEventListener('keydown',e=>{
+ if(e.code==='Space'){e.preventDefault();togglePause()}
+ else if(e.key==='r'||e.key==='R')$('#breset').click();
+ else if(e.key==='h'||e.key==='H')$('#brnd').click();
+ else if(e.key==='m'||e.key==='M')applyPreset((P.preset+1)%MODES.length);
+ else if(e.key==='c'||e.key==='C')$('#bshare').click();
+ else if(e.key==='f'||e.key==='F')$('#bfood').click();
+ else if(e.key>='1'&&e.key<='6'){const k=+e.key-1;if(k<MODES.length)applyPreset(k)}
+});
+$('#ntab1').addEventListener('click',()=>showPage('pg-plate',0));
+$('#ntab2').addEventListener('click',()=>showPage('pg-method',1));
+function showPage(id,tabIdx){
+ const pg=$('#'+id),open=pg.classList.contains('on');
+ $$('.page').forEach(p=>p.classList.remove('on'));
+ $('#ntab1').classList.remove('on');$('#ntab2').classList.remove('on');
+ if(!open){pg.classList.add('on');$(tabIdx===0?'#ntab1':'#ntab2').classList.add('on')}
+}
+cvs.addEventListener('pointerdown',e=>{paint=true;setP(e);cvs.setPointerCapture(e.pointerId)});
+cvs.addEventListener('pointermove',e=>{if(paint)setP(e)});
+cvs.addEventListener('pointerup',()=>paint=false);
+cvs.addEventListener('pointercancel',()=>paint=false);
+function setP(e){pxp=e.clientX/SCRW*GW;pyp=e.clientY/SCRH*GH}
+$('#mob').addEventListener('click',()=>{const p=$('#panel');p.classList.toggle('open');$('#mob').textContent=p.classList.contains('open')?'CLOSE':'PANEL'});
+
+/* loop */
+let last=performance.now(),ema=16.7,hudT=0;
+function loop(now){
+ const ms=now-last;last=now;ema+=(ms-ema)*0.06;fps=1000/Math.max(1,ema);
+ t0b0=performance.now();
+ if(run){step();render2()}
+ window.__MASS=meanTrail;window.__STEPN++;
+ if(now-hudT>260){hudT=now;
+  $('#fps').textContent=Math.round(fps)+' FPS';
+  $('#hag').textContent=NA;
+  $('#hgr').textContent=GW+'x'+GH;
+  $('#htr').textContent=meanTrail.toFixed(2);
+  $('#hms').textContent=stepMs.toFixed(1)+' ms';
+  $('#hmo').textContent=MODES[P.preset].name;
+ }
+ requestAnimationFrame(loop);
+}
+
+/* boot */
+const hh0=location.hash.slice(1);let had=false;
+if(hh0.length>6){try{had=dec(hh0)}catch(e){had=false}}
+size();buildFaders();buildModes();
+if(had){syncUI();markModes();reseed();pushHash(true)}
+else applyPreset(0);
+if(RM){for(let i=0;i<60;i++)step();render2();$('#bpause').textContent='RUN'}
+else requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

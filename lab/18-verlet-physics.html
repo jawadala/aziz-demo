@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0c10"/>
+<title>Study No. 18 · Suspended Weave — JAWAD, Computational Studies</title>
+<style>
+:root{--stage:#0a0c10;--stage2:#06070a;--plat:#cfd6dd;--plat-hi:#f2f6f9;--ink:#e6ebf0;--dim:#a7b0bc;--faint:#6b7480;--ember:#e06a4a;--rule:rgba(207,214,221,.16)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--stage);color:var(--ink);font:14px/1.6 Georgia,"Times New Roman",serif;display:flex;flex-direction:column;overflow:hidden}
+.lab{font:bold 9px "Courier New",ui-monospace,monospace;letter-spacing:.34em;text-transform:uppercase;color:var(--faint)}
+main{flex:1;min-height:0;position:relative}
+.view{position:absolute;inset:0;display:none;overflow:auto}
+.view.on{display:block}
+#stage{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;display:block}
+#stage.cut{cursor:crosshair}
+#stage.orbit{cursor:grabbing}
+/* ---- catalog plate ---- */
+.tblock{position:absolute;top:22px;right:22px;z-index:6;background:rgba(8,10,13,.72);border:1px solid var(--rule);max-width:352px;box-shadow:inset 0 1px 0 rgba(242,246,249,.06),0 30px 60px rgba(0,0,0,.55)}
+.tblock::before{content:"";position:absolute;top:-1px;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(242,246,249,.5),transparent)}
+.tblock .row1{display:flex;border-bottom:1px solid var(--rule)}
+.tblock .row1 .cell{padding:12px 16px}
+.tblock .row1 .cell:first-child{border-right:1px solid var(--rule);flex:1}
+.tblock .no{font:bold 9px "Courier New",monospace;letter-spacing:.4em;color:var(--faint);text-transform:uppercase;margin-bottom:7px}
+.tblock h1{font:400 28px/1.05 Didot,"Bodoni MT","Bodoni 72","Playfair Display",Georgia,serif;letter-spacing:.02em;color:var(--plat-hi)}
+.tblock .dwg{font:bold 9px "Courier New",monospace;letter-spacing:.22em;color:var(--dim);display:flex;align-items:center;text-align:center}
+.tblock .row2{border-bottom:1px solid var(--rule);padding:6px 16px;font:italic 12px Georgia,serif;color:var(--dim)}
+.tabs{display:flex}
+.tabs .tab{flex:1;background:none;border:0;border-right:1px solid var(--rule);color:var(--faint);cursor:pointer;font:bold 9px "Courier New",monospace;letter-spacing:.3em;padding:8px 0;text-transform:uppercase}
+.tabs .tab:last-child{border-right:0}
+.tabs .tab:hover{color:var(--dim)}
+.tabs .tab.on{color:var(--plat);box-shadow:inset 0 -2px 0 var(--plat)}
+/* ---- load cell readout ---- */
+.hud{position:absolute;top:22px;left:30px;z-index:6;background:rgba(8,10,13,.72);border:1px solid var(--rule);padding:11px 14px;min-width:168px;font:bold 10px "Courier New",monospace;letter-spacing:.14em;box-shadow:0 24px 48px rgba(0,0,0,.45)}
+.hud-row{display:flex;justify-content:space-between;gap:16px;padding:2.5px 0;color:var(--faint);text-transform:uppercase}
+.hud-row b{color:var(--plat);font-variant-numeric:tabular-nums;text-transform:none}
+/* ---- instrument clusters ---- */
+.cluster{position:absolute;bottom:22px;z-index:6;background:rgba(8,10,13,.72);border:1px solid var(--rule);padding:13px 16px;font:bold 9px "Courier New",monospace;letter-spacing:.22em;text-transform:uppercase;max-height:46%;overflow:auto;box-shadow:0 24px 48px rgba(0,0,0,.45)}
+.cl-bl{left:22px;width:min(400px,46vw)}
+.cl-br{right:22px;width:min(320px,40vw)}
+.cluster h3{font:inherit;color:var(--faint);letter-spacing:.34em;border-bottom:1px solid var(--rule);padding-bottom:6px;margin-bottom:10px}
+.bat{display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
+.bat .btn{display:flex;justify-content:space-between;gap:10px;background:none;border:0;border-left:2px solid transparent;color:var(--dim);cursor:pointer;font:inherit;letter-spacing:inherit;text-transform:inherit;padding:3.5px 8px;text-align:left}
+.bat .btn:hover{color:var(--plat-hi)}
+.bat .btn.on{border-left-color:var(--plat);color:var(--plat-hi);background:rgba(207,214,221,.05)}
+.fad{display:grid;grid-template-columns:64px 1fr 48px;align-items:center;gap:9px;padding:2.5px 0;color:var(--dim)}
+.fad output{color:var(--plat);text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;height:18px;background:transparent;width:100%;cursor:ew-resize}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--rule)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:9px;height:9px;margin-top:-4.5px;background:linear-gradient(135deg,#f2f6f9,#8d99a8);border:0;transform:rotate(45deg)}
+input[type=range]::-moz-range-track{height:1px;background:var(--rule)}
+input[type=range]::-moz-range-thumb{width:8px;height:8px;background:linear-gradient(135deg,#f2f6f9,#8d99a8);border:0;border-radius:0;transform:rotate(45deg)}
+.ops{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.btn.key{background:none;border:1px solid var(--rule);color:var(--dim);cursor:pointer;font:inherit;letter-spacing:.2em;padding:6px 11px;border-radius:0}
+.btn.key:hover{border-color:var(--plat);color:var(--plat-hi)}
+.btn.key.on{background:rgba(207,214,221,.12);color:var(--plat-hi);border-color:var(--plat)}
+.pset{display:flex;flex-direction:column;gap:2px}
+.pset .btn{background:none;border:0;color:var(--dim);cursor:pointer;font:inherit;letter-spacing:.18em;padding:2.5px 8px;text-align:left;display:flex;gap:12px;justify-content:space-between}
+.pset .btn:hover{color:var(--plat-hi)}
+.keys{margin-top:11px;padding-top:8px;border-top:1px dashed var(--rule);font:9.5px "Courier New",monospace;letter-spacing:.12em;color:var(--faint);text-transform:none}
+.keys b{color:var(--dim);font-weight:700}
+.edge{position:absolute;left:11px;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;transform-origin:center;rotate:180deg;font:bold 8.5px "Courier New",monospace;letter-spacing:.5em;color:rgba(207,214,221,.28);z-index:5;text-transform:uppercase;pointer-events:none}
+/* ---- calculation sheet ---- */
+.prose{max-width:800px;margin:36px 72px 36px 40px;padding:34px 34px 64px 38px;border-right:1px solid var(--rule);background:rgba(8,10,13,.5)}
+.prose h2{font:400 24px Didot,"Bodoni MT",Georgia,serif;color:var(--plat-hi);border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:16px}
+.prose h3{font:bold 10px "Courier New",monospace;letter-spacing:.3em;color:var(--dim);margin:26px 0 7px;text-transform:uppercase}
+.prose p,.prose li{font:14px/1.7 Georgia,serif;color:var(--dim);margin:8px 0}
+.prose b{color:var(--plat-hi)}
+.prose ul{padding-left:18px;list-style:square}
+.math{font:12.5px/1.7 "Courier New",ui-monospace,monospace;color:var(--plat-hi);background:rgba(207,214,221,.05);border:1px solid var(--rule);border-right:2px solid var(--plat);padding:11px 15px;margin:13px 0;overflow-x:auto;white-space:pre}
+.kbd{display:inline-block;border:1px solid var(--rule);border-bottom-width:2px;padding:0 5px;font:bold 10px "Courier New",monospace;color:var(--plat-hi)}
+footer{border-top:1px solid var(--rule);background:var(--stage2);color:var(--faint);font:bold 8.5px "Courier New",monospace;letter-spacing:.32em;text-transform:uppercase;display:flex;justify-content:space-between;gap:12px;padding:8px 18px;flex-wrap:wrap}
+footer b{color:var(--dim)}
+@media(max-width:900px){.cl-bl,.cl-br{width:44vw}.tblock{max-width:270px}.tblock h1{font-size:22px}.hud{display:none}}
+@media(max-width:640px){.cl-bl,.cl-br{width:calc(50% - 30px);font-size:8px}.tblock .row2{display:none}}
+</style>
+</head>
+<body>
+<main>
+  <section class="view on" id="view-demo">
+    <canvas id="stage"></canvas>
+    <div class="hud">
+      <div class="hud-row"><span>fps</span><b id="h-fps">–</b></div>
+      <div class="hud-row"><span>nodes</span><b id="h-p">–</b></div>
+      <div class="hud-row"><span>members</span><b id="h-c">–</b></div>
+      <div class="hud-row"><span>failed</span><b id="h-t">–</b></div>
+    </div>
+    <div class="tblock">
+      <div class="row1">
+        <div class="cell">
+          <div class="no">COMPUTATIONAL STUDIES · STUDY No. 18</div>
+          <h1>Suspended Weave</h1>
+        </div>
+        <div class="cell dwg">DWG<br/>18-A</div>
+      </div>
+      <div class="row2">verlet points + distance constraints · load to failure · drag empty space to turn the frame</div>
+      <div class="tabs">
+        <button class="tab on" data-v="demo">TEST</button>
+        <button class="tab" data-v="concept">THEORY</button>
+        <button class="tab" data-v="about">SPEC</button>
+      </div>
+    </div>
+    <div class="cluster cl-bl">
+      <h3>Specimen</h3>
+      <div class="bat" id="modes">
+        <button class="btn on" data-m="cloth"><span>A · Cloth panel</span><span>40×24</span></button>
+        <button class="btn" data-m="rope"><span>B · Rope chain</span><span>64 link</span></button>
+        <button class="btn" data-m="blob"><span>C · Membrane ring</span><span>24 pt</span></button>
+      </div>
+      <h3>Load Case</h3>
+      <label class="fad">gravity <input type="range" id="r-grav" min="0" max="2.5" step="0.05" value="1"><output id="o-grav">1.00</output></label>
+      <label class="fad">wind <input type="range" id="r-wind" min="-1" max="1" step="0.05" value="0.34"><output id="o-wind">0.34</output></label>
+      <label class="fad">tear <input type="range" id="r-tear" min="1.2" max="4" step="0.05" value="3"><output id="o-tear">3.0×</output></label>
+      <label class="fad">stiffness <input type="range" id="r-iters" min="1" max="10" step="1" value="6"><output id="o-iters">6×</output></label>
+      <div class="keys"><b>drag</b> a node to load it · yank past tear limit to fail it · <b>right-drag / C</b> shear · <b>space</b> hold · <b>M</b> specimen</div>
+    </div>
+    <div class="cluster cl-br">
+      <h3>Operations</h3>
+      <div class="ops">
+        <button class="btn key" id="b-cut">Shear: off</button>
+        <button class="btn key" id="b-pause">Hold</button>
+        <button class="btn key" id="b-reset">Re-set</button>
+        <button class="btn key" id="b-rand">Wind roll</button>
+      </div>
+      <h3>Load Tables</h3>
+      <div class="pset">
+        <button class="btn" data-p="sail"><span>T·1 Silk sail</span><span>g .85 w .28</span></button>
+        <button class="btn" data-p="gale"><span>T·2 Gale</span><span>g 1.0 w .95</span></button>
+        <button class="btn" data-p="moody"><span>T·3 Zero-g ring</span><span>g 0 w .12</span></button>
+        <button class="btn" data-p="chain"><span>T·4 Chain hang</span><span>g 1.4 w .05</span></button>
+      </div>
+    </div>
+    <div class="edge">COMPUTATIONAL STUDIES · TEST FRAME 18 · TENSION ONLY</div>
+  </section>
+  <section class="view" id="view-concept"><div class="prose">
+    <h2>Theory — position-based dynamics</h2>
+    <p>Everything on the frame is a cloud of points and a mesh of distance constraints. No rigid bodies,
+    no rotation matrices. Position-based dynamics keeps the system stable while cloth wrinkles, ropes pull
+    taut and the ring membrane jiggles under load.</p>
+    <h3>1 · Verlet integration</h3>
+    <div class="math">x'  = x + (x − x_prev) · damping + a · Δt²
+       x_prev = x</div>
+    <p>Velocity is implicit: the difference between the last two positions. One subtraction gives momentum,
+    drag and gravity. The integrator does not blow up.</p>
+    <h3>2 · Distance constraints</h3>
+    <div class="math">d = x₂ − x₁ ,  err = (|d| − rest) / |d|
+x₁ += d · err · ½   ,   x₂ −= d · err · ½</div>
+    <p>Each constraint pulls both endpoints toward its rest length. Sweeping the constraint list <i>k</i> times
+    per frame (the stiffness fader) is relaxation: force propagates across the mesh the way Gauss–Seidel
+    iterations converge.</p>
+    <h3>3 · Tearing</h3>
+    <div class="math">if |x₂ − x₁| &gt; tear · rest   →   member struck from the list</div>
+    <p>Over-stretched members fail. Grab a point and yank: stress spreads through the relaxation sweeps,
+    neighbouring links pass the tear limit and the specimen rips along a fault line.</p>
+    <h3>4 · Wind &amp; collisions</h3>
+    <div class="math">a_wind = W · (0.6 + 0.4 sin(3.1y + 2.3t)) · (0.8 + 0.4 sin(1.7x − t))</div>
+    <p>A spatially modulated horizontal acceleration: gusts travel across the surface instead of pushing it
+    uniformly. Points collide with the floor; penetration is projected out and tangential velocity is damped
+    by nudging the implicit previous-position.</p>
+    <h3>5 · The camera and the light</h3>
+    <p>The weave hangs on a <b>turntable</b>: yaw and pitch with inertia, spring-righted when idle, so a
+    specimen can be inspected from any angle mid-test. Threads shade by strain — platinum at rest, warm
+    ember as a member approaches its limit — and the floor carries a faint reflection for depth. Loading
+    physics never reads the camera; drag a node and the cloth, not the stage, moves.</p>
+  </div></section>
+  <section class="view" id="view-about"><div class="prose">
+    <h2>Spec — build record</h2>
+    <p>One self-contained HTML file: typed-array simulation, canvas 2D rendering, no libraries, no network.
+    About 1,500 live constraints run at 60 fps on integrated graphics.</p>
+    <h3>Engine</h3>
+    <ul>
+      <li><b>Points</b> — flat Float32Array pairs (x, y) plus previous positions; pinned points flagged and skipped by integration.</li>
+      <li><b>Solver</b> — per frame: integrate all points, then <i>k</i> relaxation sweeps over the constraint list, then floor projection. Failed members are tombstoned and compacted.</li>
+      <li><b>Specimens</b> — cloth (40×24 grid pinned along the top every 7 columns), rope (64-link chain, heavy doubled tip), membrane (24-point ring, radial spokes to a centre mass).</li>
+      <li><b>Camera &amp; light</b> — pitch/yaw turntable with inertia and idle spring; strain shading platinum→ember; floor reflection. Applied at draw time only.</li>
+      <li><b>Reduced motion</b> — <span class="kbd">prefers-reduced-motion</span> renders a static posed frame; controls re-pose on demand.</li>
+    </ul>
+    <h3>Interactions</h3>
+    <ul>
+      <li><b>Drag</b> any node — it follows the pointer and hauls the mesh with it. Yank past the tear limit to fail members.</li>
+      <li><b>Shear mode</b> — <span class="kbd">C</span> or the Shear button; drag the blade across members to cut each one crossed.</li>
+      <li><span class="kbd">Space</span> hold · <span class="kbd">R</span> re-set · <span class="kbd">M</span> next specimen · faders for gravity, wind, tear limit, stiffness.</li>
+      <li>Load tables T·1–T·4. State lives in the URL hash and survives reload.</li>
+    </ul>
+    <h3>Budget</h3>
+    <p>Constraint data sits in flat arrays for cache locality. The readout stack reports live node / member /
+    failure counts. DPR capped at 2 for mobile fill-rate.</p>
+  </div></section>
+</main>
+<footer><span><b>JAWAD — COMPUTATIONAL STUDIES</b> · dwg 18-A / 20 · zero dependencies</span><span>structures section · tension series</span></footer>
+<script>
+(()=>{'use strict';
+const errors=[];addEventListener('error',e=>errors.push(String(e.message||e)));
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cv=$('#stage'),ctx=cv.getContext('2d');
+let cw=0,ch=0,dpr=1;
+const S={mode:'cloth',grav:1,wind:0.34,tear:3,iters:6,seed:1818,paused:false,cut:false};
+let time=0,fps=0,dirty=true;
+function saveHash(){const p=new URLSearchParams({m:S.mode,g:S.grav,w:S.wind,t:S.tear,k:S.iters,c:S.cut?1:0,d:S.seed});history.replaceState(null,'','#'+p);}
+function loadHash(){try{const p=new URLSearchParams(location.hash.slice(1));if(!p.has('m'))return;S.mode=p.get('m');S.grav=+p.get('g');S.wind=+p.get('w');S.tear=+p.get('t');S.iters=+p.get('k');S.cut=p.get('c')==='1';S.seed=+p.get('d')||S.seed;}catch(e){}}
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+let rnd=mulberry(S.seed);
+/* ---------- world ---------- */
+let px,py,ox,oy,pin,pts=0,cA,cB,rest,broken,cons=0,grab=-1;
+function alloc(n){px=new Float32Array(n);py=new Float32Array(n);ox=new Float32Array(n);oy=new Float32Array(n);pin=new Uint8Array(n);cA=new Int32Array(n*8);cB=new Int32Array(n*8);rest=new Float32Array(n*8);broken=new Uint8Array(n*8);cons=0;}
+function addP(x,y,fx,fy){const i=pts++;px[i]=x;py[i]=y;ox[i]=x-(fx||0);oy[i]=y-(fy||0);pin[i]=0;return i;}
+function addC(a,b){if(cons>=cA.length)return;cA[cons]=a;cB[cons]=b;rest[cons]=Math.hypot(px[a]-px[b],py[a]-py[b]);broken[cons]=0;cons++;}
+function build(){if(cw<50||ch<50){dirty=true;return;}pts=0;rnd=mulberry(S.seed);time=0;tornCount=0;
+ const M=Math.min(cw,ch),ux=M/100;
+ if(S.mode==='cloth'){const cols=40,rows=24,w=Math.min(cw*.72,ux*72),h=Math.min(ch*.5,ux*46),x0=(cw-w)/2,y0=Math.max(30,ch*.08);alloc(cols*rows+16);
+  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++)addP(x0+i*w/(cols-1),y0+j*h/(rows-1));
+  /* authored load case: sheet already caught by the gust, bowed off-axis */
+  for(let j=1;j<rows;j++)for(let i=0;i<cols;i++){const id=j*cols+i;px[id]+=Math.sin(i/(cols-1)*3.14)*ux*3.5*(j/(rows-1))*(j/(rows-1));ox[id]=px[id];}
+  const pinEvery=7;
+  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const id=j*cols+i;if(i<cols-1)addC(id,id+1);if(j<rows-1)addC(id,id+cols);}
+  for(let i=0;i<cols;i+=pinEvery)pin[i]=1;pin[cols-1]=1;
+  /* authored pose: pre-settle 90 quasi-static frames so the sheet hangs in
+     equilibrium the moment the curtain lifts - no swing transient */
+  {const g0=1*ch*2.2,saveT=time;for(let f=0;f<90;f++){time=f/60;
+    for(let i=0;i<pts;i++){if(pin[i])continue;
+      const vx=(px[i]-ox[i])*.9,vy=(py[i]-oy[i])*.9;ox[i]=px[i];oy[i]=py[i];
+      px[i]+=vx;py[i]+=vy+g0/3600;}
+    for(let it=0;it<6;it++)for(let c=0;c<cons;c++){if(broken[c])continue;
+      const a=cA[c],b=cB[c];let dx=px[b]-px[a],dy=py[b]-py[a];let d=Math.sqrt(dx*dx+dy*dy)||1e-6;
+      const diff=(d-rest[c])/d*.5;dx*=diff;dy*=diff;
+      if(!pin[a]){px[a]+=dx;py[a]+=dy;}
+      if(!pin[b]){px[b]-=dx;py[b]-=dy;}}}
+   time=saveT;}}
+ else if(S.mode==='rope'){const n=64,len=Math.min(ch*.8,ch-60)/n,x0=cw/2,y0=Math.max(26,ch*.06);alloc(n+8);
+  for(let i=0;i<n;i++)addP(x0+Math.sin(i*.3)*2,y0+i*len);
+  for(let i=0;i<n-1;i++)addC(i,i+1);pin[0]=1;
+  for(let i=n-3;i<n;i++)for(let j=i+1;j<n;j++)addC(i,j);}
+ else{const n=24,R=ux*16,cx=cw/2,cy=ch*.36;alloc(n+2);
+  const c=addP(cx,cy);
+  const ring=[];for(let i=0;i<n;i++){const a=i/n*6.283;ring.push(addP(cx+Math.cos(a)*R,cy+Math.sin(a)*R,Math.cos(a)*1.2,Math.sin(a)*1.2));}
+  for(let i=0;i<n;i++){addC(ring[i],ring[(i+1)%n]);addC(ring[i],ring[(i+2)%n]);addC(ring[i],c);}
+  pin[c]=1;S._blobC=c;}
+ $('#h-p').textContent=pts;$('#h-c').textContent=cons;$('#h-t').textContent=0;dirty=true;}
+let tornCount=0;
+function step(dt){const g=S.grav*ch*2.2;
+ for(let i=0;i<pts;i++){if(pin[i]||i===grab)continue;
+  const vx=(px[i]-ox[i])*.992,vy=(py[i]-oy[i])*.992;
+  ox[i]=px[i];oy[i]=py[i];
+  const wf=S.wind*60*dt*(0.6+0.4*Math.sin(3.1*py[i]/ch*6+2.3*time))*(0.8+0.4*Math.sin(1.7*px[i]/cw*6-time*1.3));
+  px[i]+=vx+wf;py[i]+=vy+g*dt*dt;}
+ const tear=S.tear;
+ for(let it=0;it<S.iters;it++){
+  for(let c=0;c<cons;c++){if(broken[c])continue;const a=cA[c],b=cB[c];
+   let dx=px[b]-px[a],dy=py[b]-py[a];let d=Math.sqrt(dx*dx+dy*dy)||1e-6;
+   if(d>rest[c]*tear){broken[c]=1;tornCount++;$('#h-t').textContent=tornCount;continue;}
+   if(it===0&&d<rest[c]*.02&&d>0)continue;
+   const diff=(d-rest[c])/d*.5;dx*=diff;dy*=diff;
+   if(!pin[a]&&a!==grab){px[a]+=dx;py[a]+=dy;}
+   if(!pin[b]&&b!==grab){px[b]-=dx;py[b]-=dy;}}
+  const floor=ch-8;
+  for(let i=0;i<pts;i++){if(pin[i])continue;
+   if(py[i]>floor){py[i]=floor;ox[i]=px[i]-(px[i]-ox[i])*.6;}
+   if(px[i]<4)px[i]=4;if(px[i]>cw-4)px[i]=cw-4;if(py[i]<4)py[i]=4;}}
+ if(grab>=0){px[grab]=mouse.x;py[grab]=mouse.y;ox[grab]=mouse.x;oy[grab]=mouse.y;}}
+/* ---------- static stage (onyx floor, hairline grid, vignette-ready) ---------- */
+let sheetCv=null;
+function buildSheet(){
+ sheetCv=document.createElement('canvas');sheetCv.width=Math.max(1,cw*dpr);sheetCv.height=Math.max(1,ch*dpr);
+ const g=sheetCv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
+ g.lineWidth=1;
+ /* faint champagne grid rules */
+ g.strokeStyle='rgba(207,214,221,.045)';g.beginPath();
+ for(let x=24;x<cw;x+=24){g.moveTo(x+.5,0);g.lineTo(x+.5,ch);}
+ for(let y=24;y<ch;y+=24){g.moveTo(0,y+.5);g.lineTo(cw,y+.5);}
+ g.stroke();
+ g.strokeStyle='rgba(207,214,221,.09)';g.beginPath();
+ for(let x=120;x<cw;x+=120){g.moveTo(x+.5,0);g.lineTo(x+.5,ch);}
+ for(let y=120;y<ch;y+=120){g.moveTo(0,y+.5);g.lineTo(cw,y+.5);}
+ g.stroke();
+ /* floor line + datum ticks */
+ g.strokeStyle='rgba(207,214,221,.14)';
+ g.beginPath();
+ for(let x=20;x<cw;x+=40){g.moveTo(x+.5,ch-8);g.lineTo(x+.5,ch-3);}
+ g.stroke();
+ /* engraved stage mark */
+ g.strokeStyle='rgba(207,214,221,.20)';g.lineWidth=1.5;
+ g.font='bold 10px "Courier New",monospace';
+ g.strokeRect(cw-206,ch-72,178,26);
+ g.fillStyle='rgba(207,214,221,.34)';
+ g.fillText('LOAD CASE 18-A · VERLET',cw-197,ch-54);
+ g.lineWidth=1;
+ /* curator note */
+ g.fillStyle='rgba(207,214,221,.30)';
+ g.font='italic 11px Georgia,serif';
+ g.fillText('fig. 1 — thread colour = strain: platinum slack, ember at limit',64,Math.round(ch*.5));
+}
+/* ---------- camera (pseudo-3D turntable) ---------- */
+const CAM={yaw:0,pitch:0,vYaw:0,vPitch:0,idle:0};
+function camProject(x,y){
+ const cy2=y-ch*.5;
+ const yawK=1+CAM.yaw*.10;
+ const X=(x-cw*.5)*yawK+cw*.5;
+ const Y=ch*.5+cy2*(1-Math.abs(CAM.pitch)*.18)+CAM.pitch*Math.abs(x-cw*.5)*.06;
+ return [X,Y];}
+function camTick(dt){
+ if(mouse.down)return;
+ CAM.vYaw*=.93;CAM.vPitch*=.93;
+ CAM.yaw+=CAM.vYaw;CAM.pitch+=CAM.vPitch;
+ const sy=.16,sp=.05,s=.05;
+ CAM.yaw+=(Math.sin(time*.4)*sy-CAM.yaw)*s;
+ CAM.pitch+=(Math.sin(time*.31)*sp-CAM.pitch)*s;
+ CAM.yaw=Math.max(-.6,Math.min(.6,CAM.yaw));CAM.pitch=Math.max(-.3,Math.min(.3,CAM.pitch));}
+/* pointer drag: nodes when grabbed, camera when not */
+cv.addEventListener('pointerdown',e=>{
+ if(e.target!==cv)return;
+ if(grab<0&&!S.cut){CAM.px=e.clientX;CAM.py=e.clientY;CAM.drag=true;cv.classList.add('orbit');cv.setPointerCapture(e.pointerId);}});
+addEventListener('pointermove',e=>{
+ if(!CAM.drag)return;
+ if(grab>=0||mouse.down){CAM.drag=false;cv.classList.remove('orbit');return;}
+ const dx=e.clientX-CAM.px,dy=e.clientY-CAM.py;CAM.px=e.clientX;CAM.py=e.clientY;
+ CAM.yaw=Math.max(-.6,Math.min(.6,CAM.yaw+dx*.0022));
+ CAM.pitch=Math.max(-.3,Math.min(.3,CAM.pitch+dy*.0014));
+ CAM.vYaw=dx*.0022;CAM.vPitch=dy*.0014;});
+addEventListener('pointerup',()=>{CAM.drag=false;cv.classList.remove('orbit');});
+function render(){ctx.fillStyle='#0a0c10';ctx.fillRect(0,0,cw,ch);
+ if(sheetCv)ctx.drawImage(sheetCv,0,0,cw,ch);
+ /* project */
+ const P=new Float32Array(pts*2);
+ for(let i=0;i<pts;i++){const q=camProject(px[i],py[i]);P[i*2]=q[0];P[i*2+1]=q[1];}
+ /* floor reflection */
+ ctx.save();ctx.globalAlpha=.13;ctx.scale(1,-1);ctx.translate(0,-2*(ch-8));
+ for(let c=0;c<cons;c++){if(broken[c])continue;const a=cA[c],b=cB[c];
+  ctx.strokeStyle='rgba(207,214,221,.7)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(P[a*2],P[a*2+1]);ctx.lineTo(P[b*2],P[b*2+1]);ctx.stroke();}
+ ctx.restore();
+ /* ground beam */
+ ctx.strokeStyle='rgba(207,214,221,.30)';ctx.lineWidth=1.4;
+ ctx.beginPath();ctx.moveTo(0,ch-8);ctx.lineTo(cw,ch-8);ctx.stroke();
+ ctx.lineWidth=1;ctx.beginPath();
+ for(let x=0;x<cw;x+=9){ctx.moveTo(x,ch-8);ctx.lineTo(x-6,ch);}
+ ctx.stroke();
+ /* members: platinum -> ember by strain */
+ ctx.lineCap='round';
+ for(let c=0;c<cons;c++){if(broken[c])continue;const a=cA[c],b=cB[c];
+  const dx=px[b]-px[a],dy=py[b]-py[a];const d=Math.sqrt(dx*dx+dy*dy);
+  const st=d/rest[c];
+  const heat=Math.max(0,Math.min(1,(st-1.05)/.55));
+  const R=Math.round(207+heat*(224-207)),G=Math.round(214-heat*(214-106)),B=Math.round(221-heat*(221-74));
+  ctx.strokeStyle='rgba('+R+','+G+','+B+','+(S.mode==='cloth'?.88:.95)+')';
+  ctx.lineWidth=(S.mode==='cloth'?(d>rest[c]*1.8?1.7:1.05):(d>rest[c]*1.6?2.6:1.6))*(S.mode==='blob'?.8:1);
+  ctx.beginPath();ctx.moveTo(P[a*2],P[a*2+1]);ctx.lineTo(P[b*2],P[b*2+1]);ctx.stroke();}
+ /* pins */
+ for(let i=0;i<pts;i++){if(pin[i]){ctx.fillStyle='#e06a4a';ctx.beginPath();ctx.arc(P[i*2],P[i*2+1],3,0,6.283);ctx.fill();}}
+ if(grab>=0){ctx.strokeStyle='#f2f6f9';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(P[grab*2],P[grab*2+1],9,0,6.283);ctx.stroke();}
+ if(S.cut){ctx.strokeStyle='rgba(224,106,74,.9)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(mouse.x-12,mouse.y);ctx.lineTo(mouse.x+12,mouse.y);ctx.moveTo(mouse.x,mouse.y-12);ctx.lineTo(mouse.x,mouse.y+12);ctx.stroke();ctx.setLineDash([]);}
+ /* vignette */
+ const vg=ctx.createRadialGradient(cw/2,ch*.46,Math.min(cw,ch)*.3,cw/2,ch*.46,Math.max(cw,ch)*.75);
+ vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.5)');
+ ctx.fillStyle=vg;ctx.fillRect(0,0,cw,ch);
+ $('#h-fps').textContent=fps.toFixed(0);}
+let last=performance.now(),acc=0;
+function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;fps=fps*.92+(1/Math.max(dt,1e-3))*.08;
+ if(!S.paused&&!RM){time+=dt;step(dt);camTick(dt);render();}
+ else if(dirty){render();dirty=false;}
+ requestAnimationFrame(loop);}
+/* ---------- pointer ---------- */
+const mouse={x:0,y:0,down:false};
+let ptrIn=false;
+function nearest(x,y){if(!ptrIn)return -1;let best=-1,bd=32*32;for(let i=0;i<pts;i++){const dx=px[i]-x,dy=py[i]-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=i;}}return best;}
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;mouse.down=true;
+ if(S.cut){cutAt(mouse.x,mouse.y);}else{grab=nearest(mouse.x,mouse.y);if(grab>=0&&pin[grab])grab=-1;}});
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;ptrIn=true;
+ if(mouse.down&&S.cut)cutAt(mouse.x,mouse.y);});
+cv.addEventListener('pointerleave',()=>{ptrIn=false;if(grab>=0){grab=-1;}});
+cv.addEventListener('pointerup',()=>{mouse.down=false;grab=-1;});
+cv.addEventListener('contextmenu',e=>{e.preventDefault();if(!S.cut){S.cut=true;$('#b-cut').classList.add('on');$('#b-cut').textContent='Shear: on';cv.classList.add('cut');saveHash();}});
+function cutAt(x,y){const rr=10*10;for(let c=0;c<cons;c++){if(broken[c])continue;const a=cA[c],b=cB[c];
+ const x1=px[a],y1=py[a],x2=px[b],y2=py[b];
+ const l2=(x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)||1;
+ let t=((x-x1)*(x2-x1)+(y-y1)*(y2-y1))/l2;t=Math.max(0,Math.min(1,t));
+ const qx=x1+t*(x2-x1),qy=y1+t*(y2-y1);
+ if((x-qx)*(x-qx)+(y-qy)*(y-qy)<rr){broken[c]=1;tornCount++;$('#h-t').textContent=tornCount;}}}
+/* ---------- controls ---------- */
+function bindRange(id,out,key,fmt){const r=$(id),o=$(out);r.value=S[key];o.textContent=fmt(S[key]);
+ r.addEventListener('input',()=>{S[key]=+r.value;o.textContent=fmt(S[key]);saveHash();});}
+bindRange('#r-grav','#o-grav','grav',v=>(+v).toFixed(2));
+bindRange('#r-wind','#o-wind','wind',v=>(+v).toFixed(2));
+bindRange('#r-tear','#o-tear','tear',v=>(+v).toFixed(1)+'×');
+bindRange('#r-iters','#o-iters','iters',v=>v+'×');
+function setMode(m){S.mode=m;$$('#modes .btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));build();saveHash();}
+$$('#modes .btn').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+$('#b-cut').addEventListener('click',e=>{S.cut=!S.cut;e.target.classList.toggle('on',S.cut);e.target.textContent='Shear: '+(S.cut?'on':'off');cv.classList.toggle('cut',S.cut);saveHash();});
+$('#b-pause').addEventListener('click',e=>{S.paused=!S.paused;e.target.textContent=S.paused?'Run':'Hold';dirty=true;});
+$('#b-reset').addEventListener('click',()=>{S.grav=1;S.wind=0.34;S.tear=3;S.iters=6;bindSync();tornCount=0;$('#h-t').textContent=0;build();saveHash();});
+$('#b-rand').addEventListener('click',()=>{S.seed=(Math.random()*1e9)|0;S.wind=+((Math.random()*2-1).toFixed(2));bindSync();tornCount=0;$('#h-t').textContent=0;build();saveHash();});
+function bindSync(){$('#r-grav').value=S.grav;$('#o-grav').textContent=S.grav.toFixed(2);$('#r-wind').value=S.wind;$('#o-wind').textContent=S.wind.toFixed(2);$('#r-tear').value=S.tear;$('#o-tear').textContent=S.tear.toFixed(1)+'×';$('#r-iters').value=S.iters;$('#o-iters').textContent=S.iters+'×';}
+const PRESETS={sail:{mode:'cloth',grav:.85,wind:.28,tear:2.8,iters:5},gale:{mode:'cloth',grav:1,wind:.95,tear:1.8,iters:4},moody:{mode:'blob',grav:0,wind:.12,tear:3,iters:6},chain:{mode:'rope',grav:1.4,wind:.05,tear:2,iters:6}};
+$$('[data-p]').forEach(b=>b.addEventListener('click',()=>{const p=PRESETS[b.dataset.p];Object.assign(S,p);tornCount=0;$('#h-t').textContent=0;setMode(S.mode);bindSync();saveHash();}));
+/* keyboard */
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();
+ if(k===' '){e.preventDefault();$('#b-pause').click();}
+ else if(k==='r')$('#b-reset').click();else if(k==='n')$('#b-rand').click();
+ else if(k==='c')$('#b-cut').click();
+ else if(k==='m'){setMode(S.mode==='cloth'?'rope':S.mode==='rope'?'blob':'cloth');}});
+/* tabs */
+$$('.tab').forEach(t=>t.addEventListener('click',()=>{$$('.tab').forEach(x=>x.classList.toggle('on',x===t));$$('.view').forEach(v=>v.classList.toggle('on',v.id==='view-'+t.dataset.v));}));
+/* boot */
+loadHash();bindSync();
+$('#b-cut').classList.toggle('on',S.cut);$('#b-cut').textContent='Shear: '+(S.cut?'on':'off');cv.classList.toggle('cut',S.cut);
+$$('#modes .btn').forEach(b=>b.classList.toggle('on',b.dataset.m===S.mode));
+$('#b-pause').textContent=S.paused?'Run':'Hold';
+new ResizeObserver(()=>{dpr=Math.min(devicePixelRatio||1,2);cw=cv.clientWidth;ch=cv.clientHeight;cv.width=cw*dpr;cv.height=ch*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);buildSheet();build();}).observe(cv);
+cw=cv.clientWidth;ch=cv.clientHeight;buildSheet();build();
+if(RM){render();}
+else requestAnimationFrame(t=>{last=t;loop(t);});
+window.__LAB__={S,errors,selftest(){return{pts,cons,ok:pts>20&&cons>20};}};
+})();
+</script>
+</body>
+</html>

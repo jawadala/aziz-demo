@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e2a47">
+<link rel="icon" href="data:,">
+<title>BENCH 21 — SEQUENCE</title>
+<style>
+:root{--bp:#0e2a47;--bp2:#123458;--wht:#e8f1fa;--dim:#7d9ab8;--acc:#ffd23f;--line:#2a4d73}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bp);color:var(--wht);font:13px/1.5 "Courier New",ui-monospace,monospace;overflow:hidden}
+#grain{position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.4;background:repeating-linear-gradient(0deg,rgba(232,241,250,.03) 0 1px,transparent 1px 3px)}
+.reg{position:fixed;width:18px;height:18px;z-index:12;pointer-events:none;border:0 solid var(--wht)}
+.reg.tl{top:8px;left:8px;border-left:1px solid;border-top:1px solid}
+.reg.tr{top:8px;right:8px;border-right:1px solid;border-top:1px solid}
+.reg.bl{bottom:8px;left:8px;border-left:1px solid;border-bottom:1px solid}
+.reg.br{bottom:8px;right:8px;border-right:1px solid;border-bottom:1px solid}
+.plate{position:fixed;background:rgba(14,42,71,.92);border:1px solid var(--line);z-index:15}
+#idplate{top:18px;left:18px;padding:8px 12px;max-width:340px}
+#idplate h1{font:bold 15px/1.2 "Arial Narrow",Impact,"Courier New",sans-serif;color:var(--wht);letter-spacing:.22em;text-transform:uppercase}
+#idplate h1 span{color:var(--acc)}
+#idplate p{font:9.5px/1.7 "Courier New",monospace;color:var(--dim);letter-spacing:.14em;margin-top:3px}
+#side{top:110px;left:18px;bottom:18px;width:308px;padding:10px 12px;overflow-y:auto;scrollbar-width:thin}
+#side h2{font:bold 10px/1 "Courier New",monospace;color:var(--acc);letter-spacing:.24em;margin:12px 0 6px}
+#side h2:first-child{margin-top:0}
+#seq{width:100%;height:108px;background:var(--bp2);border:1px solid var(--line);color:var(--wht);font:11px/1.5 "Courier New",monospace;padding:7px;resize:none;outline:none}
+#seq:focus{border-color:var(--acc)}
+.hint{font:9.5px/1.6 "Courier New",monospace;color:var(--dim);letter-spacing:.06em;margin-top:5px}
+.fad{margin:7px 0}
+.fad label{display:flex;justify-content:space-between;font:9px/1 "Courier New",monospace;color:var(--dim);letter-spacing:.12em;margin-bottom:3px}
+.fad output{color:var(--acc)}
+.fad input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:2px;background:var(--line);outline:none}
+.fad input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:9px;height:15px;background:var(--acc);border:0;cursor:ew-resize}
+.btns{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.btns button{flex:1 1 46%;background:none;border:1px solid var(--line);color:var(--wht);font:10px "Courier New",monospace;letter-spacing:.1em;padding:7px 2px;cursor:pointer}
+.btns button:hover{border-color:var(--acc);color:var(--acc)}
+.btns button.on{background:var(--acc);color:var(--bp);border-color:var(--acc)}
+.btns button.on:hover{color:var(--bp)}
+#rcout{font:10.5px/1.6 "Courier New",monospace;color:var(--wht);word-break:break-all;background:var(--bp2);border:1px solid var(--line);padding:7px;max-height:96px;overflow-y:auto;margin-top:6px}
+#main{position:fixed;top:18px;left:346px;right:18px;bottom:18px;overflow-y:auto;scrollbar-width:thin;z-index:14}
+.stats{display:flex;gap:0;flex-wrap:wrap;border:1px solid var(--line);margin-bottom:12px}
+.stat{flex:1 1 20%;padding:8px 12px;border-right:1px solid var(--line);min-width:96px}
+.stat b{display:block;font:bold 22px/1.1 "Arial Narrow",Impact,sans-serif;color:var(--acc);letter-spacing:.04em}
+.stat span{font:9px/1.4 "Courier New",monospace;color:var(--dim);letter-spacing:.16em}
+canvas{background:var(--bp2);border:1px solid var(--line);width:100%;display:block}
+#orfbox{margin:12px 0}
+table.res{width:100%;border-collapse:collapse;font:11px/1.7 "Courier New",monospace}
+table.res th{font:bold 9px "Courier New",monospace;color:var(--acc);letter-spacing:.18em;text-align:left;border-bottom:1px solid var(--line);padding:3px 8px}
+table.res td{border-bottom:1px solid rgba(42,77,115,.5);padding:3px 8px;color:var(--wht)}
+table.res td.n{color:var(--dim)}
+table.res tr:hover td{background:rgba(255,210,63,.08)}
+#toast{position:fixed;left:50%;top:20px;transform:translateX(-50%);background:var(--acc);color:var(--bp);padding:6px 14px;font:11px "Courier New",monospace;letter-spacing:.12em;opacity:0;transition:.2s;z-index:60;pointer-events:none}
+#toast.on{opacity:1}
+#note{font:italic 12px/1.6 Georgia,serif;color:var(--dim);margin:10px 0}
+@media(max-width:960px){
+ #side{top:auto;bottom:0;left:0;right:0;width:auto;max-height:46vh;transform:translateY(112%);transition:transform .25s}
+ #side.open{transform:none}
+ #mob{display:block;position:fixed;right:10px;bottom:10px;z-index:46;background:var(--acc);color:var(--bp);border:0;font:10px "Courier New",monospace;letter-spacing:.12em;padding:6px 12px}
+ #main{left:18px;top:120px}
+ #idplate{max-width:270px}
+}
+#mob{display:none}
+</style>
+</head>
+<body>
+<div id="grain"></div>
+<div class="reg tl"></div><div class="reg tr"></div><div class="reg bl"></div><div class="reg br"></div>
+<div class="plate" id="idplate">
+ <h1>SEQUENCE <span>BENCH</span></h1>
+ <p>BENCH 21 · DNA ANALYSIS · ORF / GC / SITES<br>JAWAD — COMPUTATIONAL STUDIES</p>
+</div>
+<div class="plate" id="side">
+ <h2>SEQUENCE INPUT</h2>
+ <textarea id="seq" spellcheck="false" placeholder="paste DNA, 5'→3'"></textarea>
+ <p class="hint">Non-ACGT ignored. Min ORF: 90 bp (30 aa). Sample loads on first use.</p>
+ <h2>ANALYSIS</h2>
+ <div class="fad"><label><span>GC WINDOW BP</span><output id="o-win">60</output></label>
+  <input type="range" id="r-win" min="10" max="300" step="5" value="60"></div>
+ <div class="fad"><label><span>MIN ORF AA</span><output id="o-orf">30</output></label>
+  <input type="range" id="r-orf" min="10" max="150" step="5" value="30"></div>
+ <div class="btns">
+  <button id="b-run">RUN</button>
+  <button id="b-sample">SPECIMEN</button>
+  <button id="b-rc">REV COMP →</button>
+  <button id="b-clear">CLEAR</button>
+ </div>
+ <h2>REVERSE COMPLEMENT</h2>
+ <div id="rcout">—</div>
+</div>
+<button id="mob">BENCH</button>
+<div id="main">
+ <div class="stats" id="stats">
+  <div class="stat"><b id="s-len">0</b><span>BP</span></div>
+  <div class="stat"><b id="s-gc">-</b><span>GC %</span></div>
+  <div class="stat"><b id="s-orf">0</b><span>ORFS / 6 FRAMES</span></div>
+  <div class="stat"><b id="s-sites">0</b><span>SITES / 8 ENZYMES</span></div>
+  <div class="stat"><b id="s-mw">-</b><span>kDa PROTEIN CAP</span></div>
+ </div>
+ <h2 style="font:bold 10px 'Courier New';color:var(--acc);letter-spacing:.2em;margin:4px 0 6px">GC CONTENT, SLIDING WINDOW</h2>
+ <canvas id="gcplot" width="1200" height="240"></canvas>
+ <h2 style="font:bold 10px 'Courier New';color:var(--acc);letter-spacing:.2em;margin:16px 0 6px">RESTRICTION MAP</h2>
+ <canvas id="resplot" width="1200" height="150"></canvas>
+ <div id="orfbox"></div>
+ <div id="restbl"></div>
+ <p id="note">Stops: TAA TAG TGA. Starts: ATG. Frames: +1 +2 +3, −1 −2 −3. Sites drawn at first base of the palindrome.</p>
+</div>
+<div id="toast"></div>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s);
+const CODONS=(()=>{const b='TCAG',aa='FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG';
+ const t={};let i=0;for(const a of b)for(const c of b)for(const g of b)t[a+c+g]=aa[i++];return t})();
+const ENZ=[['EcoRI','GAATTC',1],['BamHI','GGATCC',1],['HindIII','AAGCTT',1],['NotI','GCGGCCGC',2],['XhoI','CTCGAG',1],['PstI','CTGCAG',3],['SmaI','CCCGGG',3],['KpnI','GGTACC',1]];
+const AA_MW={A:89.1,R:174.2,N:132.1,D:133.1,C:121.2,Q:146.2,E:147.1,G:75.1,H:155.2,I:131.2,L:131.2,K:146.2,M:149.2,F:165.2,P:115.1,S:105.1,T:119.1,W:204.2,Y:181.2,V:117.1};
+let SEQ='';
+function toast(m){const el=$('#toast');el.textContent=m;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),1400)}
+function clean(s){return s.toUpperCase().replace(/[^ACGTN]/g,'')}
+function revcomp(s){
+ const map={A:'T',T:'A',G:'C',C:'G',N:'N'};
+ let out='';for(let i=s.length-1;i>=0;i--)out+=map[s[i]]||'N';return out;
+}
+function findOrfs(s,minAA){
+ const out=[];const minNT=minAA*3+3;
+ const rc=revcomp(s);
+ const strands=[['+',s,1],['−',rc,1]];
+ for(const[strand,seq]of strands){
+  for(let f=0;f<3;f++){
+   let i=f,inORF=false,start=0;
+   while(i+3<=seq.length){
+    const c=seq.substr(i,3);
+    if(!inORF&&c==='ATG'){inORF=true;start=i}
+    else if(inORF&&(c==='TAA'||c==='TAG'||c==='TGA')){
+     const len=i+3-start;
+     if(len>=minNT){
+      const nt=seq.substr(start,len);
+      let prot='';for(let k=0;k<nt.length;k+=3){const a=CODONS[nt.substr(k,3)];if(a==='*')break;prot+=a}
+      // position in original strand coordinates
+      let gstart,gend;
+      if(strand==='+'){gstart=start;gend=i+3}else{gstart=s.length-(i+3);gend=s.length-start}
+      out.push({strand,frame:f+1,gstart,gend,nt:len,prot,aa:prot.length,mw:protWeight(prot)});
+     }
+     inORF=false;
+    }
+    i+=3;
+   }
+  }
+ }
+ return out.sort((a,b)=>b.aa-a.aa);
+}
+function protWeight(p){let m=0;for(const c of p)m+=AA_MW[c]||0;return m/1000}
+function gcWindows(s,w){
+ const n=s.length;const out=new Float32Array(Math.max(1,Math.ceil(n)));
+ let g=0,c=0;
+ for(let i=0;i<n;i++){
+  const ch=s[i];if(ch==='G')g++;if(ch==='C')c++;
+  if(i>=w){const o=s[i-w];if(o==='G')g--;if(o==='C')c--}
+  out[i]=(g+c)/Math.max(1,Math.min(w,i+1));
+ }
+ return out;
+}
+function findSites(s){
+ const out=[];
+ for(const[name,p,off]of ENZ){
+  let idx=0;
+  while((idx=s.indexOf(p,idx))!==-1){out.push({name,p,idx,cut:idx+off});idx++}
+ }
+ return out.sort((a,b)=>a.idx-b.idx);
+}
+/* ---------- plots ---------- */
+function plotGC(win){
+ const cv=$('#gcplot'),x=cv.getContext('2d');
+ const W=cv.width,H=cv.height;
+ x.fillStyle='#123458';x.fillRect(0,0,W,H);
+ x.strokeStyle='#2a4d73';x.beginPath();
+ for(let gy=0;gy<=4;gy++){const y=12+gy*(H-24)/4;x.moveTo(0,y);x.lineTo(W,y)}
+ x.stroke();
+ x.fillStyle='#7d9ab8';x.font='10px Courier New';
+ x.fillText('100%',4,20);x.fillText('50%',4,(H)/2);x.fillText('0%',4,H-6);
+ if(!SEQ)return;
+ const arr=gcWindows(SEQ,win);
+ x.strokeStyle='#ffd23f';x.lineWidth=1.4;x.beginPath();
+ for(let i=0;i<arr.length;i++){
+  const px=i/(SEQ.length-1||1)*W;
+  const py=H-12-(arr[i]-0)*(H-24);
+  i?x.lineTo(px,py):x.moveTo(px,py);
+ }
+ x.stroke();
+ // mean line
+ let m=0;for(const ch of SEQ)if(ch==='G'||ch==='C')m++;
+ const mean=m/Math.max(1,SEQ.length);
+ x.strokeStyle='rgba(232,241,250,.5)';x.setLineDash([4,4]);x.beginPath();
+ const my=H-12-mean*(H-24);x.moveTo(0,my);x.lineTo(W,my);x.stroke();x.setLineDash([]);
+ $('#s-gc').textContent=(mean*100).toFixed(1);
+}
+function plotSites(sites){
+ const cv=$('#resplot'),x=cv.getContext('2d');
+ const W=cv.width,H=cv.height;
+ x.fillStyle='#123458';x.fillRect(0,0,W,H);
+ const cols=['#ffd23f','#7fd4ff','#ff8f6b','#9dff8f','#e08fff','#8ffff2','#ffc2e0','#fff5b3'];
+ ENZ.forEach((e,i)=>{
+  const st=sites.filter(s=>s.name===e[0]);
+  x.fillStyle=cols[i];
+  for(const s of st){const px=s.idx/(SEQ.length-1||1)*W;x.fillRect(px,H-22,2,14)}
+ });
+ x.fillStyle='#7d9ab8';x.font='9px Courier New';
+ ENZ.forEach((e,i)=>{
+  x.fillStyle=cols[i];
+  x.fillText(e[0],6+i*88,14);
+  const n=sites.filter(s=>s.name===e[0]).length;
+  x.fillText('x'+n,6+i*88,26);
+ });
+ $('#s-sites').textContent=sites.length;
+}
+function showOrfs(orfs){
+ $('#s-orf').textContent=orfs.length;
+ let h='<table class="res"><tr><th>FRAME</th><th>STRAND</th><th>START</th><th>END</th><th>AA</th><th>kDa</th><th>FIRST 24 RESIDUES</th></tr>';
+ for(const o of orfs.slice(0,40)){
+  h+='<tr><td class="n">+'+o.frame+'</td><td>'+o.strand+'</td><td class="n">'+(o.gstart+1)+'</td><td class="n">'+o.gend+'</td><td>'+o.aa+'</td><td>'+o.mw.toFixed(1)+'</td><td style="color:#7fd4ff">'+(o.prot.slice(0,24)||'')+'</td></tr>';
+ }
+ h+='</table>';
+ $('#orfbox').innerHTML=orfs.length?h:'<p style="color:#7d9ab8;font:italic 12px Georgia">No ORFs at current threshold. Lower MIN ORF AA or check the sequence.</p>';
+}
+function showSites(sites){
+ let h='<table class="res"><tr><th>ENZYME</th><th>SITE</th><th>POSITIONS (1-BASED)</th></tr>';
+ for(const[name,p]of ENZ){
+  const pos=sites.filter(s=>s.name===name).map(s=>s.idx+1);
+  h+='<tr><td>'+name+'</td><td class="n">'+p+'</td><td>'+(pos.length?pos.join(', '):'—')+'</td></tr>';
+ }
+ $('#restbl').innerHTML='<table class="res">'+h.slice(h.indexOf('<tr>'))+'</table>';
+}
+function run(){
+ SEQ=clean($('#seq').value);
+ $('#s-len').textContent=SEQ.length;
+ if(SEQ.length<20){$('#gcplot').getContext('2d').fillRect(0,0,1,1);plotGC(+$('#r-win').value);plotSites([]);showOrfs([]);$('#s-mw').textContent='-';return}
+ const win=+$('#r-win').value,minAA=+$('#r-orf').value;
+ const orfs=findOrfs(SEQ,minAA);
+ const sites=findSites(SEQ);
+ plotGC(win);plotSites(sites);showOrfs(orfs);showSites(sites);
+ $('#s-mw').textContent=orfs.length?orfs[0].mw.toFixed(1):'-';
+}
+function sample(){
+ // synthetic construct; codon walk verified stop-free in frames +1..+3:
+ // EcoRI - ORF1 (ATG..TAA, 55 aa) - 6 bp spacer - BamHI - ORF2 (ATG..TGA, 16 aa) - HindIII
+ const walk1='TTGCTGAAGATTCCTGACCTGAAGGTTCCTGACATTCCTGACCTGAAGGCTTCTGATCCTGAGGTTCCTGACCTGAAGGTT';
+ const walk2='GACTACCTGAAGGACTACCTGAAGGATTCTGACCTGAAGGACTTCCTGAC';
+ const codons1=walk1.match(/.{3}/g),codons2=walk2.match(/.{3}/g);
+ // eliminate stops (TAA TAG TGA) in the walk itself
+ const ok=c=>!['TAA','TAG','TGA'].includes(c);
+ if(!codons1.every(ok)||!codons2.every(ok)){toast('SPECIMEN BUILD FAILED');return}
+ const orf1='ATG'+codons1.join('')+'TAA';
+ const orf2='ATG'+codons2.join('')+'TGA';
+ const s='GAATTC'+orf1+'TGACT'+orf2+'AAGCTT'.replace('GGATCC','GGATTT'); // BamHI moved out of tail
+ const s2='GAATTC'+orf1+'TGACT'+'GGATCC'+orf2+'AAGCTT';
+ $('#seq').value=s2;run();toast('SPECIMEN LOADED, '+s2.length+' BP');
+}
+$('#b-run').addEventListener('click',()=>{run();toast('RUN COMPLETE')});
+$('#b-sample').addEventListener('click',sample);
+$('#b-rc').addEventListener('click',()=>{
+ const s=clean($('#seq').value);
+ $('#rcout').textContent=s.length?revcomp(s):'—';
+ if(s.length)toast('REVERSE COMPLEMENT COMPUTED');
+});
+$('#b-clear').addEventListener('click',()=>{$('#seq').value='';SEQ='';run();$('#rcout').textContent='—';toast('CLEARED')});
+$('#r-win').addEventListener('input',()=>{$('#o-win').textContent=$('#r-win').value;if(SEQ)plotGC(+$('#r-win').value)});
+$('#r-orf').addEventListener('input',()=>{$('#o-orf').textContent=$('#r-orf').value;if(SEQ){const o=findOrfs(SEQ,+$('#r-orf').value);showOrfs(o);$('#s-orf').textContent=o.length}});
+$('#mob').addEventListener('click',()=>{$('#side').classList.toggle('open')});
+if(!clean($('#seq').value))sample();
+})();
+</script>
+</body>
+</html>

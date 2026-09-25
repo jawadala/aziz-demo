@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f0a">
+<link rel="icon" href="data:,">
+<title>BENCH 22 — HYDROPATHY</title>
+<style>
+:root{--bg:#0a0f0a;--ph:#33ff66;--phd:#1a5c2e;--amb:#ffb000;--tx:#b9e6c3;--dim:#4e7a58;--ink:#03140a}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font:13px/1.45 "Courier New",ui-monospace,monospace;overflow:hidden}
+#scan{position:fixed;inset:0;pointer-events:none;z-index:9;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px)}
+.reg{position:fixed;width:18px;height:18px;z-index:12;pointer-events:none;border:0 solid var(--phd)}
+.reg.tl{top:8px;left:8px;border-left:1px solid;border-top:1px solid}
+.reg.tr{top:8px;right:8px;border-right:1px solid;border-top:1px solid}
+.reg.bl{bottom:8px;left:8px;border-left:1px solid;border-bottom:1px solid}
+.reg.br{bottom:8px;right:8px;border-right:1px solid;border-bottom:1px solid}
+.plate{position:fixed;background:rgba(3,20,10,.9);border:1px solid var(--phd);z-index:15}
+#idplate{top:18px;left:18px;padding:8px 12px;max-width:340px}
+#idplate h1{font:bold 15px/1.2 "Courier New",monospace;color:var(--ph);letter-spacing:.2em}
+#idplate h1 span{color:var(--amb)}
+#idplate p{font:9.5px/1.7 "Courier New",monospace;color:var(--dim);letter-spacing:.14em;margin-top:3px}
+#side{top:110px;left:18px;bottom:18px;width:308px;padding:10px 12px;overflow-y:auto;scrollbar-width:thin}
+#side h2{font:bold 10px/1 "Courier New",monospace;color:var(--amb);letter-spacing:.24em;margin:12px 0 6px}
+#side h2:first-child{margin-top:0}
+#seq{width:100%;width:100%;height:104px;background:var(--ink);border:1px solid var(--phd);color:var(--ph);font:11px/1.5 "Courier New",monospace;padding:7px;resize:none;outline:none}
+#seq:focus{border-color:var(--amb)}
+.hint{font:9.5px/1.6 "Courier New",monospace;color:var(--dim);letter-spacing:.06em;margin-top:5px}
+.fad{margin:7px 0}
+.fad label{display:flex;justify-content:space-between;font:9px/1 "Courier New",monospace;color:var(--dim);letter-spacing:.12em;margin-bottom:3px}
+.fad output{color:var(--amb)}
+.fad input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:2px;background:var(--phd);outline:none}
+.fad input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:9px;height:15px;background:var(--ph);border:0;cursor:ew-resize}
+.btns{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.btns button{flex:1 1 46%;background:none;border:1px solid var(--phd);color:var(--tx);font:10px "Courier New",monospace;letter-spacing:.1em;padding:7px 2px;cursor:pointer}
+.btns button:hover{border-color:var(--ph);color:var(--ph)}
+#rcout{font:10.5px/1.6 "Courier New",monospace;color:var(--ph);word-break:break-all;background:var(--ink);border:1px solid var(--phd);padding:7px;max-height:88px;overflow-y:auto;margin-top:6px}
+#main{position:fixed;top:18px;left:346px;right:18px;bottom:18px;overflow-y:auto;scrollbar-width:thin;z-index:14}
+.stats{display:flex;flex-wrap:wrap;border:1px solid var(--phd);margin-bottom:12px}
+.stat{flex:1 1 20%;padding:8px 12px;border-right:1px solid var(--phd);min-width:96px}
+.stat b{display:block;font:bold 22px/1.1 "Courier New",monospace;color:var(--ph)}
+.stat span{font:9px/1.4 "Courier New",monospace;color:var(--dim);letter-spacing:.16em}
+canvas{background:var(--ink);border:1px solid var(--phd);width:100%;display:block}
+.plabel{font:bold 10px "Courier New",monospace;color:var(--amb);letter-spacing:.2em;margin:14px 0 6px}
+#tbl{margin:12px 0}
+table.res{width:100%;border-collapse:collapse;font:11px/1.7 "Courier New",monospace}
+table.res th{font:bold 9px "Courier New",monospace;color:var(--amb);letter-spacing:.18em;text-align:left;border-bottom:1px solid var(--phd);padding:3px 8px}
+table.res td{border-bottom:1px solid rgba(26,92,46,.5);padding:3px 8px;color:var(--tx)}
+table.res td.n{color:var(--dim)}
+#toast{position:fixed;left:50%;top:20px;transform:translateX(-50%);background:var(--ph);color:var(--ink);padding:6px 14px;font:11px "Courier New",monospace;letter-spacing:.12em;opacity:0;transition:.2s;z-index:60;pointer-events:none}
+#toast.on{opacity:1}
+#note{font:italic 12px/1.6 Georgia,serif;color:var(--dim);margin:10px 0}
+#mob{display:none}
+@media(max-width:960px){
+ #side{top:auto;bottom:0;left:0;right:0;width:auto;max-height:46vh;transform:translateY(112%);transition:transform .25s}
+ #side.open{transform:none}
+ #mob{display:block;position:fixed;right:10px;bottom:10px;z-index:46;background:var(--ph);color:var(--ink);border:0;font:10px "Courier New",monospace;letter-spacing:.12em;padding:6px 12px}
+ #main{left:18px;top:120px}
+ #idplate{max-width:270px}
+}
+</style>
+</head>
+<body>
+<div id="scan"></div>
+<div class="reg tl"></div><div class="reg tr"></div><div class="reg bl"></div><div class="reg br"></div>
+<div class="plate" id="idplate">
+ <h1>HYDROPATHY <span>BENCH</span></h1>
+ <p>BENCH 22 · PROTEIN SOLVENT ANALYSIS<br>JAWAD — COMPUTATIONAL STUDIES</p>
+</div>
+<div class="plate" #panel-id="side" id="side">
+ <h2>PROTEIN INPUT</h2>
+ <textarea id="seq" spellcheck="false" placeholder="paste protein, single-letter code"></textarea>
+ <p class="hint">B, X, Z treated as neutral (0.0). Stop codon * ignored. Whitespace and digits stripped.</p>
+ <h2>ANALYSIS</h2>
+ <div class="fad"><label><span>WINDOW RESIDUES</span><output id="o-win">9</output></label>
+  <input type="range" id="r-win" min="3" max="25" step="2" value="9"></div>
+ <div class="fad"><label><span>NET CHARGE pH</span><output id="o-ph">7.0</output></label>
+  <input type="range" id="r-ph" min="0" max="14" step="0.1" value="7"></div>
+ <div class="fad"><label><span>CHARGE CARRIER AMP</span><output id="o-amp">1.0</output></label>
+  <input type="range" id="r-amp" min="0" max="2" step="0.1" value="1"></div>
+ <div class="btns">
+  <button id="b-run">RUN</button>
+  <button id="b-sample">SPECIMEN</button>
+  <button id="b-peaks">FLAG SEGMENTS</button>
+  <button id="b-clear">CLEAR</button>
+ </div>
+ <h2>COMPOSITION</h2>
+ <div id="rcout">—</div>
+</div>
+<button id="mob">BENCH</button>
+<div id="main">
+ <div class="stats">
+  <div class="stat"><b id="s-len">0</b><span>RESIDUES</span></div>
+  <div class="stat"><b id="s-gravy">-</b><span>GRAVY</span></div>
+  <div class="stat"><b id="s-charge">-</b><span>NET CHARGE</span></div>
+  <div class="stat"><b id="s-pi">-</b><span>pI ESTIMATE</span></div>
+  <div class="stat"><b id="s-seg">0</b><span>HYDROPHOBIC SEGMENTS</span></div>
+  <div class="stat"><b id="s-max">-</b><span>PEAK SCORE</span></div>
+ </div>
+ <div class="plabel">KYTE-DOOLITTLE PROFILE, WINDOWED AVERAGE</div>
+ <canvas id="hyd" width="1200" height="260"></canvas>
+ <div class="plabel">NET CHARGE vs pH TITRATION CURVE</div>
+ <canvas id="charge" width="1200" height="200"></canvas>
+ <div id="tbl"></div>
+ <p id="note">Segments flagged at mean Kyte-Doolittle ≥ +1.1 over 13+ residues, threshold +1.4. That band selects membrane-spanning helices; cytosolic loops stay below it.</p>
+</div>
+<div id="toast"></div>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s);
+/* Kyte-Doolittle scale, 1982, verified values */
+const KD={A:1.8,R:-4.5,N:-3.5,D:-3.5,C:2.5,Q:-3.5,E:-3.5,G:-0.4,H:-3.2,I:4.5,L:3.8,K:-3.9,M:1.9,F:2.8,P:-1.6,S:-0.8,T:-0.7,W:-0.9,Y:-1.3,V:4.2};
+/* pKa set (polyprotic, standard biochem values) */
+const PKA={Cterm:3.1, D:3.9, E:4.1, C:8.3, Y:10.1, H:6.0, Nterm:8.0, K:10.5, R:12.5};
+const CLEAN=s=>s.toUpperCase().replace(/[^A-Z]/g,'');
+function toast(m){const el=$('#toast');el.textContent=m;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),1400)}
+function hydropathy(s,w){
+ const out=[];const h=w>>1;
+ for(let i=0;i<s.length;i++){
+  let sum=0,c=0;
+  for(let k=i-h;k<=i+h;k++){
+   if(k>=0&&k<s.length){sum+=KD[s[k]]||0;c++}
+  }
+  out.push(sum/c);
+ }
+ return out;
+}
+function gravy(s){let t=0;for(const c of s)t+=KD[c]||0;return t/Math.max(1,s.length)}
+function chargeAt(s,pH){
+ let q=0;
+ const pos=[[PKA.Nterm,1],[PKA.K,1],[PKA.R,1],[PKA.H,1]];
+ for(const[p]of pos)q+=1/(1+Math.pow(10,pH-p));
+ q*=1; // per-chain: N-term once
+ const neg=[[PKA.Cterm,-1],[PKA.D,-1],[PKA.E,-1],[PKA.C,-1],[PKA.Y,-1]];
+ for(const[p]of neg)q+=-1/(1+Math.pow(10,p-pH));
+ // count actual residues: N/C terms once, residues per occurrence
+ const cnt=c=>[...s].filter(x=>x===c).length;
+ q=1/(1+Math.pow(10,pH-PKA.Nterm));
+ q+=cnt('K')/(1+Math.pow(10,pH-PKA.K));
+ q+=cnt('R')/(1+Math.pow(10,pH-PKA.R));
+ q+=cnt('H')/(1+Math.pow(10,pH-PKA.H));
+ q-=1/(1+Math.pow(10,PKA.Cterm-pH));
+ q-=cnt('D')/(1+Math.pow(10,PKA.D-pH));
+ q-=cnt('E')/(1+Math.pow(10,PKA.E-pH));
+ q-=cnt('C')/(1+Math.pow(10,PKA.C-pH));
+ q-=cnt('Y')/(1+Math.pow(10,PKA.Y-pH));
+ return q;
+}
+function pI(s){
+ let lo=0,hi=14;
+ for(let i=0;i<60;i++){
+  const mid=(lo+hi)/2;
+  (chargeAt(s,mid)>0)?lo=mid:hi=mid;
+ }
+ return (lo+hi)/2;
+}
+function segments(hy,thr,minLen){
+ // flag runs above threshold, patch single-point dips, then keep runs
+ // whose MEAN stays above a floor: standard TM-helix screening practice.
+ const out=[];let start=-1;let dips=0;
+ const meanfloor=thr-0.3;
+ for(let i=0;i<hy.length;i++){
+  if(hy[i]>=thr){if(start<0)start=i;dips=0}
+  else if(start>=0){
+   if(hy[i]>=thr-0.15&&dips<2){dips++;continue}
+   const len=i-start;
+   let m=0;for(let k=start;k<i;k++)m+=hy[k];
+   if(len>=minLen&&m/len>=meanfloor)out.push([start,i-1]);
+   start=-1;dips=0;
+  }
+ }
+ if(start>=0){
+  const len=hy.length-start;
+  let m=0;for(let k=start;k<hy.length;k++)m+=hy[k];
+  if(len>=minLen&&m/len>=meanfloor)out.push([start,hy.length-1]);
+ }
+ return out;
+}
+function plotHyd(hy,segs){
+ const cv=$('#hyd'),x=cv.getContext('2d');
+ const W=cv.width,H=cv.height;
+ x.fillStyle='#03140a';x.fillRect(0,0,W,H);
+ x.strokeStyle='#1a5c2e';x.beginPath();
+ for(let gy=0;gy<=4;gy++){const y=12+gy*(H-24)/4;x.moveTo(0,y);x.lineTo(W,y)}
+ x.stroke();
+ x.fillStyle='#4e7a58';x.font='10px Courier New';
+ x.fillText('+4.5',4,20);x.fillText('0.0',4,H/2);x.fillText('−4.5',4,H-6);
+ // threshold line at +1.6
+ const ty=H/2-1.6/4.5*(H/2-12);
+ x.strokeStyle='rgba(255,176,0,.65)';x.setLineDash([5,4]);x.beginPath();x.moveTo(0,ty);x.lineTo(W,ty);x.stroke();x.setLineDash([]);
+ // flagged segments
+ x.fillStyle='rgba(255,176,0,.13)';
+ for(const[a,b]of segs){const xa=a/(hy.length-1||1)*W,xb=(b+1)/(hy.length-1||1)*W;x.fillRect(xa,12,xb-xa,H-24)}
+ // profile
+ x.strokeStyle='#33ff66';x.lineWidth=1.4;x.beginPath();
+ for(let i=0;i<hy.length;i++){
+  const px=i/(hy.length-1||1)*W;
+  const py=H/2-hy[i]/4.5*(H/2-12);
+  i?x.lineTo(px,py):x.moveTo(px,py);
+ }
+ x.stroke();
+}
+function plotCharge(s){
+ const cv=$('#charge'),x=cv.getContext('2d');
+ const W=cv.width,H=cv.height;
+ x.fillStyle='#03140a';x.fillRect(0,0,W,H);
+ x.strokeStyle='#1a5c2e';x.beginPath();
+ for(let gx=0;gx<=7;gx++){const px=gx*W/7;x.moveTo(px,0);x.lineTo(px,H)}
+ x.stroke();
+ x.fillStyle='#4e7a58';x.font='10px Courier New';
+ for(let p=0;p<=14;p+=2)x.fillText(p,p*W/14+3,H-6);
+ const n=140;
+ x.strokeStyle='#ffb000';x.lineWidth=1.6;x.beginPath();
+ for(let i=0;i<=n;i++){
+  const pH=i/n*14;
+  const q=chargeAt(s,pH);
+  const py=H/2-q/20*(H/2-10);
+  i?x.lineTo(px0(),py):x.moveTo(px0(),py);
+  function px0(){return pH/14*W}
+ }
+ x.stroke();
+ const pIv=pI(s);
+ const pi_x=pIv/14*W;
+ x.strokeStyle='rgba(51,255,102,.8)';x.setLineDash([4,4]);x.beginPath();x.moveTo(pi_x,0);x.lineTo(pi_x,H);x.stroke();x.setLineDash([]);
+ x.fillStyle='#33ff66';x.fillText('pI '+pIv.toFixed(2),pi_x+5,16);
+}
+function run(){
+ const s=CLEAN($('#seq').value);
+ $('#s-len').textContent=s.length;
+ if(s.length<5){plotHyd([],[]);$('#s-gravy').textContent='-';$('#s-charge').textContent='-';$('#s-pi').textContent='-';$('#s-seg').textContent='0';$('#s-max').textContent='-';return}
+ const w=+$('#r-win').value;
+ const hy=hydropathy(s,w);
+ const segs=segments(hy,1.4,13);
+ plotHyd(hy,segs);plotCharge(s);
+ $('#s-gravy').textContent=gravy(s).toFixed(2);
+ $('#s-charge').textContent=chargeAt(s,+$('#r-ph').value).toFixed(2);
+ $('#s-pi').textContent=pI(s).toFixed(2);
+ $('#s-seg').textContent=segs.length;
+ $('#s-max').textContent=Math.max(...hy).toFixed(2);
+ window.__SEGS=segs;
+ let h='<table class="res"><tr><th>SEGMENT</th><th>FROM</th><th>TO</th><th>LEN</th><th>MEAN KD</th></tr>';
+ for(const[a,b]of segs){
+  let m=0;for(let i=a;i<=b;i++)m+=hy[i];
+  h+='<tr><td>TM CANDIDATE</td><td class="n">'+(a+1)+'</td><td class="n">'+(b+1)+'</td><td>'+(b-a+1)+'</td><td>'+(m/(b-a+1)).toFixed(2)+'</td></tr>';
+ }
+ $('#tbl').innerHTML=segs.length?h:'<p style="color:#4e7a58;font:italic 12px Georgia">No segments above +1.6 for 19+ residues at this window.</p>';
+}
+function sample(){
+ // bacteriorhodopsin, BACR_HALSA (UniProt P02945 SV=2), residues 1-230.
+ // Helices annotated at ~11-31, 36-61, 73-95, 105-127, 135-155, 163-185, 196-220.
+ const s='AQITGRPEWIWLALGTALMGLGTLYFLVKGMGVSDPDAKKFYAITTLVPAIAFTMYLSMLLGYGLTMVPFGGEQNPIYWARYADWLFTTPLLLLDLALLVDADQGTILALVGADGIMIGTGLVGALTKVYSYRFVWWAISTAAMLYILYVLFFGFTSKAESMRPEVASTFKVLRNVTVVLWSAYPVVWLIGSEGAGIVPLNIETLLFMVLDVSAKVGFGLILLRSRAIFGEAEAPEPSAGDGAAATSD';
+ $('#seq').value=s;run();toast('SPECIMEN: BACTERIORHODOPSIN 10-230');
+}
+$('#b-run').addEventListener('click',()=>{run();toast('RUN COMPLETE')});
+$('#b-sample').addEventListener('click',sample);
+$('#b-peaks').addEventListener('click',()=>{run();toast('SEGMENTS FLAGGED AT +1.6')});
+$('#b-clear').addEventListener('click',()=>{$('#seq').value='';run();toast('CLEARED')});
+$('#r-win').addEventListener('input',()=>{$('#o-win').textContent=$('#r-win').value;run()});
+$('#r-ph').addEventListener('input',()=>{$('#o-ph').textContent=(+$('#r-ph').value).toFixed(1);run()});
+$('#mob').addEventListener('click',()=>{$('#side').classList.toggle('open')});
+sample();
+})();
+</script>
+</body>
+</html>

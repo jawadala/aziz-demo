@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05060f">
+<title>STUDY 16 · RL AGENT</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='4' fill='%2305060f'/><rect x='2' y='9' width='3' height='3' fill='%232fd6ff'/><rect x='7' y='4' width='3' height='3' fill='%234ade80'/><rect x='12' y='9' width='2' height='3' fill='%23a78bfa'/></svg>">
+<style>
+:root{--bg:#05060f;--panel:#0a0e1e;--panel2:#0d1328;--line:#1b2340;--txt:#e8f2ff;--mut:#7f93b8;--cyan:#2fd6ff;--vio:#a78bfa;--grn:#4ade80}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font:13px/1.5 ui-monospace,ui-monospace,monospace;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);background:#0a0e1e;flex-wrap:wrap;z-index:5}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:.14em;font-size:13px;white-space:nowrap}
+.logo{width:15px;height:15px;border-radius:4px;background:conic-gradient(from 210deg,var(--cyan),var(--vio),var(--grn),var(--cyan));;flex:none}
+.brand .sub{color:var(--mut);font-weight:400;letter-spacing:.08em;font-size:10px}
+.badge{font-size:10px;color:#051018;background:linear-gradient(90deg,var(--cyan),#7ee7ff);padding:2px 8px;border-radius:99px;font-weight:700;letter-spacing:.1em}
+.tabs{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{background:var(--panel2);border:1px solid var(--line);color:var(--mut);padding:6px 12px;border-radius:8px;cursor:pointer;font:inherit;font-size:11px;letter-spacing:.1em}
+.tabs button.on{color:#051018;background:linear-gradient(90deg,var(--cyan),#7ee7ff);border-color:var(--cyan);font-weight:700}
+main{flex:1;display:grid;grid-template-columns:296px 1fr;min-height:0}
+aside{border-right:1px solid var(--line);background:var(--panel);padding:12px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.grp{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--panel2);display:flex;flex-direction:column;gap:7px}
+.lab{font-size:10px;letter-spacing:.14em;color:var(--mut)}
+.lab b{color:var(--cyan)}
+.lab.sm{margin-top:2px}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+button{background:#111a38;border:1px solid var(--line);color:var(--txt);padding:7px 10px;border-radius:8px;cursor:pointer;font:inherit;font-size:11px;letter-spacing:.06em}
+button:hover{border-color:var(--cyan);color:#fff}
+button.pri{background:linear-gradient(90deg,#0e4a63,#0e6a63);border-color:var(--cyan);font-weight:700}
+button.wide{width:100%}
+select,input[type=range]{width:100%}
+select{background:#0a1024;border:1px solid var(--line);color:var(--txt);padding:6px;border-radius:8px;font:inherit;font-size:12px}
+input[type=range]{accent-color:var(--cyan);height:22px}
+input[type=checkbox]{accent-color:var(--grn);width:15px;height:15px}
+.ck{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--txt);cursor:pointer}
+.note{font-size:10px;color:var(--mut)}
+.stage{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;background:#04050c}
+canvas.view{flex:1;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.hud{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.chiprow{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:#070d1ecc;border:1px solid var(--line);border-radius:7px;padding:3px 8px;font-size:10px;color:var(--mut);letter-spacing:.06em}
+.chip b{color:var(--cyan);font-size:11px}
+.chip b.g{color:var(--grn)} .chip b.v{color:var(--vio)}
+.hint{position:absolute;right:10px;bottom:8px;font-size:10px;color:#5c6f92;text-align:right;pointer-events:none}
+footer{padding:7px 14px;border-top:1px solid var(--line);color:var(--mut);font-size:10px;letter-spacing:.12em;display:flex;gap:8px;flex-wrap:wrap;background:#070a16}
+footer b{color:var(--cyan)}
+.doc{padding:22px;overflow:auto;max-width:900px}
+.doc h2{color:var(--cyan);letter-spacing:.16em;font-size:15px;margin:18px 0 8px}
+.doc h2:first-child{margin-top:0}
+.doc h3{color:var(--vio);font-size:12px;letter-spacing:.12em;margin:14px 0 6px}
+.doc p,.doc li{color:#c4d4ee;font-size:13px}
+.doc ul{margin:6px 0 6px 18px}
+.doc .f{background:#070d1f;border:1px solid var(--line);border-left:3px solid var(--grn);border-radius:8px;padding:10px 12px;margin:8px 0;font-size:13px;color:#d9ffe9;overflow-x:auto;white-space:pre}
+.doc table{border-collapse:collapse;margin:8px 0;font-size:12px}
+.doc td,.doc th{border:1px solid var(--line);padding:5px 9px;text-align:left}
+.doc th{color:var(--mut);letter-spacing:.1em;font-weight:400;font-size:10px}
+.doc td k{color:var(--grn);font-style:normal}
+@media(max-width:880px){main{grid-template-columns:1fr;grid-template-rows:minmax(320px,52vh) minmax(0,1fr)}aside{order:2;border-right:0;border-top:1px solid var(--line)}}
+#toast{position:fixed;left:50%;bottom:52px;transform:translateX(-50%);background:#0c2a24;border:1px solid var(--grn);color:#c9ffe2;padding:8px 16px;border-radius:9px;font-size:11px;letter-spacing:.1em;opacity:0;transition:opacity .25s;pointer-events:none;z-index:99}
+#toast.show{opacity:1}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+<div class="brand"><span class="logo"></span>SYSTEMS LABORATORY <span class="sub">/ COMPUTATIONAL STUDIES</span></div>
+<span class="badge">STUDY 16 · RL AGENT</span>
+<nav class="tabs">
+<button data-tab="viz" class="on">DEMO</button>
+<button data-tab="concept">CONCEPT</button>
+<button data-tab="about">NOTES</button>
+</nav>
+</header>
+<main>
+<aside id="side">
+<div class="grp">
+<div class="lab">WORLD MAP</div>
+<select id="map">
+<option value="classic">classic — simple corridor</option>
+<option value="rooms">four rooms — doors & walls</option>
+<option value="cliff">cliff — danger along the edge</option>
+<option value="maze">winding maze</option>
+</select>
+</div>
+<div class="grp">
+<div class="lab">VIEW</div>
+<select id="view">
+<option value="both">values + policy arrows</option>
+<option value="value">values only (heat)</option>
+<option value="policy">policy only (arrows)</option>
+</select>
+<label class="ck"><input type="checkbox" id="qtip" checked> tap a cell for its Q-table</label>
+</div>
+<div class="grp">
+<div class="lab">α LEARNING RATE · <b id="vA">0.20</b></div>
+<input type="range" id="a" min="1" max="100" value="20">
+<div class="lab sm">γ DISCOUNT · <b id="vG">0.95</b></div>
+<input type="range" id="g" min="50" max="99" value="95">
+<div class="lab sm">ε EXPLORE · <b id="vE">15</b>%</div>
+<input type="range" id="e" min="0" max="60" value="15">
+<div class="lab sm">SPEED · <b id="vS">8</b> steps/frame</div>
+<input type="range" id="s" min="1" max="60" value="8">
+</div>
+<div class="grp">
+<div class="lab">REWARD SHAPING</div>
+<div class="lab sm">GOAL · <b id="vRg">+1.0</b></div>
+<input type="range" id="rg" min="0" max="300" value="100">
+<div class="lab sm">STEP · <b id="vRs">−0.04</b></div>
+<input type="range" id="rs" min="0" max="50" value="4">
+<div class="lab sm">TRAP · <b id="vRt">−1.0</b></div>
+<input type="range" id="rt" min="0" max="300" value="100">
+</div>
+<div class="grp">
+<div class="row">
+<button id="bPlay" class="pri">PAUSE</button>
+<button id="bStep">STEP</button>
+<button id="bReset">RESET Q</button>
+</div>
+<div class="row">
+<button id="bWalls">WALLS</button>
+<button id="bClearW">CLEAR WALLS</button>
+</div>
+</div>
+</aside>
+<div class="stage" id="stage">
+<canvas id="cv" class="view"></canvas>
+<div class="hud">
+<div class="chiprow">
+<span class="chip">FPS <b id="hFps">–</b></span>
+<span class="chip">EPISODE <b id="hEp">0</b></span>
+<span class="chip">STEPS <b id="hSt">0</b></span>
+<span class="chip">ε <b id="hEps">–</b></span>
+<span class="chip">BEST <b class="g" id="hBest">–</b></span>
+</div>
+<div class="chip"><span id="hStat">training</span></div>
+</div>
+<div class="qbox" id="qbox" hidden></div>
+<div class="hint">drag = paint wall · shift/right-drag = erase<br>drag ◎ goal · SPACE pause · S step · R reset · Q toggle Q-box · 1-4 maps</div>
+</div>
+</main>
+<section id="tab-concept" class="doc" hidden>
+<h2>TABULAR Q-LEARNING</h2>
+<p>No teacher. Q starts at zero. Act, observe reward, update one entry. Repeated updates turn the table into a value map.</p>
+<h3>1 · STATES, ACTIONS, REWARDS</h3>
+<div class="f">state  s  = current cell (24×16 = 384 states)
+action a  = ↓ up ← right   (4 actions)
+reward r  = goal (+1.0) · trap (−1.0) · step (−0.04)</div>
+<p>r_step &lt; 0: longer routes cost more; optimal policy prefers short routes.</p>
+<h3>2 · THE UPDATE RULE</h3>
+<div class="f">Q(s,a) ← Q(s,a) + α · [ r + γ · max Q(s′,·) − Q(s,a) ]
+└────── TD error δ ──────┘</div>
+<p>δ = outcome (r plus discounted max at s′) minus prediction. α scales the correction, γ the credit back:</p>
+<ul>
+<li><b>α</b> — 0.05: slow, stable. 0.99: values oscillate.</li>
+<li><b>γ</b> — 0.5: value spreads ~2-3 cells. 0.99: across the map.</li>
+<li><b>ε</b> — probability ε: uniform random action; else argmax Q.</li>
+</ul>
+<div class="f">π(s) = argmax Q(s,·)     ← greedy policy, drawn as arrows</div>
+<h3>3 · FAILURE MODES</h3>
+<ul>
+<li><b>ε = 0 before first goal</b> — greedy from a zero table follows noise; may never reach the goal.</li>
+<li><b>α at max</b> — values oscillate. <b>γ near 0.5</b> — value stops spreading beyond 2-3 cells.</li>
+<li><b>Wall painted across a learned route</b> — stale Q-values persist until re-training reroutes.</li>
+</ul>
+</section>
+<section id="tab-about" class="doc" hidden>
+<h2>BUILD RECORD</h2>
+<p>Single self-contained HTML file. No frameworks, no CDNs, no fonts, no build step. Tabular RL stack: agent, environment, reward function, display.</p>
+<h3>ENGINEERING NOTES</h3>
+<ul>
+<li>Q-table: <b>Float32Array</b> cells×4. Env returns (s′, r, done); terminals: goal, trap, cliff, step cap.</li>
+<li>Per frame: up to <b>60 env steps</b> (speed slider), ε-greedy, one-line Q update. Walls editable live.</li>
+<li><b>Reduced motion:</b> static frame after 40 pre-trained episodes; STEP still advances.</li>
+</ul>
+
+<h3>SOURCES</h3>
+<p>Watkins, PhD thesis, Cambridge 1989; Watkins &amp; Dayan, ML 8:279, 1992. Code: github.com/openai/gym; tensorflow/agents.</p>
+<h3>PERF</h3>
+<p>One step: table lookup, max of 4, one multiply-add; thousands per frame. Canvas repaint (384 cells) dominates; 60 fps integrated.</p>
+</section>
+<footer><b>SYSTEMS LABORATORY</b> · STUDY 16 · rl agent · single file</footer>
+<script>
+'use strict';
+window.__errors__=[];addEventListener('error',e=>window.__errors__.push(String(e&&e.message||e)));
+const $=s=>document.querySelector(s);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const dpr=Math.min(2,devicePixelRatio||1);
+const COLS=24,ROWS=16,NC=COLS*ROWS,NA=4;
+const DX=[0,0,-1,1],DY=[1,-1,0,0];
+const walls=new Uint8Array(NC);
+let goal={x:COLS-2,y:ROWS-2},start={x:1,y:ROWS-2};
+let Q=new Float32Array(NC*NA);
+let alpha=0.20,gamma=0.95,eps=0.15,speed=8;
+let rGoal=1.0,rStep=-0.04,rTrap=-1.0;
+let mapName='classic';
+const idx=(x,y)=>y*COLS+x;
+const inb=(x,y)=>x>=0&&y>=0&&x<COLS&&y<ROWS;
+function rect(x0,y0,x1,y1,v){for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)walls[idx(x,y)]=v;}
+const MAPS={
+classic(){rect(0,0,COLS-1,0,1);rect(0,ROWS-1,COLS-1,ROWS-1,1);rect(0,0,0,ROWS-1,1);rect(COLS-1,0,COLS-1,ROWS-1,1);
+rect(11,1,12,9,1);},
+rooms(){rect(0,0,COLS-1,0,1);rect(0,ROWS-1,COLS-1,ROWS-1,1);rect(0,0,0,ROWS-1,1);rect(COLS-1,0,COLS-1,ROWS-1,1);
+rect(11,0,12,6,1);rect(11,10,12,ROWS-1,1);
+rect(5,0,6,ROWS-1,1);rect(5,7,6,8,0);
+rect(17,0,18,ROWS-1,1);rect(17,7,18,8,0);},
+cliff(){rect(0,0,COLS-1,0,1);rect(0,ROWS-1,COLS-1,ROWS-1,1);rect(0,0,0,ROWS-1,1);rect(COLS-1,0,COLS-1,ROWS-1,1);
+rect(1,ROWS-2,COLS-3,ROWS-2,2); 
+goal={x:COLS-2,y:ROWS-2};start={x:1,y:ROWS-2};},
+maze(){rect(0,0,COLS-1,0,1);rect(0,ROWS-1,COLS-1,ROWS-1,1);rect(0,0,0,ROWS-1,1);rect(COLS-1,0,COLS-1,ROWS-1,1);
+rect(3,1,3,13,1);rect(3,1,9,1,0);
+rect(6,3,6,14,1);rect(6,13,12,13,0);
+rect(9,1,9,10,1);rect(9,1,15,1,0);
+rect(12,3,12,13,1);rect(12,3,18,3,0);
+rect(15,5,15,14,1);rect(15,14,20,14,0);
+rect(18,1,18,11,1);rect(18,1,21,1,0);
+rect(20,3,20,12,1);rect(20,10,21,10,0);
+goal={x:COLS-2,y:2};}
+};
+let trapCells=new Set();
+function loadMap(name){mapName=name;walls.fill(0);MAPS[name]();trapCells=new Set();
+for(let i=0;i<NC;i++)if(walls[i]===2)trapCells.add(i),walls[i]=0;
+if(!inb(goal.x,goal.y))goal={x:COLS-2,y:ROWS-2};
+if(!inb(start.x,start.y))start={x:1,y:ROWS-2};}
+let s0=idx(start.x,start.y),st=s0,episodes=0,stepsTotal=0,curEpSteps=0,curRet=0,best=-Infinity,tdqAvg=0;
+let epReturns=[];
+function spawn(){st=idx(start.x,start.y);curEpSteps=0;curRet=0;}
+function envStep(a){
+const x=st%COLS,y=(st/COLS)|0;
+let nx=x+DX[a],ny=y+DY[a];
+if(!inb(nx,ny)||walls[idx(nx,ny)]){nx=x;ny=y;}
+const ns=idx(nx,ny);
+let r=rStep,done=false;
+if(trapCells.has(ns)){r=rTrap;done=true;}
+else if(nx===goal.x&&ny===goal.y){r=rGoal;done=true;}
+if(curEpSteps>2000){done=true;r=rStep;}
+return{ns,r,done};
+}
+function maxQ(s){let m=-Infinity;for(let a=0;a<NA;a++){const v=Q[s*NA+a];if(v>m)m=v;}return m;}
+function trainStep(){
+let a;
+if(Math.random()<eps)a=(Math.random()*NA)|0;
+else{a=0;let m=-Infinity;
+for(let k=0;k<NA;k++){const v=Q[st*NA+k];if(v>m){m=v;a=k;}}}
+const {ns,r,done}=envStep(a);
+const i=st*NA+a;
+const target=done?r:r+gamma*maxQ(ns);
+const td=target-Q[i];
+Q[i]+=alpha*td;
+tdqAvg=tdqAvg*0.995+Math.abs(td)*0.005;
+curRet+=r;curEpSteps++;stepsTotal++;
+st=ns;
+if(done){episodes++;
+epReturns.push(curRet);if(epReturns.length>400)epReturns.shift();
+if(curRet>best)best=curRet;
+spawn();}
+}
+const stage=$('#stage'),cv=$('#cv'),ctx=cv.getContext('2d');
+let cs=20,ox=0,oy=0;
+function fit(){const r=stage.getBoundingClientRect();cv.width=Math.max(2,(r.width*dpr)|0);cv.height=Math.max(2,(r.height*dpr)|0);if(RM)draw();}
+new ResizeObserver(fit).observe(stage);
+function heat(v){
+if(v<=-0.999)return '#3a1a4a';
+const t=clamp((v+1)/2,0,1);
+if(t<0.5){const k=t/0.5;return `rgb(${(20+40*k)|0},${(28+60*k)|0},${(60+120*k)|0})`;}
+const k=(t-0.5)/0.5;
+return `rgb(${(60+90*k)|0},${(88+80*k)|0},${(180+60*k)|0})`;}
+function draw(now){
+const W=cv.width/dpr,H=cv.height/dpr;
+ctx.setTransform(dpr,0,0,dpr,0,0);
+ctx.fillStyle='#04050c';ctx.fillRect(0,0,W,H);
+cs=Math.min(W/COLS,H/ROWS);ox=(W-cs*COLS)/2;oy=(H-cs*ROWS)/2;
+const mode=viewSel.value;
+if(mode!=='policy'){
+let vmin=Infinity,vmax=-Infinity;
+for(let i=0;i<NC;i++)if(!walls[i]){const v=maxQ(i);if(v<vmin)vmin=v;if(v>vmax)vmax=v;}
+if(vmax-vmin<1e-6)vmax=vmin+1;
+for(let i=0;i<NC;i++){
+const x=i%COLS,y=(i/COLS)|0;
+if(walls[i]){ctx.fillStyle='#22315e';ctx.fillRect(ox+x*cs+0.5,oy+y*cs+0.5,cs-1,cs-1);continue;}
+const v=(maxQ(i)-vmin)/(vmax-vmin)*2-1;
+ctx.fillStyle=heat(v);
+ctx.fillRect(ox+x*cs+0.5,oy+y*cs+0.5,cs-1,cs-1);
+}
+}else{
+for(let i=0;i<NC;i++){const x=i%COLS,y=(i/COLS)|0;
+ctx.fillStyle=walls[i]?'#22315e':'#0a1024';
+ctx.fillRect(ox+x*cs+0.5,oy+y*cs+0.5,cs-1,cs-1);}
+}
+for(const ti of trapCells){const x=ti%COLS,y=(ti/COLS)|0;
+ctx.fillStyle='rgba(255,80,120,0.55)';ctx.fillRect(ox+x*cs+1,oy+y*cs+1,cs-2,cs-2);
+ctx.fillStyle='#05060f';ctx.font=`${Math.max(7,cs*0.5)|0}px ui-monospace`;ctx.fillText('×',ox+x*cs+cs*0.28,oy+(y+0.72)*cs);}
+if(mode!=='value'){
+ctx.fillStyle='rgba(234,255,242,0.92)';
+const ar=cs*0.22;
+for(let i=0;i<NC;i++){
+if(walls[i])continue;
+const x=i%COLS,y=(i/COLS)|0;
+if(x===goal.x&&y===goal.y)continue;
+let ba=0,m=-Infinity,votes=0;
+for(let a=0;a<NA;a++){const v=Q[i*NA+a];if(v>m){m=v;ba=a;}if(Math.abs(v)<1e-6)votes++;}
+if(votes===NA)continue;
+const cx2=ox+(x+0.5)*cs,cy2=oy+(y+0.5)*cs;
+const dx=DX[ba],dy=DY[ba];
+ctx.beginPath();
+ctx.moveTo(cx2+dx*ar,cy2+dy*ar);
+ctx.lineTo(cx2-dx*ar-dy*ar*0.7,cy2-dy*ar-dx*ar*0.7);
+ctx.lineTo(cx2-dx*ar+dy*ar*0.7,cy2-dy*ar+dx*ar*0.7);
+ctx.closePath();ctx.fill();
+}
+}
+const gx=ox+(goal.x+0.5)*cs,gy=oy+(goal.y+0.5)*cs;
+const pr=cs*0.42*((RM||paused)?1:1+0.1*Math.sin(now/300));
+ctx.save();ctx.shadowColor='#4ade80';ctx.shadowBlur=14;
+ctx.strokeStyle='#4ade80';ctx.lineWidth=2.5;
+ctx.beginPath();ctx.arc(gx,gy,pr,0,6.2832);ctx.stroke();
+ctx.beginPath();ctx.arc(gx,gy,pr*0.45,0,6.2832);ctx.stroke();ctx.restore();
+ctx.strokeStyle='rgba(47,214,255,0.4)';ctx.lineWidth=2;ctx.beginPath();
+for(let k=0;k<trail.length;k+=2){const px=ox+trail[k]*cs,py=oy+trail[k+1]*cs;k?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+ctx.stroke();
+if(trail.length>=2){const ax2=ox+trail[trail.length-2]*cs,ay2=oy+trail[trail.length-1]*cs;
+ctx.save();ctx.shadowColor='#2fd6ff';ctx.shadowBlur=16;
+ctx.fillStyle='#2fd6ff';ctx.beginPath();ctx.arc(ax2,ay2,cs*0.3,0,6.2832);ctx.fill();ctx.restore();}
+ctx.fillStyle='rgba(127,147,184,0.9)';ctx.font=`${Math.max(8,cs*0.4)|0}px ui-monospace`;
+ctx.fillText('●',ox+(start.x+0.3)*cs,oy+(start.y+0.7)*cs);
+}
+const trail=[];
+const qbox=$('#qbox');
+let qCell=-1;
+function showQ(i){
+qCell=i;
+const x=i%COLS,y=(i/COLS)|0;
+if(walls[i]){qbox.innerHTML='cell ('+x+','+y+') — wall';qbox.hidden=false;return;}
+const names=['↓ down','↑ up','← left','→ right'];
+let html='<div class="qt">Q(' + x + ',' + y + ') · best = <b>'+names[0]+'</b></div>';
+let ba=0,m=-Infinity;
+for(let a=0;a<NA;a++){const v=Q[i*NA+a];if(v>m){m=v;ba=a;}}
+html='<div class="qt">Q('+x+','+y+') · greedy = <b>'+names[ba].slice(2)+'</b></div>';
+for(let a=0;a<NA;a++){const v=Q[i*NA+a];
+const w=clamp(Math.abs(v)/Math.max(1e-6,Math.abs(m)||1),0,1);
+html+='<div class="qr'+(a===ba?' hot':'')+'"><span>'+names[a]+'</span><i style="width:'+(w*100).toFixed(0)+'%"></i><em>'+v.toFixed(3)+'</em></div>';}
+qbox.innerHTML=html;qbox.hidden=false;
+}
+cv.addEventListener('pointerdown',e=>{
+const r=cv.getBoundingClientRect();
+const x=Math.floor((e.clientX-r.left-ox)/cs),y=Math.floor((e.clientY-r.top-oy)/cs);
+if(inb(x,y))showQ(idx(x,y));});
+let drag=null,paintVal=1,lastCell=null;
+function cellAt2(e){const r=cv.getBoundingClientRect();
+const x=Math.floor((e.clientX-r.left-ox)/cs),y=Math.floor((e.clientY-r.top-oy)/cs);return inb(x,y)?{x,y}:null;}
+function paintLine2(a,b){const steps=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y)*2));
+for(let k=0;k<=steps;k++){const p={x:Math.round(a.x+(b.x-a.x)*k/steps),y:Math.round(a.y+(b.y-a.y)*k/steps)};
+if((p.x===goal.x&&p.y===goal.y))continue;
+walls[idx(p.x,p.y)]=paintVal;}}
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+cv.addEventListener('pointerdown',e=>{if(e.pointerId!==undefined&&e.pointerId>-1){try{cv.setPointerCapture(e.pointerId);}catch(err){}}const p=cellAt2(e);if(!p)return;
+if(Math.hypot(p.x-goal.x,p.y-goal.y)<0.8){drag='goal';return;}
+drag='paint';paintVal=(e.shiftKey||e.button===2)?0:1;lastCell=p;
+if(!(p.x===goal.x&&p.y===goal.y))walls[idx(p.x,p.y)]=paintVal;});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const p=cellAt2(e);if(!p)return;
+if(drag==='goal'){if(walls[idx(p.x,p.y)])return;goal=p;}
+else{if(lastCell)paintLine2(lastCell,p);lastCell=p;}});
+addEventListener('pointerup',()=>{drag=null;lastCell=null;});
+const hFps=$('#hFps'),hEp=$('#hEp'),hSt=$('#hSt'),hEps=$('#hEps'),hBest=$('#hBest'),hStat=$('#hStat');
+let hudAcc=0,lastT=performance.now(),fpsV=60;
+const elMap=$('#map'),viewSel=$('#view'),elA=$('#a'),elG=$('#g'),elE=$('#e'),elS=$('#s');
+elA.oninput=()=>{alpha=+elA.value/100;$('#vA').textContent=alpha.toFixed(2);};
+elG.oninput=()=>{gamma=+elG.value/100;$('#vG').textContent=gamma.toFixed(2);};
+elE.oninput=()=>{eps=+elE.value/100;$('#vE').textContent=elE.value;};
+elS.oninput=()=>{speed=+elS.value;$('#vS').textContent=speed;};
+const rgEl=$('#rg'),rsEl=$('#rs'),rtEl=$('#rt');
+rgEl.oninput=()=>{rGoal=+rgEl.value/100;$('#vRg').textContent=(rGoal>=0?'+':'')+rGoal.toFixed(1);};
+rsEl.oninput=()=>{rStep=-+rsEl.value/100;$('#vRs').textContent=rStep.toFixed(2);};
+rtEl.oninput=()=>{rTrap=-+rtEl.value/100;$('#vRt').textContent=(rTrap>=0?'+':'')+rTrap.toFixed(1);};
+elMap.onchange=()=>{loadMap(elMap.value);Q=new Float32Array(NC*NA);spawn();trail.length=0;qbox.hidden=true;};
+elA.oninput();elG.oninput();elE.oninput();elS.oninput();rgEl.oninput();rsEl.oninput();rtEl.oninput();
+const bPlay=$('#bPlay');
+let paused=false;
+bPlay.onclick=()=>{paused=!paused;bPlay.textContent=paused?'RESUME':'PAUSE';};
+$('#bStep').onclick=()=>{trainStep();trail.push((st%COLS)+0.5,((st/COLS)|0)+0.5);if(trail.length>60)trail.splice(0,2);};
+$('#bReset').onclick=()=>{Q=new Float32Array(NC*NA);episodes=0;stepsTotal=0;best=-Infinity;epReturns=[];tdqAvg=0;spawn();trail.length=0;};
+$('#bWalls').onclick=()=>{};
+$('#bClearW').onclick=()=>{const border=(x,y)=>x===0||y===0||x===COLS-1||y===ROWS-1;
+for(let i=0;i<NC;i++)if(!border(i%COLS,(i/COLS)|0))walls[i]=0;};
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600);}
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+const k=e.key.toLowerCase();
+if(k===' '){e.preventDefault();paused=!paused;bPlay.textContent=paused?'RESUME':'PAUSE';}
+else if(k==='s'){$('#bStep').onclick();}
+else if(k==='r'){$('#bReset').onclick();}
+else if(k==='q'){qbox.hidden=!qbox.hidden;}
+else if(k==='1'){elMap.value='classic';elMap.onchange();}
+else if(k==='2'){elMap.value='rooms';elMap.onchange();}
+else if(k==='3'){elMap.value='cliff';elMap.onchange();}
+else if(k==='4'){elMap.value='maze';elMap.onchange();}});
+function rle(arr){let out='',i=0;while(i<arr.length){let j=i;while(j<arr.length&&arr[j]===arr[i])j++;out+=(j-i).toString(36)+arr[i];i=j;}return out;}
+function unrle(s,len){const bits=new Uint8Array(len);let i=0,p=0;
+while(i<s.length&&p<len){let j=i;while(j<s.length&&s[j]>='0'&&s[j]<='9')j++;
+const n=parseInt(s.slice(i,j),10)||1;const b=+(s[j]||0);
+for(let k=0;k<n&&p<len;k++)bits[p++]=b;i=j+1;}
+return bits;}
+function saveHash(){const o={m:mapName,a:alpha,g:gamma,e:Math.round(eps*100),s:speed,
+rg:Math.round(rGoal*100),rs:Math.round(-rStep*100),rt:Math.round(-rTrap*100),
+w:rle(walls),G:goal.x+','+goal.y};
+history.replaceState(null,'','#'+Object.entries(o).map(([k2,v])=>k2+'='+v).join('&'));}
+function loadHash(){if(location.hash.length<3)return;
+const o={};location.hash.replace(/^#/,'').split('&').forEach(p=>{const kv=p.split('=');if(kv[0])o[kv[0]]=kv.slice(1).join('=');});
+try{
+if(o.m&&MAPS[o.m]){mapName=o.m;elMap.value=mapName;}
+if(o.a)alpha=clamp(+o.a,1,100)/100,elA.value=alpha*100,$('#vA').textContent=alpha.toFixed(2);
+if(o.g)gamma=clamp(+o.g,50,99)/100,elG.value=gamma*100,$('#vG').textContent=gamma.toFixed(2);
+if(o.e!==undefined)eps=clamp(+o.e,0,60)/100,elE.value=+o.e,$('#vE').textContent=o.e;
+if(o.s)speed=clamp(+o.s,1,60),elS.value=speed,$('#vS').textContent=speed;
+if(o.rg!==undefined){rGoal=clamp(+o.rg,0,300)/100;rgEl.value=+o.rg;$('#vRg').textContent=(rGoal>=0?'+':'')+rGoal.toFixed(1);}
+if(o.rs!==undefined){rStep=-clamp(+o.rs,0,50)/100;rsEl.value=+o.rs;$('#vRs').textContent=rStep.toFixed(2);}
+if(o.rt!==undefined){rTrap=-clamp(+o.rt,0,300)/100;rtEl.value=+o.rt;$('#vRt').textContent=(rTrap>=0?'+':'')+rTrap.toFixed(1);}
+walls.set(unrle(o.w||'',NC));
+if(o.G){const [x,y]=o.G.split(',').map(Number);if(inb(x,y))goal={x,y};}
+}catch(err){}}
+setInterval(saveHash,3000);
+function frame(now){if(!RM)requestAnimationFrame(frame);
+const dt=Math.min(50,now-lastT)||16.6;lastT=now;
+fpsV=fpsV*0.93+(1000/dt)*0.07;
+if(!paused){
+for(let k=0;k<speed;k++)trainStep();
+trail.push((st%COLS)+0.5,((st/COLS)|0)+0.5);
+if(trail.length>60)trail.splice(0,2);
+}
+draw(now);
+hudAcc+=dt/1000;
+if(hudAcc>0.15){hudAcc=0;
+hFps.textContent=Math.round(fpsV);
+hEp.textContent=episodes;
+hSt.textContent=stepsTotal;
+hEps.textContent=eps.toFixed(2);
+hBest.textContent=isFinite(best)?best.toFixed(2):'–';
+const recent=epReturns.slice(-20);
+const avg=recent.length?recent.reduce((a2,b2)=>a2+b2,0)/recent.length:0;
+hStat.textContent=paused?'paused':(episodes<3?'exploring: no goal found yet':(avg>best*0.9&&best>-0.5?'converged: recent returns within 10% of best':'training: mean return climbing')); }
+}
+loadHash();
+loadMap(mapName);
+Q=new Float32Array(NC*NA);
+spawn();
+fit();
+if(RM){let g2=0;while(episodes<40&&g2++<200000)trainStep();draw();}
+else requestAnimationFrame(frame);
+window.__LAB_READY__=true;
+window.__LAB__={get episodes(){return episodes;},get best(){return best;}};
+
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+document.querySelectorAll('section.doc').forEach(el=>el.hidden=true);
+document.querySelectorAll('main,footer').forEach(el=>el.hidden=(b.dataset.tab!=='viz'));
+if(b.dataset.tab!=='viz'){document.querySelector('#tab-'+b.dataset.tab).hidden=false;}
+if(typeof fit==='function')fit();
+}));
+</script>
+<div id="toast"></div>
+<style>
+.qbox{position:absolute;top:10px;right:10px;background:#070d1eee;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:11px;min-width:210px;backdrop-filter:blur(4px)}
+.qbox .qt{color:var(--mut);letter-spacing:.08em;margin-bottom:6px}
+.qbox .qt b{color:var(--grn)}
+.qbox .qr{display:flex;align-items:center;gap:8px;margin:3px 0;color:#c4d4ee}
+.qbox .qr span{width:64px;flex:none}
+.qbox .qr i{display:block;height:5px;background:linear-gradient(90deg,var(--cyan),var(--vio));border-radius:3px;flex:1;max-width:90px}
+.qbox .qr em{font-style:normal;color:var(--mut);min-width:52px;text-align:right}
+.qbox .qr.hot{color:#fff}
+.qbox .qr.hot i{background:linear-gradient(90deg,var(--grn),#eafff2)}
+</style>
+</body>
+</html>

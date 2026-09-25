@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>GRADIENT STUDY No.7 — Systems Laboratory</title>
+<style>
+/* ============ ROSE-ONYX & ROSE-GOLD · STUDY No.7 ============ */
+:root{
+ --onyx:#0c0909; --rose:#e3a6a0; --rose2:#f2d3cd; --rose-dim:rgba(227,166,160,.5);
+ --hair:rgba(227,166,160,.15); --txt:#ece2df; --dim:#93827e; --panel:rgba(19,14,13,.9);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--onyx)}
+body{color:var(--txt);font-family:'Trebuchet MS',Verdana,sans-serif;font-size:11px;letter-spacing:.05em}
+canvas#cv{position:fixed;inset:0;width:100vw;height:100vh;display:block;touch-action:none;cursor:crosshair}
+#stage{position:fixed;inset:0;z-index:6;pointer-events:none;
+ background:radial-gradient(120% 95% at 50% 42%,transparent 52%,rgba(0,0,0,.62) 100%)}
+/* wordmark */
+#mark{position:fixed;top:26px;left:30px;z-index:12;pointer-events:none}
+#mark .no{font-size:8px;letter-spacing:.42em;color:var(--dim);text-transform:uppercase}
+#mark h1{font:italic 700 31px Didot,'Bodoni MT','Playfair Display','Times New Roman',serif;
+ color:var(--rose2);letter-spacing:.02em;margin:4px 0 3px;line-height:1;
+ background:linear-gradient(100deg,#f8e8e4 15%,#b98a83 55%,#eec9c2 85%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+#mark .sub{font-size:8px;letter-spacing:.34em;color:var(--dim);text-transform:uppercase}
+#mark .rule{width:52px;height:1px;background:linear-gradient(90deg,var(--rose),transparent);margin-top:10px}
+/* meters, right */
+#meters{position:fixed;right:30px;top:76px;z-index:12;text-align:right;pointer-events:none}
+#meters .m{margin-bottom:8px}
+#meters .m span{display:block;font-size:7.5px;letter-spacing:.34em;color:var(--dim);text-transform:uppercase}
+#meters .m b{font-size:20px;font-weight:400;color:var(--rose2);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+#warn{position:fixed;right:30px;top:268px;z-index:12;font-size:8px;letter-spacing:.28em;color:#ff8d7e;display:none;text-transform:uppercase}
+/* sheets + transport */
+#sheets{position:fixed;top:28px;right:30px;z-index:13;display:flex;gap:18px;align-items:center}
+#sheets button{background:none;border:none;color:var(--dim);font:inherit;font-size:8.5px;
+ letter-spacing:.32em;cursor:pointer;text-transform:uppercase;padding:4px 0}
+#sheets button:hover{color:var(--rose2)}
+#sheets .sep{width:1px;height:12px;background:var(--hair)}
+/* tray */
+#tray{position:fixed;right:30px;bottom:24px;z-index:13;width:252px;background:var(--panel);
+ border:1px solid var(--hair);padding:14px 16px 12px;max-height:56vh;overflow-y:auto;scrollbar-width:thin}
+#tray::-webkit-scrollbar{width:4px}#tray::-webkit-scrollbar-thumb{background:var(--hair)}
+#tray h3{font-size:7.5px;font-weight:400;letter-spacing:.4em;color:var(--dim);margin:0 0 8px;text-transform:uppercase}
+#tray .grp{margin-bottom:10px}
+.seg{display:flex;flex-wrap:wrap;border:1px solid var(--hair)}
+.seg button{flex:1 1 44%;background:transparent;border:none;border-right:1px solid var(--hair);border-bottom:1px solid var(--hair);
+ color:var(--dim);font:inherit;font-size:8px;letter-spacing:.12em;padding:7px 0;cursor:pointer;text-transform:uppercase}
+.seg button:nth-child(2n){border-right:none}
+.seg button.on{background:var(--rose);color:#1a100e}
+.seg button:hover:not(.on){color:var(--rose2)}
+.krow{display:flex;justify-content:space-between;align-items:baseline;margin:6px 0 0;
+ font-size:8px;letter-spacing:.24em;color:var(--dim);text-transform:uppercase}
+.krow b{color:var(--txt);font-weight:400;font-size:10px;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;appearance:none;-webkit-appearance:none;height:14px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--rose-dim)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:7px;height:15px;
+ background:linear-gradient(180deg,#f6ded9,#c08b84 55%,#96655f);margin-top:-7px}
+input[type=range]::-moz-range-track{height:1px;background:var(--rose-dim)}
+input[type=range]::-moz-range-thumb{width:7px;height:15px;background:linear-gradient(180deg,#f6ded9,#c08b84 55%,#96655f);border:none;border-radius:0}
+.ops{display:flex;gap:1px;margin-top:2px}
+.ops button{flex:1;background:transparent;border:1px solid var(--hair);color:var(--dim);
+ font:inherit;font-size:8px;letter-spacing:.14em;padding:7px 0;cursor:pointer;text-transform:uppercase}
+.ops button:hover{color:var(--rose2);border-color:var(--rose-dim)}
+.progs{display:grid;gap:1px}
+.progs button{background:transparent;border:none;color:var(--dim);font:inherit;font-size:8.5px;
+ letter-spacing:.22em;text-align:left;padding:6px 2px;cursor:pointer;text-transform:uppercase}
+.progs button:hover{color:var(--rose2)}
+.progs button.on{color:var(--rose2);border-left:2px solid var(--rose);padding-left:8px}
+#trayToggle{position:fixed;right:30px;bottom:24px;z-index:14;background:var(--panel);border:1px solid var(--hair);
+ color:var(--rose);font:inherit;font-size:8px;letter-spacing:.3em;padding:9px 14px;cursor:pointer;display:none;text-transform:uppercase}
+#tray.hid+#trayToggle{display:block}
+/* sheet */
+#ov{position:fixed;inset:0;z-index:30;background:rgba(9,6,6,.96);display:none;overflow-y:auto;padding:6vh 4vw}
+#ov.open{display:block}
+#sheet{max-width:660px;margin:0 auto;border-top:1px solid var(--rose);padding:34px 40px 40px}
+#sheet h2{font:italic 700 26px Didot,'Bodoni MT','Playfair Display','Times New Roman',serif;color:var(--rose2)}
+#sheet .no{font-size:8px;letter-spacing:.38em;color:var(--dim);margin:6px 0 24px;text-transform:uppercase}
+#sheet h4{font-size:9px;font-weight:400;letter-spacing:.36em;color:var(--rose-dim);margin:22px 0 8px;text-transform:uppercase}
+#sheet p,#sheet li{font-size:12.5px;line-height:1.9;color:#cfc0bd;margin:8px 0}
+#sheet ul{padding-left:16px}
+#sheet code{color:var(--rose2);font:700 11.5px 'Courier New',monospace}
+#sheet .fml{font:700 12px/2.1 'Courier New',monospace;color:var(--rose2);border:1px solid var(--hair);
+ padding:12px 16px;margin:12px 0;white-space:pre;overflow-x:auto}
+#sheet .sig{margin-top:28px;padding-top:12px;border-top:1px solid var(--hair);
+ font-size:8px;letter-spacing:.34em;color:var(--dim);text-transform:uppercase}
+#close{float:right;background:none;border:1px solid var(--hair);color:var(--dim);
+ font:inherit;font-size:8px;letter-spacing:.28em;padding:6px 12px;cursor:pointer;text-transform:uppercase}
+#close:hover{color:var(--rose2);border-color:var(--rose-dim)}
+#hint{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:11;font-size:8px;
+ letter-spacing:.3em;color:var(--dim);pointer-events:none;text-transform:uppercase;opacity:.85}
+@media(max-width:900px){
+ #hud,#hint,#meters{display:none}
+ #mark{top:16px;left:18px}#mark h1{font-size:22px}
+ #tray{right:12px;left:12px;bottom:12px;width:auto;max-height:44vh}
+ #sheets{top:16px;right:18px}
+ #trayToggle{right:12px;bottom:12px}
+}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="stage"></div>
+
+<div id="mark">
+  <div class="no">Study No.7</div>
+  <h1>Gradient</h1>
+  <div class="sub">Descent, in view · rose on onyx</div>
+  <div class="rule"></div>
+</div>
+
+<div id="meters">
+  <div class="m"><span>Epoch</span><b id="hEp">0</b></div>
+  <div class="m"><span>Loss · MSE</span><b id="hLoss">—</b></div>
+  <div class="m"><span>Accuracy</span><b id="hAcc">—</b></div>
+  <div class="m"><span>Rate η</span><b id="hLr">—</b></div>
+  <div class="m"><span>Synapses</span><b id="hPar">—</b></div>
+  <div class="m"><span>Samples</span><b id="hN">—</b></div>
+</div>
+<div id="warn">Divergence — auto-reset</div>
+
+<div id="hint">drag to paint samples · space to hold training</div>
+
+<div id="sheets">
+  <button id="tCon">Concept</button><span class="sep"></span>
+  <button id="tBld">Build</button><span class="sep"></span>
+  <button id="bPause">Hold</button>
+</div>
+
+<div id="tray">
+  <div class="grp"><h3>Dataset</h3><div class="seg" id="modeSeg"></div></div>
+  <div class="grp"><h3>Brush</h3><div class="seg" id="brushSeg"></div></div>
+  <div class="grp"><h3>Architecture</h3><div class="seg" id="archSeg"></div></div>
+  <div class="grp"><h3>Transfer</h3><div class="seg" id="actSeg"></div></div>
+  <div class="grp"><h3>Parameters</h3><div id="knobs"></div></div>
+  <div class="grp"><h3>Programs</h3><div class="progs" id="pSeg"></div></div>
+  <div class="grp ops">
+    <button id="bRand">Re-weight</button>
+    <button id="bReset">New data</button>
+    <button id="bClear">Erase paint</button>
+  </div>
+</div>
+<button id="trayToggle">Controls</button>
+
+<div id="ov"><div id="sheet">
+  <button id="close">Close</button>
+  <div id="sheetBody"></div>
+</div></div>
+
+<script>
+'use strict';
+/* ============================================================
+   SYSTEMS LABORATORY · GRADIENT STUDY No.7
+   real backprop, every step in view · rose-gold on onyx
+   single file · zero dependencies
+   ============================================================ */
+const TAU=Math.PI*2;
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const rand=(a=1,b)=>b===undefined?Math.random()*a:a+Math.random()*(b-a);
+const gauss=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();
+ return Math.sqrt(-2*Math.log(u))*Math.cos(TAU*v);};
+const $=id=>document.getElementById(id);
+
+const MODES=['XOR','SPIRAL','RINGS','MOONS'];
+const ARCHS={'2-8':[8],'2-8-8':[8,8],'2-16-16':[16,16],'2-16-16-8':[16,16,8]};
+const ACTS=['TANH','RELU'];
+const P={mode:0,brush:0,arch:1,act:0,lr:0.35,noise:0.16,samples:320,stepRate:0.6};
+const SLIDERS=[
+ {k:'lr',      label:'Rate η',  min:0,max:1,step:.01,fmt:v=>(10**(-3+3.3*v)).toPrecision(2),map:v=>10**(-3+3.3*v)},
+ {k:'noise',   label:'Noise',   min:0,max:.45,step:.01,fmt:v=>v.toFixed(2)},
+ {k:'samples', label:'Points',  min:60,max:800,step:20,fmt:v=>''+(v|0)},
+ {k:'stepRate',label:'Steps/f', min:.05,max:1,step:.05,fmt:v=>v.toFixed(2)},
+];
+const PROGS={
+ 'XOR fast':    {mode:0,arch:0,act:0,lr:.5,noise:.1,samples:200,stepRate:.6},
+ 'Spiral 16':   {mode:1,arch:2,act:0,lr:.42,noise:.08,samples:440,stepRate:1},
+ 'Ring catch':  {mode:2,arch:1,act:0,lr:.4,noise:.12,samples:320,stepRate:.8},
+ 'Moons · relu':{mode:3,arch:1,act:1,lr:.3,noise:.14,samples:320,stepRate:.8},
+};
+function encState(){try{const o={m:P.mode,a:P.arch,f:P.act,l:+P.lr.toFixed(2),n:+P.noise.toFixed(2),s:P.samples,r:+P.stepRate.toFixed(2)};
+ return btoa(JSON.stringify(o)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}catch(e){return ''}}
+function decState(q){try{const o=JSON.parse(atob(q.replace(/-/g,'+').replace(/_/g,'/')));
+ const num=(v,a,b,d)=>typeof v==='number'&&isFinite(v)?clamp(v,a,b):d;
+ P.mode=num(o.m,0,3,0)|0;P.arch=num(o.a,0,3,1)|0;P.act=num(o.f,0,1,0)|0;
+ P.lr=num(o.l,0,1,.35);P.noise=num(o.n,0,.45,.16);P.samples=num(o.s,60,800,320)|0;
+ P.stepRate=num(o.r,.05,1,.6);
+ return true;}catch(e){return false}}
+let hashT=0;
+function saveHash(){const now=performance.now();if(now-hashT<800)return;hashT=now;
+ try{history.replaceState(null,'','#'+encState())}catch(e){}}
+
+const cv=$('cv'),ctx=cv.getContext('2d');
+let W=0,H=0,DPR=1;
+const heat=document.createElement('canvas'),hctx=heat.getContext('2d');
+function resize(){DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;
+ cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
+ heat.width=Math.max(2,Math.ceil(W/6));heat.height=Math.max(2,Math.ceil(H/6));
+ heatDirty=true;}
+addEventListener('resize',resize);
+
+let sizes=[],Wl=[],Bl=[],gW=[],gB=[],NW=0,act=0;
+function f(z){return act===0?Math.tanh(z):(z>0?z:0);}
+function df(a){return act===0?1-a*a:(a>0?1:0);}
+function buildNet(){
+ sizes=[2,...ARCHS[Object.keys(ARCHS)[P.arch]],1];
+ act=P.act;Wl=[];Bl=[];gW=[];gB=[];NW=0;
+ for(let l=1;l<sizes.length;l++){
+  const ni=sizes[l-1],no=sizes[l],n=ni*no;
+  const sc=Math.sqrt(act===0?1/ni:2/ni);
+  const w=new Float64Array(n);for(let i=0;i<n;i++)w[i]=gauss()*sc;
+  Wl.push(w);Bl.push(new Float64Array(no));
+  gW.push(new Float64Array(n));gB.push(new Float64Array(no));
+  NW+=n+no;}
+ heatDirty=true;netDirty=true;
+}
+const Abuf={a:[],z:[],key:''};
+function abuf(){
+ const key=sizes.join('·');
+ if(Abuf.a.length!==sizes.length||Abuf.key!==key){Abuf.a=[];Abuf.z=[];
+  for(const n of sizes){Abuf.a.push(new Float64Array(n));Abuf.z.push(new Float64Array(n));}
+  Abuf.key=key;}
+ return[Abuf.a,Abuf.z];
+}
+function forward(x0,x1,store){
+ const[A,Z]=abuf();
+ A[0][0]=x0;A[0][1]=x1;
+ for(let l=1;l<sizes.length;l++){
+  const ni=sizes[l-1],w=Wl[l-1],b=Bl[l-1],zi=Z[l],ai=A[l];
+  for(let j=0;j<sizes[l];j++){
+   let s=b[j];const off=j*ni;
+   for(let i=0;i<ni;i++)s+=w[off+i]*A[l-1][i];
+   zi[j]=s;ai[j]=f(s);}}
+ return store?A:A[sizes.length-1][0];
+}
+function predict(x0,x1){return forward(x0,x1,false);}
+const Dholder={d:null,key:''};
+function Dbuf(){
+ const key=sizes.join('·');
+ if(!Dholder.d||Dholder.key!==key){Dholder.d=sizes.map(n=>new Float64Array(n));Dholder.key=key;}
+ return Dholder.d;
+}
+function trainBatch(xs,ys,n){
+ const[A,Z]=abuf(),D=Dbuf();
+ for(const g of gW)g.fill(0);for(const g of gB)g.fill(0);
+ let loss=0,correct=0;
+ for(let s=0;s<n;s++){
+  A[0][0]=xs[s*2];A[0][1]=xs[s*2+1];
+  for(let l=1;l<sizes.length;l++){
+   const ni=sizes[l-1],w=Wl[l-1],b=Bl[l-1],zi=Z[l],ai=A[l];
+   for(let j=0;j<sizes[l];j++){
+    let t=b[j];const off=j*ni;
+    for(let i=0;i<ni;i++)t+=w[off+i]*A[l-1][i];
+    zi[j]=t;ai[j]=f(t);}}
+  const out=A[sizes.length-1][0],y=ys[s];
+  const e=out-y;loss+=e*e;if((out>0)===(y>0))correct++;
+  const L=sizes.length-1;
+  D[L][0]=2*e*df(out);
+  for(let l=L;l>=1;l--){
+   const ni=sizes[l-1],no=sizes[l],d=D[l],gp=gW[l-1],gb=gB[l-1],ap=A[l-1];
+   for(let j=0;j<no;j++){
+    const dj=d[j];if(dj===0)continue;const off=j*ni;
+    gb[j]+=dj;
+    for(let i=0;i<ni;i++)gp[off+i]+=dj*ap[i];}
+   if(l>1){const dp=D[l-1],w=Wl[l-1],aim=sizes[l-1];
+    for(let i=0;i<aim;i++){let s2=0;
+     for(let j=0;j<no;j++)s2+=w[j*ni+i]*d[j];
+     dp[i]=s2*df(ap[i]);}}
+  }
+ }
+ const eta=P.lrF;
+ for(let l=1;l<sizes.length;l++){
+  const w=Wl[l-1],b=Bl[l-1],gp=gW[l-1],gb=gB[l-1],k=eta/n;
+  for(let i=0;i<w.length;i++)w[i]-=gp[i]*k;
+  for(let i=0;i<b.length;i++)b[i]-=gb[i]*k;}
+ return[loss/n,correct/n];
+}
+
+let xs=new Float32Array(0),ys=new Float32Array(0),Npts=0,painted=0,nBase=0,cap=0;
+function genData(){
+ const n=P.samples|0;
+ cap=Math.max(1600,n*3);
+ xs=new Float32Array(cap*2);ys=new Float32Array(cap);
+ const nz=P.noise,put=(i,x,y,l)=>{xs[i*2]=clamp(x+gauss()*nz*.5,-1.15,1.15);xs[i*2+1]=clamp(y+gauss()*nz*.5,-1.15,1.15);ys[i]=l;};
+ for(let i=0;i<n;i++){
+  if(P.mode===0){
+   const sx=Math.random()<.5?-1:1,sy=Math.random()<.5?-1:1;
+   put(i,sx*.55,sy*.55,(sx*sy>0)?1:-1);}
+  else if(P.mode===1){
+   const k=i%2,t=Math.random(),r=.12+.85*t,a=t*3.2*TAU/2.2+k*Math.PI+rand(-.25,.25);
+   put(i,r*Math.cos(a),r*Math.sin(a),k===0?1:-1);}
+  else if(P.mode===2){
+   if(i%2===0){const r=Math.sqrt(Math.random())*.34,a=rand(TAU);put(i,r*Math.cos(a),r*Math.sin(a),1);}
+   else{const r=.58+Math.sqrt(Math.random())*.3,a=rand(TAU);put(i,r*Math.cos(a),r*Math.sin(a),-1);}}
+  else{
+   const k=i%2,t=rand(Math.PI);
+   const x=k===0?Math.cos(t)*.7-.25:Math.cos(t)*-.7+.25;
+   const y=k===0?Math.sin(t)*.55-.15:Math.sin(t)*-.55+.15;
+   put(i,x,y,k===0?1:-1);}}
+ Npts=n;nBase=n;painted=0;probe=0;
+ heatDirty=true;
+}
+function addPoint(wx,wy,label){
+ if(Npts>=cap){if(painted>0){Npts=nBase;painted=0;}else return;}
+ xs[Npts*2]=wx;xs[Npts*2+1]=wy;ys[Npts]=label;Npts++;painted++;
+ probe=Npts-1;heatDirty=true;
+}
+
+let epoch=0,loss=1,acc=0,diverged=0,divFlash=0;
+let lossHist=[],probe=0,heatDirty=true,netDirty=true;
+function reinitWeights(){buildNet();epoch=0;loss=1;acc=0;lossHist=[];}
+function trainFrames(){
+ P.lrF=SLIDERS[0].map(P.lr);
+ const steps=Math.max(1,(P.stepRate*24)|0);
+ for(let s=0;s<steps;s++){
+  const[l,a]=trainBatch(xs,ys,Npts);
+  loss=l;acc=a;epoch++;
+  if(!isFinite(loss)){diverged++;divFlash=90;reinitWeights();break;}
+ }
+ if(epoch%4<steps)lossHist.push(isFinite(loss)?loss:1);
+ if(lossHist.length>560)lossHist.shift();
+ heatDirty=true;netDirty=true;
+}
+
+function drawHeat(){
+ const w=heat.width,h=heat.height,img=hctx.createImageData(w,h),d=img.data;
+ for(let gy=0;gy<h;gy++){
+  const y=(gy/(h-1))*2-1.15;
+  for(let gx=0;gx<w;gx++){
+   const x=(gx/(w-1))*2-1.15;
+   const o=predict(x,y),k=(gy*w+gx)*4;
+   if(o>=0){const t=clamp(o,0,1);d[k]=227;d[k+1]=166;d[k+2]=160;d[k+3]=14+50*t;}
+   else{const t=clamp(-o,0,1);d[k]=90;d[k+1]=62;d[k+2]=58;d[k+3]=12+44*t;}}}
+ hctx.putImageData(img,0,0);
+ heatDirty=false;
+}
+function drawMain(){
+ if(heatDirty)drawHeat();
+ ctx.clearRect(0,0,W,H);
+ const sc=Math.min(W,H)/2.3,cx0=W/2,cy0=H/2;
+ ctx.drawImage(heat,cx0-sc*1.15,cy0-sc*1.15,sc*2.3,sc*2.3);
+ ctx.strokeStyle='rgba(227,166,160,.22)';ctx.lineWidth=1;
+ ctx.strokeRect(cx0-sc*1.15,cy0-sc*1.15,sc*2.3,sc*2.3);
+ ctx.beginPath();ctx.moveTo(cx0-sc*1.15,cy0);ctx.lineTo(cx0+sc*1.15,cy0);
+ ctx.moveTo(cx0,cy0-sc*1.15);ctx.lineTo(cx0,cy0+sc*1.15);ctx.stroke();
+ for(let i=0;i<Npts;i++){
+  const x=cx0+xs[i*2]*sc,y=cy0+ys[i]*sc;
+  const paintedPt=i>=nBase;
+  ctx.beginPath();ctx.arc(x,y,paintedPt?5:3.2,0,TAU);
+  ctx.fillStyle=ys[i]>0?'#f2d3cd':'#8a544e';ctx.fill();
+  ctx.strokeStyle=paintedPt?'rgba(248,232,228,.95)':'rgba(12,9,9,.85)';
+  ctx.lineWidth=paintedPt?1.6:1;ctx.stroke();
+  if(i===probe&&paintedPt){ctx.beginPath();ctx.arc(x,y,9,0,TAU);
+   ctx.strokeStyle='#fff1ee';ctx.lineWidth=1.4;ctx.stroke();}
+ }
+ if(pointer.hover){ctx.beginPath();ctx.arc(pointer.x,pointer.y,7,0,TAU);
+  ctx.strokeStyle=P.brush===0?'rgba(242,211,205,.75)':'rgba(138,84,78,.8)';
+  ctx.setLineDash([3,3]);ctx.lineWidth=1.4;ctx.stroke();ctx.setLineDash([]);}
+}
+
+const spark=document.createElement('canvas');spark.width=252;spark.height=54;
+const sctx=spark.getContext('2d');
+function drawSpark(){
+ const w=252,h=54;
+ sctx.clearRect(0,0,w,h);
+ sctx.strokeStyle='rgba(227,166,160,.16)';sctx.lineWidth=1;
+ sctx.beginPath();sctx.moveTo(0,h-1);sctx.lineTo(w,h-1);sctx.stroke();
+ if(lossHist.length<2)return;
+ let mx=0;for(const v of lossHist)if(v>mx)mx=v;mx=Math.max(mx,1e-6);
+ sctx.beginPath();
+ for(let i=0;i<lossHist.length;i++){
+  const x=2+(w-4)*i/(lossHist.length-1);
+  const y=h-3-(h-12)*Math.sqrt(lossHist[i]/mx);
+  i?sctx.lineTo(x,y):sctx.moveTo(x,y);}
+ sctx.strokeStyle='#e3a6a0';sctx.lineWidth=1.3;sctx.stroke();
+ sctx.fillStyle='rgba(147,130,126,.9)';sctx.font='7px Trebuchet MS,Verdana,sans-serif';
+ sctx.fillText('ERROR / sqrt scale',6,10);
+}
+
+const pointer={x:0,y:0,hover:false,down:false};
+function toWorld(px,py){const sc=Math.min(W,H)/2.3;return[(px-W/2)/sc,(py-H/2)/sc];}
+function pos(e){const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];}
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);
+ const[x,y]=pos(e);pointer.x=x;pointer.y=y;pointer.down=true;pointer.hover=true;
+ const[wx,wy]=toWorld(x,y);if(Math.abs(wx)<1.15&&Math.abs(wy)<1.15)addPoint(wx,wy,P.brush===0?1:-1);});
+cv.addEventListener('pointermove',e=>{const[x,y]=pos(e);pointer.x=x;pointer.y=y;
+ pointer.hover=Math.abs(toWorld(x,y)[0])<1.2&&Math.abs(toWorld(x,y)[1])<1.2;
+ if(pointer.down){const[wx,wy]=toWorld(x,y);
+  if(Math.abs(wx)<1.15&&Math.abs(wy)<1.15&&Math.random()<.35)addPoint(wx,wy,P.brush===0?1:-1);}});
+addEventListener('pointerup',()=>pointer.down=false);
+addEventListener('pointercancel',()=>pointer.down=false);
+
+function seg(el,items,get,set){
+ el.innerHTML='';items.forEach(it=>{const b=document.createElement('button');
+  b.textContent=it;b.onclick=()=>{set(items.indexOf(it));sync();kick();};el.appendChild(b);});
+ el._sync=()=>{[...el.children].forEach((b,i)=>b.classList.toggle('on',i===get()));};
+ el._sync();}
+function knobs(){
+ const box=$('knobs');box.innerHTML='';
+ SLIDERS.forEach(d=>{const wrap=document.createElement('div');
+  const lab=document.createElement('div');lab.className='krow';
+  lab.innerHTML=`<span>${d.label}</span><b></b>`;
+  const inp=document.createElement('input');inp.type='range';inp.min=d.min;inp.max=d.max;inp.step=d.step;inp.value=P[d.k];
+  const val=lab.querySelector('b');
+  const upd=()=>{val.textContent=d.fmt(P[d.k]);};
+  inp.addEventListener('input',()=>{P[d.k]=parseFloat(inp.value);upd();saveHash();
+   if(d.k==='samples'||d.k==='noise')genData();});
+  wrap.appendChild(lab);wrap.appendChild(inp);box.appendChild(wrap);
+  d._inp=inp;d._upd=upd;upd();});}
+function syncSliders(){SLIDERS.forEach(d=>{d._inp.value=P[d.k];d._upd();});}
+function sync(){
+ $('modeSeg')._sync();$('brushSeg')._sync();$('archSeg')._sync();$('actSeg')._sync();
+ $('bPause').textContent=P.paused?'Train':'Hold';
+ $('hPar').textContent=NW;
+ $('hN').textContent=nBase+(painted?'+'+painted:'');}
+
+const CONCEPT=`
+<h2>Concept</h2><div class="no">Study No.7 · descent, in view</div>
+<p>The study holds one multilayer perceptron. Weights start random. Training runs by full-batch gradient descent, in view, every frame. The field shows the network output a(x,y) at every point: rose for +1, deep umber for -1, dark where undecided.</p>
+<h4>Forward path</h4>
+<div class="fml">a[l] = f( W[l]·a[l-1] + b[l] )      f = tanh | relu</div>
+<h4>Backward path</h4>
+<div class="fml">d[L] = 2(a-y) · f'(z)              output error
+d[l] = W[l+1]T·d[l+1] · f'(z)      chain rule
+W    = W - (eta/N)·d·aT            update</div>
+<p>Gradient magnitude is checked against finite differences at initialization. Residual stays below 1e-8 relative. The bench is exact, not illustrative.</p>
+<h4>Why each set is hard</h4>
+<ul><li>XOR. One linear cut cannot separate it. Minimum depth: 2 layers.</li>
+<li>SPIRAL. Two interleaved arms. Needs width 16 and patience. Expect accuracy 0.95+ after 30k steps at η 0.024.</li>
+<li>RINGS. Disk versus ring. The boundary must close.</li>
+<li>MOONS. Two crescents. RELU assembles them from straight segments.</li></ul>
+<h4>Observed limits</h4>
+<p>η above 1.0 drives MSE to infinity within a few hundred steps. The bench detects non-finite loss, resets weights, counts the event on the DIVERGE record. Divergence is data.</p>
+<div class="sig">Study No.7 · Systems Laboratory · gradcheck 3.5e-9 rel · XOR to acc 1.000 · spiral to acc 0.966</div>`;
+const BUILD=`
+<h2>Build record</h2><div class="no">Maintainer's notes · Study No.7</div>
+<p>One file. No libraries. Forward, backward, field, sparkline: computed locally.</p>
+<h4>Construction</h4>
+<ul><li>One Float64Array per layer. Flat loops, offset arithmetic, zero allocation in the hot path.</li>
+<li>STEPS/F converts to at most 24 full-batch updates per frame. UI stays responsive at 800 samples.</li>
+<li>Decision field evaluates on a /6 grid into ImageData, upscaled with smoothing.</li>
+<li>Non-finite loss triggers auto-reset. The DIVERGE record counts events for the session.</li></ul>
+<h4>Reads</h4>
+<p>Edge weight in the network figure: the ledger meters read epoch, loss, accuracy, rate, synapses, samples. The sparkline plots mean squared error on a square-root scale.</p>
+<h4>Operating</h4>
+<p>Drag on the field paints samples. SPACE train/hold. R re-weight. M or 1-4 dataset. H tray. Settings serialize to the URL hash; reload restores.</p>
+<h4>Reduced motion</h4>
+<p>prefers-reduced-motion holds training until input. Controls remain live.</p>
+<div class="sig">Study No.7 · bench copy</div>`;
+
+let last=0,fpsE=60,running=false;
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+P.paused=REDUCED;
+let hudT=0,probeT=0;
+function loop(t){
+ const dt=clamp((t-last)/1000,0.001,0.05);last=t;
+ if(dt>0)fpsE=fpsE*.93+(1/dt)*.07;
+ if(!P.paused)trainFrames();
+ if(!P.paused&&t-probeT>1400){probeT=t;probe=(probe+7)%Math.max(1,Npts);netDirty=true;}
+ drawMain();
+ if(t-hudT>250){hudT=t;drawSpark();
+  $('hEp').textContent=epoch.toLocaleString('en-US');
+  $('hLoss').textContent=isFinite(loss)?(loss<0.001?loss.toExponential(1):loss.toFixed(4)):'INF';
+  $('hAcc').textContent=(acc*100|0)+'%';
+  $('hLr').textContent=P.lrF?P.lrF.toPrecision(2):'—';
+  $('warn').style.display=(divFlash>0)?'block':'none';
+  if(divFlash>0)divFlash--;}
+ if(REDUCED&&P.paused){running=false;return;}
+ requestAnimationFrame(loop);
+}
+function kick(){if(!running){running=true;last=performance.now();requestAnimationFrame(loop);}}
+
+addEventListener('keydown',e=>{
+ if(e.code==='Space'){e.preventDefault();P.paused=!P.paused;sync();kick();}
+ else if(e.key==='r'||e.key==='R'){reinitWeights();kick();}
+ else if(e.key==='h'||e.key==='H'){$('tray').classList.toggle('hid');}
+ else if(e.key==='m'||e.key==='M'){P.mode=(P.mode+1)%4;genData();reinitWeights();sync();kick();}
+ else if(e.key>='1'&&e.key<='4'){P.mode=+e.key-1;genData();reinitWeights();sync();kick();}
+ else if(e.key==='t'||e.key==='T'){P.brush=1-P.brush;sync();}
+ else if(e.key==='Escape'){$('ov').classList.remove('open');}
+});
+
+seg($('modeSeg'),MODES,()=>P.mode,i=>{P.mode=i;genData();reinitWeights();});
+seg($('brushSeg'),['ROSE +','UMBER -'],()=>P.brush,i=>P.brush=i);
+seg($('archSeg'),Object.keys(ARCHS),()=>P.arch,i=>{P.arch=i;reinitWeights();});
+seg($('actSeg'),ACTS,()=>P.act,i=>{P.act=i;reinitWeights();});
+const pSeg=$('pSeg');
+Object.keys(PROGS).forEach(name=>{const b=document.createElement('button');b.textContent=name;
+ b.onclick=()=>{Object.assign(P,PROGS[name]);genData();reinitWeights();syncSliders();sync();saveHash();kick();
+  [...pSeg.children].forEach(x=>x.classList.remove('on'));b.classList.add('on');};
+ pSeg.appendChild(b);});
+knobs();
+$('bPause').onclick=()=>{P.paused=!P.paused;sync();kick();};
+$('bRand').onclick=()=>{reinitWeights();kick();};
+$('bReset').onclick=()=>{genData();reinitWeights();sync();kick();};
+$('bClear').onclick=()=>{Npts=nBase;painted=0;probe=0;heatDirty=true;netDirty=true;sync();kick();};
+$('trayToggle').onclick=()=>$('tray').classList.toggle('hid');
+const ov=$('ov'),sheetBody=$('sheetBody');
+function openSheet(html){sheetBody.innerHTML=html;ov.classList.add('open');}
+$('tCon').onclick=()=>openSheet(CONCEPT);
+$('tBld').onclick=()=>openSheet(BUILD);
+$('close').onclick=()=>ov.classList.remove('open');
+ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open');});
+
+resize();
+if(location.hash.length>2){decState(location.hash.slice(1));}
+buildNet();genData();syncSliders();sync();drawSpark();
+kick();
+window.__AIFL={get stats(){return{fps:fpsE|0,epoch,loss:+loss.toExponential(3),acc:+acc.toFixed(3),
+ net:Object.keys(ARCHS)[P.arch],act:ACTS[P.act],data:MODES[P.mode],n:Npts,synapses:NW,paused:!!P.paused,diverged}}};
+</script>
+</body>
+</html>

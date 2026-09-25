@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0b0a08"/>
+<title>Study No. 17 · Gilded Relief — JAWAD, Computational Studies</title>
+<style>
+:root{--stage:#0b0a08;--stage2:#070605;--gold:#d6b36a;--gold-hi:#f1dfa9;--ink:#ece5d2;--dim:#a99e86;--faint:#6f6650;--rule:rgba(214,179,106,.22)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--stage);color:var(--ink);font:14px/1.6 Georgia,"Times New Roman",serif;display:flex;flex-direction:column;overflow:hidden}
+.lab{font:bold 9px "Courier New",ui-monospace,monospace;letter-spacing:.34em;text-transform:uppercase;color:var(--faint)}
+main{flex:1;min-height:0;position:relative}
+.view{position:absolute;inset:0;display:none;overflow:auto}
+.view.on{display:block}
+#stage{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;display:block}
+#stage.orbit{cursor:grabbing}
+/* ---- catalog plate ---- */
+.plate{position:absolute;z-index:6;background:rgba(10,9,7,.72);border:1px solid var(--rule);padding:16px 20px 15px;max-width:360px;box-shadow:inset 0 1px 0 rgba(241,223,169,.07),0 30px 60px rgba(0,0,0,.55)}
+.plate::before{content:"";position:absolute;top:-1px;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(241,223,169,.55),transparent)}
+.plate-tl{top:22px;left:22px}
+.plate .cat{font:bold 9px "Courier New",monospace;letter-spacing:.4em;color:var(--faint);margin-bottom:9px;text-transform:uppercase}
+.plate h1{font:400 31px/1.05 Didot,"Bodoni MT","Bodoni 72","Playfair Display",Georgia,serif;letter-spacing:.02em;color:var(--gold-hi);font-weight:400}
+.plate .sub{font:italic 12.5px Georgia,serif;color:var(--dim);margin-top:7px;max-width:300px}
+.tabs{display:flex;gap:0;margin-top:13px;border-top:1px solid var(--rule);padding-top:10px}
+.tab{background:none;border:0;border-bottom:1px solid transparent;color:var(--faint);cursor:pointer;font:bold 9px "Courier New",monospace;letter-spacing:.3em;padding:2px 14px 4px 0;margin-right:12px;text-transform:uppercase}
+.tab:hover{color:var(--dim)}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+/* ---- readout ---- */
+.hud{position:absolute;top:22px;right:30px;z-index:6;background:rgba(10,9,7,.72);border:1px solid var(--rule);padding:11px 14px;min-width:158px;font:bold 10px "Courier New",monospace;letter-spacing:.14em;box-shadow:0 24px 48px rgba(0,0,0,.45)}
+.hud-row{display:flex;justify-content:space-between;gap:16px;padding:2.5px 0;color:var(--faint);text-transform:uppercase}
+.hud-row b{color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums;text-transform:none}
+/* ---- instrument clusters ---- */
+.cluster{position:absolute;bottom:22px;z-index:6;background:rgba(10,9,7,.72);border:1px solid var(--rule);padding:13px 16px;font:bold 9px "Courier New",monospace;letter-spacing:.22em;text-transform:uppercase;max-height:46%;overflow:auto;box-shadow:0 24px 48px rgba(0,0,0,.45)}
+.cl-bl{left:22px;width:min(400px,44vw)}
+.cl-br{right:22px;width:min(300px,38vw)}
+.cluster h3{font:inherit;color:var(--faint);letter-spacing:.34em;border-bottom:1px solid var(--rule);padding-bottom:6px;margin-bottom:10px}
+.bat{display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
+.bat .btn{display:flex;justify-content:space-between;gap:10px;background:none;border:0;border-left:2px solid transparent;color:var(--dim);cursor:pointer;font:inherit;letter-spacing:inherit;text-transform:inherit;padding:3.5px 8px;text-align:left}
+.bat .btn:hover{color:var(--gold-hi)}
+.bat .btn.on{border-left-color:var(--gold);color:var(--gold-hi);background:rgba(214,179,106,.06)}
+.fad{display:grid;grid-template-columns:58px 1fr 46px;align-items:center;gap:9px;padding:2.5px 0;color:var(--dim)}
+.fad output{color:var(--gold);text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;height:18px;background:transparent;width:100%;cursor:ew-resize}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--rule)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:9px;height:9px;margin-top:-4.5px;background:linear-gradient(135deg,#f1dfa9,#a8834a);border:0;transform:rotate(45deg)}
+input[type=range]::-moz-range-track{height:1px;background:var(--rule)}
+input[type=range]::-moz-range-thumb{width:8px;height:8px;background:linear-gradient(135deg,#f1dfa9,#a8834a);border:0;border-radius:0;transform:rotate(45deg)}
+.ops{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.btn.key{background:none;border:1px solid var(--rule);color:var(--dim);cursor:pointer;font:inherit;letter-spacing:.2em;padding:6px 11px;border-radius:0}
+.btn.key:hover{border-color:var(--gold);color:var(--gold-hi)}
+.btn.key.on{background:rgba(214,179,106,.14);color:var(--gold-hi);border-color:var(--gold)}
+.pset{display:flex;flex-direction:column;gap:2px}
+.pset .btn{background:none;border:0;color:var(--dim);cursor:pointer;font:inherit;letter-spacing:.18em;padding:2.5px 8px;text-align:left;display:flex;gap:12px;justify-content:space-between}
+.pset .btn:hover{color:var(--gold-hi)}
+.keys{margin-top:11px;padding-top:8px;border-top:1px dashed var(--rule);font:9.5px "Courier New",monospace;letter-spacing:.12em;color:var(--faint);text-transform:none}
+.keys b{color:var(--dim);font-weight:700}
+.edge{position:absolute;right:11px;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;font:bold 8.5px "Courier New",monospace;letter-spacing:.5em;color:rgba(214,179,106,.30);z-index:5;text-transform:uppercase;pointer-events:none}
+/* ---- field notes ---- */
+.prose{max-width:800px;margin:36px 40px 36px 72px;padding:34px 38px 64px 34px;border-left:1px solid var(--rule);background:rgba(10,9,7,.5)}
+.prose h2{font:400 24px Didot,"Bodoni MT",Georgia,serif;color:var(--gold-hi);border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:16px}
+.prose h3{font:bold 10px "Courier New",monospace;letter-spacing:.3em;color:var(--dim);margin:26px 0 7px;text-transform:uppercase}
+.prose p,.prose li{font:14px/1.7 Georgia,serif;color:var(--dim);margin:8px 0}
+.prose b{color:var(--gold-hi)}
+.prose ul{padding-left:18px;list-style:square}
+.math{font:12.5px/1.7 "Courier New",ui-monospace,monospace;color:var(--gold-hi);background:rgba(214,179,106,.05);border:1px solid var(--rule);border-left:2px solid var(--gold);padding:11px 15px;margin:13px 0;overflow-x:auto;white-space:pre}
+.kbd{display:inline-block;border:1px solid var(--rule);border-bottom-width:2px;padding:0 5px;font:bold 10px "Courier New",monospace;color:var(--gold-hi)}
+footer{border-top:1px solid var(--rule);background:var(--stage2);color:var(--faint);font:bold 8.5px "Courier New",monospace;letter-spacing:.32em;text-transform:uppercase;display:flex;justify-content:space-between;gap:12px;padding:8px 18px;flex-wrap:wrap}
+footer b{color:var(--dim)}
+@media(max-width:900px){.cl-bl,.cl-br{width:44vw}.plate{max-width:270px}.plate h1{font-size:24px}.hud{display:none}}
+@media(max-width:640px){.cl-bl,.cl-br{width:calc(50% - 30px);font-size:8px}.plate .sub{display:none}}
+</style>
+</head>
+<body>
+<main>
+  <section class="view on" id="view-demo">
+    <canvas id="stage"></canvas>
+    <div class="plate plate-tl">
+      <div class="cat">COMPUTATIONAL STUDIES · STUDY No. 17</div>
+      <h1>Gilded Relief</h1>
+      <div class="sub">a live scalar field, cut into iso-contours and lit as polished metal — drag the plate to turn it</div>
+      <div class="tabs">
+        <button class="tab on" data-v="demo">SURVEY</button>
+        <button class="tab" data-v="concept">CONCEPT</button>
+        <button class="tab" data-v="about">NOTES</button>
+      </div>
+    </div>
+    <div class="hud">
+      <div class="hud-row"><span>fps</span><b id="h-fps">–</b></div>
+      <div class="hud-row"><span>grid</span><b id="h-grid">–</b></div>
+      <div class="hud-row"><span>segs</span><b id="h-seg">–</b></div>
+      <div class="hud-row"><span>field</span><b id="h-mode">–</b></div>
+    </div>
+    <div class="cluster cl-bl">
+      <h3>Field · Roman Index</h3>
+      <div class="bat" id="modes">
+        <button class="btn" data-m="meta"><span>I · Metaballs</span><span>Σ r²/d²</span></button>
+        <button class="btn on" data-m="noise"><span>II · Noise Field</span><span>fbm 4-oct</span></button>
+        <button class="btn" data-m="vortex"><span>III · Vortex</span><span>sin θ·r</span></button>
+      </div>
+      <h3>Levels</h3>
+      <label class="fad">iso <input type="range" id="r-iso" min="0.05" max="0.95" step="0.01" value="0.50"><output id="o-iso">0.50</output></label>
+      <label class="fad">speed <input type="range" id="r-spd" min="0" max="3" step="0.05" value="0.8"><output id="o-spd">0.8</output></label>
+      <label class="fad">grid <input type="range" id="r-res" min="40" max="180" step="4" value="128"><output id="o-res">128²</output></label>
+      <div class="keys"><b>drag</b> injects a gauge bump · <b>space</b> halt · <b>R</b> re-survey · <b>N</b> re-seed · <b>1/2/3</b> field</div>
+    </div>
+    <div class="cluster cl-br">
+      <h3>Operations</h3>
+      <div class="ops">
+        <button class="btn key on" id="b-fill">Area wash</button>
+        <button class="btn key on" id="b-anim">Sweep level</button>
+        <button class="btn key" id="b-pause">Halt</button>
+        <button class="btn key" id="b-reset">Re-survey</button>
+        <button class="btn key" id="b-rand">Re-seed</button>
+      </div>
+      <h3>Traced Plates</h3>
+      <div class="pset">
+        <button class="btn" data-p="lava"><span>P·1 Lava Lamp</span><span>meta</span></button>
+        <button class="btn" data-p="topo"><span>P·2 Topography</span><span>fbm</span></button>
+        <button class="btn" data-p="storm"><span>P·3 Vortex Storm</span><span>vortex</span></button>
+        <button class="btn" data-p="wire"><span>P·4 Wireframe</span><span>meta</span></button>
+      </div>
+    </div>
+    <div class="edge">COMPUTATIONAL STUDIES · SURVEY DEPT. · SHEET 17 / 20</div>
+  </section>
+  <section class="view" id="view-concept"><div class="prose">
+    <h2>Field Notes — extraction of iso-lines</h2>
+    <p>An <b>implicit surface</b> is a shape stored as an equation rather than as geometry.
+    We evaluate a scalar field <b>f(x, y, t)</b> across a survey grid and recover its outline with our own
+    marching-squares extractor: every grid cell is classified into one of <b>16 cases</b> from the signs of its
+    four corners, and the contour crosses each bent edge at the <b>linearly interpolated</b> level —
+    genuine sub-cell precision, none of the blocky threshold look.</p>
+    <h3>1 · Implicit fields</h3>
+    <div class="math">metaballs   f(p) = Σᵢ  rᵢ² / (|p − cᵢ|² + ε)
+f = 0.5 · (1 + sin(2.6θ + k·r − ωt)) · e^(−2.6r²)   (vortex arms)
+f = fbm(x, y, t) — 4-octave value noise, trilinear + quintic fade</div>
+    <p>Inside the iso-level T the field reads as land; the boundary of that region is the curve inked.
+    A pointer drag injects one Gaussian bump into the field. The contours re-route around it.</p>
+    <h3>2 · Cell classification</h3>
+    <div class="math">case = (f₀₀ ≥ T) | (f₁₀ ≥ T)«1 | (f₁₁ ≥ T)«2 | (f₀₁ ≥ T)«3     →  16 cases</div>
+    <p>Each case yields 0–2 contour segments per cell. The two <b>saddle cases</b> (5 and 10) are ambiguous;
+    we settle them with the cell-centre average:</p>
+    <div class="math">f_c = ¼(f₀₀ + f₁₀ + f₁₁ + f₀₁)   →   connect or split the saddle</div>
+    <h3>3 · Sub-cell interpolation</h3>
+    <div class="math">t = (T − fₐ) / (f_b − fₐ)      crossing point = lerp(cornerₐ, corner_b, t)</div>
+    <p>The same crossings, joined around the inside corners, close into filled polygons — so one extraction
+    pass serves both the hairline contour and the translucent area wash.</p>
+    <p>The extractor's output is then dressed as a <b>gilded relief</b>: each filled cell shades itself by
+    banded field height — ten champagne gradients, dark onyx in the valleys, polished gold on the peaks,
+    a specular pass on the highest band. The plate itself carries a <b>camera</b>: pitch and yaw with
+    inertia, idle auto-return. The math is untouched; only the light is new.</p>
+    <h3>4 · Animated iso-level</h3>
+    <div class="math">T(t) = T₀ + A·sin(0.5 t),  A = 0.18</div>
+    <p>Sweeping the level reads out the field's topology: islands merge, lakes open, contours re-route.
+    Level-set reasoning, one rule pass per frame.</p>
+  </div></section>
+  <section class="view" id="view-about"><div class="prose">
+    <h2>Station Notes — construction record</h2>
+    <p>One self-contained HTML file. No frameworks, no CDN, no images, no webfonts. A 2D-canvas renderer
+    rules every mark. Holds 60 fps on a phone.</p>
+    <h3>Engine</h3>
+    <ul>
+      <li><b>Field sampler</b> — Float32 grid (40²–180²), three generators: analytic metaballs, value-noise fbm, analytic vortex. Aspect-corrected world coordinates so shapes stay round.</li>
+      <li><b>Extractor</b> — one pass builds a Path2D for filled regions and a Path2D for contour segments; saddle cells resolved by centre average. Inked as a wide faint gold pass plus a hairline champagne core.</li>
+      <li><b>Loop</b> — requestAnimationFrame with clamped dt; FPS is an exponential moving average logged in the readout stack.</li>
+      <li><b>Reduced motion</b> — with <span class="kbd">prefers-reduced-motion</span>, time stands still: a crisp static frame, every control re-renders on demand.</li>
+    </ul>
+    <h3>Interactions</h3>
+    <ul>
+      <li><b>Camera</b> — the plate sits on a pitch/yaw head. Drag to turn, release with pace and it coasts; a spring rights it when idle. Amplitude clamped so the survey never reads upside down.</li>
+      <li><b>Drag</b> the sheet — injects a Gaussian bump at the pointer; the contours chase the cursor.</li>
+      <li><span class="kbd">Space</span> halt · <span class="kbd">R</span> re-survey · <span class="kbd">N</span> re-seed · <span class="kbd">1</span>/<span class="kbd">2</span>/<span class="kbd">3</span> field · <span class="kbd">F</span> area wash · <span class="kbd">A</span> sweep level.</li>
+      <li>Faders: iso level, animation speed, grid resolution (re-sampled in real time).</li>
+      <li>Plates P·1–P·4: Lava Lamp, Topography, Vortex Storm, Wireframe.</li>
+      <li>State is shareable — the URL hash encodes field, faders, toggles and seed; reload restores it.</li>
+    </ul>
+    <h3>Cost of ink</h3>
+    <p>25k cells × 4 corner tests per frame is trivial for modern JS; the expense sits in stroking thousands of
+    segments, so everything is batched into two Path2D strokes. Device pixel ratio is capped at 2 to keep
+    mobile fill-rate honest.</p>
+  </div></section>
+</main>
+<footer><span><b>JAWAD — COMPUTATIONAL STUDIES</b> · sheet 17/20 · zero dependencies</span><span>field notes · survey series</span></footer>
+<script>
+(()=>{'use strict';
+const errors=[];addEventListener('error',e=>errors.push(String(e.message||e)));
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cv=$('#stage'),ctx=cv.getContext('2d');
+let cw=0,ch=0,dpr=1,vign=null,sheetCv=null;
+const S={mode:'noise',iso:.5,speed:.8,res:128,fill:true,anim:true,seed:1723,paused:false};
+let time=0,segCount=0,fps=0,dirty=true;
+/* ---------- state in URL hash ---------- */
+function saveHash(){const p=new URLSearchParams({m:S.mode,i:S.iso,s:S.speed,r:S.res,f:S.fill?1:0,a:S.anim?1:0,d:S.seed});history.replaceState(null,'','#'+p);}
+function loadHash(){try{const p=new URLSearchParams(location.hash.slice(1));if(!p.has('m'))return;S.mode=p.get('m');S.iso=+p.get('i');S.speed=+p.get('s');S.res=+p.get('r');S.fill=p.get('f')==='1';S.anim=p.get('a')==='1';S.seed=+p.get('d')||S.seed;}catch(e){}}
+/* ---------- seeded PRNG ---------- */
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+let rnd=mulberry(S.seed);
+/* ---------- value noise ---------- */
+function h3(x,y,z){let n=Math.imul(x,374761393)^Math.imul(y,668265263)^Math.imul(z,1274126177)^S.seed;n=Math.imul(n^n>>>13,1274126177);return((n^n>>>16)>>>0)/4294967295;}
+const fade=t=>t*t*t*(t*(t*6-15)+10);
+function vnoise(x,y,z){const xi=Math.floor(x),yi=Math.floor(y),zi=Math.floor(z);const xf=x-xi,yf=y-yi,zf=z-zi;const u=fade(xf),v=fade(yf),w=fade(zf);
+ const l=(a,b,t)=>a+(b-a)*t;
+ return l(l(l(h3(xi,yi,zi),h3(xi+1,yi,zi),u),l(h3(xi,yi+1,zi),h3(xi+1,yi+1,zi),u),v),
+          l(l(h3(xi,yi,zi+1),h3(xi+1,yi,zi+1),u),l(h3(xi,yi+1,zi+1),h3(xi+1,yi+1,zi+1),u),v),w);}
+function fbm(x,y,z){let a=.5,f=1,s=0;for(let o=0;o<4;o++){s+=a*vnoise(x*f,y*f,z*f);f*=2.03;a*=.5;}return s/0.9375;}
+/* ---------- field sources ---------- */
+let balls=[];
+function makeBalls(){rnd=mulberry(S.seed+7);balls=[];const nB=6;for(let i=0;i<nB;i++)balls.push({u:.15+rnd()*.7,v:.15+rnd()*.7,r:.06+rnd()*.06,a1:rnd()*6.28,a2:rnd()*6.28,w1:.3+rnd()*.5,w2:.3+rnd()*.5,amp:.05+rnd()*.09});}
+const mouse={u:.5,v:.5,amt:0,tgt:0};
+function fieldAt(u,v,t,asp){const X=(u-.5)*asp,Y=(v-.5);let f=0;
+ if(S.mode==='meta'){for(const b of balls){const bu=b.u+b.amp*Math.sin(b.w1*t+b.a1),bv=b.v+b.amp*Math.cos(b.w2*t+b.a2);const dx=(bu-.5)*asp-X,dy=bv-.5-Y;f+=b.r*b.r/(dx*dx+dy*dy+1e-4);}f*=1.35;}
+ else if(S.mode==='noise'){f=fbm(X*2.6+9.2,Y*2.6+3.1,t*.4);}
+ else{const r=Math.hypot(X,Y),th=Math.atan2(Y,X);f=.55+.5*Math.sin(2.6*th+r*11-t*1.25)*Math.exp(-r*r*2.6)+.16*Math.sin(-1.7*th+r*13+t*.9)*Math.exp(-r*r*3.6);}
+ if(mouse.amt>.003){const dx=(mouse.u-u)*asp,dy=mouse.v-v;f+=.0056/(dx*dx+dy*dy+2e-4)*mouse.amt;}
+ return f;}
+/* ---------- marching squares tables ---------- */
+const SEG=[[],[[0,3]],[[0,1]],[[3,1]],[[1,2]],[[0,3],[1,2]],[[0,2]],[[3,2]],[[3,2]],[[0,2]],[[0,3],[1,2]],[[1,2]],[[3,1]],[[0,1]],[[0,3]],[]];
+const FILL=[[],[[0,4,3]],[[0,5,1]],[[3,4,5,1]],[[1,6,2]],[[0,4,3],[1,6,2]],[[0,5,6,2]],[[3,4,5,6,2]],[[3,7,2]],[[0,4,7,2]],[[0,5,1],[2,7,3]],[[1,5,4,7,2]],[[3,7,6,1]],[[0,1,6,7,4]],[[0,5,6,7,3]],[[4,5,6,7]]];
+const SEG5I=[[0,1],[2,3]],FILL5I=[[0,1,6,2,3,4]],SEG10I=[[1,2],[0,3]],FILL10I=[[0,5,1,2,7,3]];
+let F=new Float32Array(0),pathFill,pathLine;let _cell=0,_ox=0,_oy=0,_n=0,asp=1,t=0;
+function march(T){const n=S.res|0;_n=n;const w=n+1;if(F.length!==w*w)F=new Float32Array(w*w);
+ const cell=Math.min(cw,ch)/n,ox=(cw-cell*n)/2,oy=(ch-cell*n)/2;_cell=cell;_ox=ox;_oy=oy;asp=(cw>0&&ch>0)?cw/ch:1;t=time;
+ for(let j=0;j<=n;j++){const v=j/n;for(let i=0;i<=n;i++)F[j*w+i]=fieldAt(i/n,v,t,asp);}
+ pathFill=new Path2D();pathLine=new Path2D();segCount=0;
+ for(let j=0;j<n;j++){const y0=oy+j*cell,y1=y0+cell;
+  for(let i=0;i<n;i++){const x0=ox+i*cell,x1=x0+cell;
+   const fa=F[j*w+i],fb=F[j*w+i+1],fc=F[(j+1)*w+i+1],fd=F[(j+1)*w+i];
+   const cs=(fa>=T?1:0)|(fb>=T?2:0)|(fc>=T?4:0)|(fd>=T?8:0);
+   if(cs===0)continue;
+   if(cs===15){pathFill.moveTo(x0,y0);pathFill.lineTo(x1,y0);pathFill.lineTo(x1,y1);pathFill.lineTo(x0,y1);pathFill.closePath();continue;}
+   const ed=(a,b)=>{const t2=(T-a)/((b-a)||1e-9);return t2<0?0:t2>1?1:t2;};
+   const P=[[x0+ed(fa,fb)*cell,y0],[x1,y0+ed(fb,fc)*cell],[x0+ed(fd,fc)*cell,y1],[x0,y0+ed(fa,fd)*cell]];
+   let segs=SEG[cs],polys=FILL[cs];
+   if(cs===5){if((fa+fb+fc+fd)*.25>=T){segs=SEG5I;polys=FILL5I;}}
+   else if(cs===10){if((fa+fb+fc+fd)*.25>=T){segs=SEG10I;polys=FILL10I;}}
+   for(let k=0;k<segs.length;k++){const s=segs[k];pathLine.moveTo(P[s[0]][0],P[s[0]][1]);pathLine.lineTo(P[s[1]][0],P[s[1]][1]);segCount++;}
+   for(let k=0;k<polys.length;k++){const poly=polys[k];const p0=P[poly[0]]||[[x0,y0],[x1,y0],[x1,y1],[x0,y1]][poly[0]-4];pathFill.moveTo(p0[0],p0[1]);
+    for(let m=1;m<poly.length;m++){const idx=poly[m];const pt=idx<4?P[idx]:[[x0,y0],[x1,y0],[x1,y1],[x0,y1]][idx-4];pathFill.lineTo(pt[0],pt[1]);}
+    pathFill.closePath();}}}}
+/* ---------- static survey sheet (grid, rulers, furniture) ---------- */
+function buildSheet(){
+ sheetCv=document.createElement('canvas');sheetCv.width=Math.max(1,cw*dpr);sheetCv.height=Math.max(1,ch*dpr);
+ const g=sheetCv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
+ g.lineWidth=1;
+ g.strokeStyle='rgba(238,244,248,.05)';g.beginPath();
+ for(let x=24;x<cw;x+=24){g.moveTo(x+.5,0);g.lineTo(x+.5,ch);}
+ for(let y=24;y<ch;y+=24){g.moveTo(0,y+.5);g.lineTo(cw,y+.5);}
+ g.stroke();
+ g.strokeStyle='rgba(238,244,248,.12)';g.beginPath();
+ for(let x=120;x<cw;x+=120){g.moveTo(x+.5,0);g.lineTo(x+.5,ch);}
+ for(let y=120;y<ch;y+=120){g.moveTo(0,y+.5);g.lineTo(cw,y+.5);}
+ g.stroke();
+ /* edge rulers */
+ g.fillStyle='rgba(238,244,248,.55)';g.strokeStyle='rgba(238,244,248,.5)';
+ g.font='bold 9px "Courier New",monospace';g.textAlign='left';
+ g.beginPath();
+ for(let x=0;x<cw;x+=12){const tall=x%120===0;g.moveTo(x+.5,0);g.lineTo(x+.5,tall?14:7);if(tall&&x>0)g.fillText(String(x).padStart(4,'0'),x+3,23);}
+ for(let y=0;y<ch;y+=12){const tall=y%120===0;g.moveTo(0,y+.5);g.lineTo(tall?14:7,y+.5);if(tall&&y>0)g.fillText(String(y).padStart(4,'0'),5,y-3);}
+ g.stroke();
+ /* registration marks, three free corners (4th is under the plate) */
+ g.strokeStyle='rgba(238,244,248,.4)';
+ const reg=(x,y)=>{g.beginPath();g.arc(x,y,7,0,6.283);g.moveTo(x-11,y);g.lineTo(x+11,y);g.moveTo(x,y-11);g.lineTo(x,y+11);g.stroke();};
+ reg(26,ch-26);reg(cw-26,26);reg(cw-26,ch-26);
+ /* north arrow */
+ const nx=42,ny=Math.round(ch*.6);
+ g.beginPath();g.arc(nx,ny,15,0,6.283);g.moveTo(nx,ny+9);g.lineTo(nx,ny-9);g.moveTo(nx-4,ny-4);g.lineTo(nx,ny-9);g.lineTo(nx+4,ny-4);g.stroke();
+ g.font='bold 10px "Courier New",monospace';g.fillText('N',nx-3.5,ny+28);
+ /* scale bar, upper centre */
+ const sx=Math.round(cw*.5-60),sy=40;
+ g.beginPath();g.moveTo(sx,sy);g.lineTo(sx+120,sy);g.moveTo(sx,sy-4);g.lineTo(sx,sy+4);g.moveTo(sx+60,sy-3);g.lineTo(sx+60,sy+3);g.moveTo(sx+120,sy-4);g.lineTo(sx+120,sy+4);g.stroke();
+ g.fillText('0',sx-2,sy-7);g.fillText('60',sx+55,sy-7);g.fillText('120 m',sx+126,sy-7);
+ /* hand-placed survey notes */
+ g.fillStyle='rgba(238,244,248,.38)';
+ g.fillText('E 0420',Math.round(cw*.66),Math.round(ch*.36));
+ g.fillText('N 0210',Math.round(cw*.36),Math.round(ch*.68));
+ g.font='italic 11px Georgia,serif';g.fillStyle='rgba(238,244,248,.5)';
+ g.fillText('fig. 1 — iso-lines at surveyed level T',Math.round(Math.max(cw*.46,470)),ch-30);
+}
+/* ---------- gilded-plate camera (pseudo-3D) ---------- */
+const CAM={yaw:0,pitch:0,vYaw:0,vPitch:0,drag:false,lx:0,ly:0};
+cv.addEventListener('pointerdown',e=>{CAM.drag=true;CAM.lx=e.clientX;CAM.ly=e.clientY;cv.classList.add('orbit');cv.setPointerCapture(e.pointerId);});
+addEventListener('pointermove',e=>{if(!CAM.drag)return;
+ const dx=(e.clientX-CAM.lx)/cw,dy=(e.clientY-CAM.ly)/ch;CAM.lx=e.clientX;CAM.ly=e.clientY;
+ CAM.yaw+=dx*1.4;CAM.pitch+=dy*.9;CAM.vYaw=dx*1.4;CAM.vPitch=dy*.9;
+ CAM.yaw=Math.max(-.9,Math.min(.9,CAM.yaw));CAM.pitch=Math.max(-.55,Math.min(.55,CAM.pitch));});
+addEventListener('pointerup',()=>{CAM.drag=false;cv.classList.remove('orbit');});
+function camTick(dt){
+ if(CAM.drag)return;
+ CAM.yaw+=CAM.vYaw;CAM.pitch+=CAM.vPitch;
+ CAM.vYaw*=.94;CAM.vPitch*=.94;
+ const ay=.22,ap=.085,s=.055;
+ CAM.yaw+=(Math.sin(time*.31)*ay-CAM.yaw)*s;
+ CAM.pitch+=(Math.sin(time*.23)*ap-CAM.pitch)*s;
+ CAM.yaw=Math.max(-.9,Math.min(.9,CAM.yaw));CAM.pitch=Math.max(-.55,Math.min(.55,CAM.pitch));}
+function drawRelief(T,n,cell,ox,oy){
+ const sh=Math.sin(-CAM.yaw),chd=Math.cos(-CAM.yaw);
+ const sq=1-Math.abs(CAM.pitch)*.20;
+ const w=cell*1.06*(1+Math.abs(CAM.yaw)*.06),hh=cell*1.06*sq;
+ const hw=w/2,hh2=hh/2;
+ const stops=[[10,9,7],[26,21,13],[46,36,20],[68,53,28],[96,74,38],[126,98,50],[156,124,66],[186,150,84],[214,179,106],[236,209,140],[244,232,178]];
+ for(let j=0;j<n;j++){const wy=oy+j*cell;
+  for(let i=0;i<n;i++){const wx=ox+i*cell;
+   const fa=F[j*(n+1)+i];
+   if(fa<T)continue;
+   const h=fa-T,t2=Math.min(1,h*2.85);
+   const b=Math.min(10,t2*10.999|0),f=Math.min(10,b+1),fr=t2*10.999-b;
+   const A=stops[b],B=stops[f];
+   ctx.fillStyle='rgb('+(A[0]+(B[0]-A[0])*fr|0)+','+(A[1]+(B[1]-A[1])*fr|0)+','+(A[2]+(B[2]-A[2])*fr|0)+')';
+   const cx=wx+cell/2-cw/2,cy=wy+cell/2-ch/2;
+   const X=cx*chd+cy*sh,Y=-cx*sh+cy*chd;
+   ctx.fillRect(cw/2+X-hw,ch/2+Y-hh2,w,hh);}}
+ /* specular crest: bright hairline rides the contour over the lightest band */
+ ctx.strokeStyle='rgba(244,232,178,.45)';ctx.lineWidth=1;
+ ctx.stroke(pathLine);}
+/* ---------- render ---------- */
+function resize(){dpr=Math.min(devicePixelRatio||1,2);cw=cv.clientWidth;ch=cv.clientHeight;cv.width=cw*dpr;cv.height=ch*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+ vign=ctx.createRadialGradient(cw/2,ch/2,Math.min(cw,ch)*.25,cw/2,ch/2,Math.max(cw,ch)*.72);vign.addColorStop(0,'rgba(0,0,0,0)');vign.addColorStop(1,'rgba(0,0,0,.62)');
+ buildSheet();dirty=true;}
+function render(){ctx.fillStyle='#0b0a08';ctx.fillRect(0,0,cw,ch);
+ if(sheetCv)ctx.drawImage(sheetCv,0,0,cw,ch);
+ const T=S.iso+(S.anim?0.18*Math.sin(time*.5):0);
+ const Tc=Math.min(.97,Math.max(.03,T));
+ march(Tc);
+ if(S.fill)drawRelief(Tc,_n,_cell,_ox,_oy);
+ ctx.lineCap='round';ctx.lineJoin='round';
+ ctx.strokeStyle='rgba(214,179,106,.22)';ctx.lineWidth=5;ctx.stroke(pathLine);
+ ctx.strokeStyle='#f1dfa9';ctx.lineWidth=1.35;ctx.stroke(pathLine);
+ if(S.mode==='meta'){ctx.fillStyle='#f1dfa9';for(const b of balls){const bu=b.u+b.amp*Math.sin(b.w1*time+b.a1),bv=b.v+b.amp*Math.cos(b.w2*time+b.a2);ctx.beginPath();ctx.arc((bu)*cw-(cw-Math.min(cw,ch))/2*(cw>ch?1:0)*0+((cw-Math.min(cw,ch))/2)+(bu-.5)*(Math.min(cw,ch)), (ch-Math.min(cw,ch))/2+(bv-.5)*Math.min(cw,ch),2.2,0,6.283);ctx.fill();}}
+ ctx.fillStyle=vign;ctx.fillRect(0,0,cw,ch);
+ $('#h-fps').textContent=fps.toFixed(0);$('#h-grid').textContent=S.res+'\u00b2';$('#h-seg').textContent=segCount;$('#h-mode').textContent=S.mode;}
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+ fps=fps*.92+(1/Math.max(dt,1e-3))*.08;
+ if(!S.paused&&!RM)time+=dt*S.speed;
+ camTick(dt);
+ mouse.amt+=(mouse.tgt-mouse.amt)*.12;
+ if(!S.paused&&!RM||dirty){render();dirty=false;}
+ requestAnimationFrame(loop);}
+/* ---------- controls ---------- */
+function bindRange(id,out,key,fmt,after){const r=$(id),o=$(out);r.value=S[key];o.textContent=fmt(S[key]);
+ r.addEventListener('input',()=>{S[key]=+r.value;o.textContent=fmt(S[key]);dirty=true;saveHash();if(after)after();});}
+bindRange('#r-iso','#o-iso','iso',v=>(+v).toFixed(2));
+bindRange('#r-spd','#o-spd','speed',v=>(+v).toFixed(1));
+bindRange('#r-res','#o-res','res',v=>v+'\u00b2');
+function setMode(m){S.mode=m;$$('#modes .btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));$('#h-mode').textContent=m;dirty=true;saveHash();}
+$$('#modes .btn').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+function tog(id,key){const b=$(id);b.classList.toggle('on',S[key]);b.addEventListener('click',()=>{S[key]=!S[key];b.classList.toggle('on',S[key]);dirty=true;saveHash();});}
+tog('#b-fill','fill');tog('#b-anim','anim');
+$('#b-pause').addEventListener('click',e=>{S.paused=!S.paused;e.target.textContent=S.paused?'Run':'Halt';dirty=true;});
+$('#b-reset').addEventListener('click',()=>{time=0;S.iso=.5;S.speed=.8;S.res=128;$('#r-iso').value=.5;$('#o-iso').textContent='0.50';$('#r-spd').value=.8;$('#o-spd').textContent='0.8';$('#r-res').value=128;$('#o-res').textContent='128\u00b2';makeBalls();dirty=true;saveHash();});
+$('#b-rand').addEventListener('click',()=>{S.seed=(Math.random()*1e9)|0;rnd=mulberry(S.seed);makeBalls();dirty=true;saveHash();});
+const PRESETS={lava:{mode:'meta',iso:.38,speed:.8,res:104,fill:true,anim:true},topo:{mode:'noise',iso:.52,speed:.5,res:148,fill:true,anim:false},storm:{mode:'vortex',iso:.5,speed:1.4,res:124,fill:false,anim:true},wire:{mode:'meta',iso:.5,speed:1.2,res:168,fill:false,anim:false}};
+$$('[data-p]').forEach(b=>b.addEventListener('click',()=>{const p=PRESETS[b.dataset.p];Object.assign(S,p);makeBalls();syncUI();dirty=true;saveHash();}));
+function syncUI(){$$('#modes .btn').forEach(b=>b.classList.toggle('on',b.dataset.m===S.mode));
+ $('#r-iso').value=S.iso;$('#o-iso').textContent=S.iso.toFixed(2);$('#r-spd').value=S.speed;$('#o-spd').textContent=S.speed.toFixed(1);$('#r-res').value=S.res;$('#o-res').textContent=S.res+'\u00b2';
+ $('#b-fill').classList.toggle('on',S.fill);$('#b-anim').classList.toggle('on',S.anim);$('#h-mode').textContent=S.mode;}
+/* pointer */
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const r=cv.getBoundingClientRect();mouse.u=(e.clientX-r.left)/r.width;mouse.v=(e.clientY-r.top)/r.height;mouse.tgt=1.6;});
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mouse.u=(e.clientX-r.left)/r.width;mouse.v=(e.clientY-r.top)/r.height;mouse.tgt=1;});
+cv.addEventListener('pointerup',()=>mouse.tgt=1);cv.addEventListener('pointerleave',()=>mouse.tgt=0);
+/* keyboard */
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'&&e.target.type==='text')return;const k=e.key.toLowerCase();
+ if(k===' '){e.preventDefault();$('#b-pause').click();}
+ else if(k==='r')$('#b-reset').click();else if(k==='n')$('#b-rand').click();
+ else if(k==='f')$('#b-fill').click();else if(k==='a')$('#b-anim').click();
+ else if(k==='1')setMode('meta');else if(k==='2')setMode('noise');else if(k==='3')setMode('vortex');});
+/* tabs */
+$$('.tab').forEach(t=>t.addEventListener('click',()=>{$$('.tab').forEach(x=>x.classList.toggle('on',x===t));$$('.view').forEach(v=>v.classList.toggle('on',v.id==='view-'+t.dataset.v));}));
+/* boot */
+loadHash();makeBalls();syncUI();$('#b-pause').textContent=S.paused?'Run':'Halt';
+new ResizeObserver(resize).observe(cv);resize();
+if(RM){render();dirty=false;setInterval(()=>{if(dirty){render();dirty=false;}},120);}
+else requestAnimationFrame(t=>{last=t;loop(t);});
+window.__LAB__={S,errors,selftest(){march(S.iso);return{segs:segCount,grid:S.res*S.res,ok:segCount>50};}};
+})();
+</script>
+</body>
+</html>

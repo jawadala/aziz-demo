@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#e9e2d2">
+<link rel="icon" href="data:,">
+<title>SPECIMEN 04 — TWO REAGENTS</title>
+<style>
+:root{--bone:#e9e2d2;--blood:#8a1e1e;--dark:#2b1a12;--dim:#8b7d6a;--line:#d3c8b1}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bone);color:var(--dark);font:13px/1.45 "Courier New",ui-monospace,monospace;overflow:hidden}
+#view{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+#grain{position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.45;background:
+ repeating-linear-gradient(0deg,rgba(43,26,18,.04) 0 1px,transparent 1px 3px),
+ repeating-linear-gradient(90deg,rgba(138,30,30,.035) 0 1px,transparent 1px 5px)}
+.reg{position:fixed;width:20px;height:20px;z-index:12;pointer-events:none;border:0 solid var(--dark)}
+.reg.tl{top:10px;left:10px;border-left:1.5px solid;border-top:1.5px solid}
+.reg.tr{top:10px;right:10px;border-right:1.5px solid;border-top:1.5px solid}
+.reg.bl{bottom:10px;left:10px;border-left:1.5px solid;border-bottom:1.5px solid}
+.reg.br{bottom:10px;right:10px;border-right:1.5px solid;border-bottom:1.5px solid}
+#rulr{position:fixed;top:0;bottom:0;right:0;width:12px;z-index:11;pointer-events:none;opacity:.6;background:repeating-linear-gradient(0deg,var(--line) 0 1px,transparent 1px 36px)}
+#rulb{position:fixed;bottom:0;left:0;right:0;height:12px;z-index:11;pointer-events:none;opacity:.6;background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 36px)}
+.plate{position:fixed;background:rgba(233,226,210,.95);border:1px solid var(--dark);z-index:15}
+#idplate{top:20px;left:20px;padding:10px 14px;max-width:340px;border-left:5px solid var(--blood)}
+#idplate h1{font:italic bold 19px/1.15 Georgia,"Times New Roman",serif;color:var(--dark);letter-spacing:.02em}
+#idplate h1 span{color:var(--blood)}
+#idplate p{font:9.5px/1.7 "Courier New",monospace;color:var(--dim);letter-spacing:.14em;margin-top:4px}
+#hud{bottom:20px;right:24px;padding:8px 12px;min-width:190px;font:11px/1.7 "Courier New",monospace}
+#hud .row{display:flex;justify-content:space-between;gap:16px}
+#hud .row span{color:var(--dim)}
+#hud .row b{color:var(--blood)}
+#fps{font:bold 24px/1.1 "Arial Narrow",Impact,sans-serif;color:var(--blood);letter-spacing:.05em}
+#panel{top:20px;left:20px;bottom:20px;width:240px;padding:10px 12px;overflow-y:auto;scrollbar-width:thin}
+#panel h2{font:bold 10px/1 "Courier New",monospace;color:var(--blood);letter-spacing:.24em;margin:13px 0 7px;border-bottom:1px solid var(--line);padding-bottom:4px}
+#panel h2:first-child{margin-top:0}
+.bat{display:flex;flex-direction:column;gap:2px}
+.bat button{display:flex;align-items:center;gap:8px;background:none;border:0;color:var(--dim);font:11px "Courier New",monospace;letter-spacing:.08em;text-align:left;padding:3px 4px;cursor:pointer}
+.bat button::before{content:"·";color:var(--line);font-size:16px;line-height:.6}
+.bat button.on{color:var(--dark);font-weight:bold}
+.bat button.on::before{content:"●";color:var(--blood);font-size:10px}
+.fad{margin:8px 0}
+.fad label{display:flex;justify-content:space-between;font:9px/1 "Courier New",monospace;color:var(--dim);letter-spacing:.12em;margin-bottom:3px}
+.fad output{color:var(--blood);font-weight:bold}
+.fad input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:3px;background:var(--line);outline:none}
+.fad input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:9px;height:17px;background:var(--blood);border:1px solid var(--dark);cursor:ew-resize}
+.fad input[type=range]::-moz-range-thumb{width:9px;height:17px;background:var(--blood);border:1px solid var(--dark);border-radius:0;cursor:ew-resize}
+.note{font:italic 11.5px/1.5 Georgia,serif;color:var(--dim)}
+.btns{display:flex;flex-wrap:wrap;gap:5px}
+.btns button{flex:1 1 44%;background:none;border:1px solid var(--dark);color:var(--dark);font:10px "Courier New",monospace;letter-spacing:.1em;padding:6px 2px;cursor:pointer}
+.btns button:hover{background:var(--blood);border-color:var(--blood);color:var(--bone)}
+#manual{left:20px;bottom:20px;padding:8px 12px;font:10px/1.8 "Courier New",monospace;color:var(--dim);letter-spacing:.08em}
+#manual b{color:var(--blood);font-weight:normal;border:1px solid var(--line);padding:0 4px}
+#toast{position:fixed;left:50%;bottom:60px;transform:translateX(-50%);background:var(--blood);color:var(--bone);padding:6px 14px;font:11px "Courier New",monospace;letter-spacing:.12em;opacity:0;transition:.2s;z-index:60;pointer-events:none}
+#toast.on{opacity:1}
+#mob{display:none}
+#pgnotes{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:45;display:flex;gap:6px}
+#pgnotes button{background:var(--bone);border:1px solid var(--dark);color:var(--dim);font:10px "Courier New",monospace;letter-spacing:.12em;padding:4px 10px;cursor:pointer}
+#pgnotes button.on{color:var(--bone);background:var(--blood);border-color:var(--blood)}
+.page{position:fixed;inset:0;overflow-y:auto;padding:60px 24px;display:none;background:var(--bone);z-index:40}
+.page.on{display:block}
+.wrap{max-width:640px;margin:0 auto}
+.page h1{font:italic bold 19px/1.3 Georgia,serif;color:var(--dark);margin-bottom:4px}
+.page .cat{font:10px "Courier New",monospace;color:var(--dim);letter-spacing:.16em;margin-bottom:26px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.page h2{font:bold 11px "Courier New",monospace;color:var(--blood);letter-spacing:.18em;margin:24px 0 8px}
+.page p{color:var(--dark);margin:8px 0;font-size:13px}
+.page ul{margin:8px 0 8px 18px}
+.page li{margin:5px 0;font-size:13px}
+.eq{font:12px/1.7 "Courier New",monospace;color:var(--dark);background:rgba(138,30,30,.06);border-left:3px solid var(--blood);padding:10px 14px;margin:12px 0;white-space:pre;overflow-x:auto}
+@media(max-width:840px){
+ #panel{top:auto;bottom:52px;left:10px;right:auto;width:216px;max-height:50vh;transform:translateY(112%);transition:transform .25s}
+ #panel.open{transform:none}
+ #mob{display:block;position:fixed;left:10px;bottom:14px;z-index:46;background:var(--blood);color:var(--bone);border:0;font:10px "Courier New",monospace;letter-spacing:.12em;padding:6px 12px}
+ #idplate{max-width:250px}
+ #manual{display:none}
+ #hud{transform:scale(.85);transform-origin:bottom right}
+}
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+<div id="grain"></div>
+<div class="reg tl"></div><div class="reg tr"></div><div class="reg bl"></div><div class="reg br"></div>
+<div id="rulr"></div><div id="rulb"></div>
+<div class="plate" id="idplate">
+ <h1>TWO <span>REAGENTS</span></h1>
+ <p>SPECIMEN 04 · U/V COUPLED DIFFUSION PLATE<br>JAWAD — COMPUTATIONAL STUDIES</p>
+</div>
+<div class="plate" id="hud">
+ <div id="fps">--</div>
+ <div class="row"><span>LATTICE</span><b id="hgr">-</b></div>
+ <div class="row"><span>REAGENT V</span><b id="hmv">0.0%</b></div>
+ <div class="row"><span>ACTIVITY</span><b id="hac">-</b></div>
+ <div class="row"><span>STEP</span><b id="hms">- ms</b></div>
+ <div class="row"><span>BATH</span><b id="hmo">-</b></div>
+</div>
+<div class="plate" id="panel">
+ <h2>BATH</h2>
+ <div class="bat" id="modes"></div>
+ <h2>RATES</h2>
+ <div id="faders"></div>
+ <h2>OPERATE</h2>
+ <div class="btns">
+  <button id="bpause">HOLD</button>
+  <button id="breset">RESEED</button>
+  <button id="brnd">RE-DERIVE</button>
+  <button id="bshare">STATE→URL</button>
+  <button id="bclr">DRAIN</button>
+  <button id="bnotes">NOTES</button>
+ </div>
+ <p class="note">Canvas drag deposits reagent V. Drain empties V everywhere. Morphology settles in 10-30 s per bath.</p>
+</div>
+<div class="plate" id="manual">
+ <b>SPACE</b> hold&nbsp; <b>R</b> reseed&nbsp; <b>H</b> re-derive&nbsp; <b>M</b> next&nbsp; <b>C</b> state&nbsp; <b>P</b> drain brush&nbsp; <b>1-6</b> bath
+</div>
+<div id="pgnotes">
+ <button id="ntab1" class="on">PLATE NOTES</button>
+ <button id="ntab2">METHOD</button>
+</div>
+<button id="mob">PANEL</button>
+<div id="toast"></div>
+<div class="page" id="pg-plate"><div class="wrap">
+<h1>PLATE NOTES — SPECIMEN 04</h1>
+<div class="cat">TWO REAGENTS · U/V COUPLED DIFFUSION · CATALOG 04/24</div>
+<p>Two reagents on a lattice. U is fed continuously at rate F. V is produced where U meets V (u v² term) and drained at rate F+k. V diffuses at half the U rate. Every structure on this plate is that one reaction, iterated.</p>
+<p>Feed rate F and kill rate k select the morphology. The pairs in the BATH list sit in distinct regimes of the (F, k) plane; the faders move you off them into transitional forms.</p>
+<h2>BATHS</h2>
+<ul>
+<li>CORAL f.0545 k.0620 — branching fronts, net growth.</li>
+<li>MITOSIS f.0367 k.0649 — rounds that split, then split again.</li>
+<li>WORMS f.0780 k.0610 — crawling loops, self-avoiding filaments.</li>
+<li>SOLITON f.0300 k.0620 — stable dots, no growth.</li>
+<li>LAVA f.0140 k.0540 — negative-feed regime: bubbles that close.</li>
+<li>U-SKATE f.0620 k.0609 — skate profile, long-lived movers.</li>
+</ul>
+<h2>OPERATING NOTES</h2>
+<ul>
+<li>REAGENT V readout: fraction of lattice above 0.15. Living baths hold steady or oscillate; 0.0 means the bath burned out — RESEED.</li>
+<li>Brush deposits V=1. P toggles drain-brush (V=0). DRAIN empties the plate.</li>
+<li>STATE→URL encodes F, k, diffusion, dt. Reload resumes the bath.</li>
+<li>Torus topology. Fronts cross the plate edge without reflection.</li>
+</ul>
+</div></div>
+<div class="page" id="pg-method"><div class="wrap">
+<h1>METHOD — SPECIMEN 04</h1>
+<div class="cat">REACTION LAW, LAPLACIAN, STABILITY</div>
+<h2>1 · REACTION</h2>
+<div class="eq">∂u/∂t = Du∇²u − u v² + F(1−u)
+∂v/∂t = Dv∇²v + u v² − (F+k)v</div>
+<p>Explicit Euler on a lattice, Δt = dt fader. Du 1.00, Dv 0.50 nominal. F refills U; the u v² term converts the pair; k removes V.</p>
+<h2>2 · LAPLACIAN</h2>
+<div class="eq">∇²x ≈ 0.05·(corners) + 0.20·(edges) − x</div>
+<p>Nine-point stencil, isotropy to second order. Wrap indexing on both axes; no boundary layer.</p>
+<h2>3 · SEEDING</h2>
+<p>U initialized to 1 everywhere, V to 0. V seeded in a handful of small random blocks. Structure grows from the block edges; uniform V carpets die to the drain term.</p>
+<h2>4 · STABILITY ENVELOPE</h2>
+<ul>
+<li>dt above ≈ 1.5 with Du 1.0 violates the explicit limit; the lattice checkers, then NaNs. This is the honest edge: dt is capped below it.</li>
+<li>F near 0 starves U; V everywhere decays to 0 regardless of k.</li>
+<li>k above ≈ 0.073 with F below 0.03 is empty regime: no growth from any seed.</li>
+</ul>
+<h2>5 · DEFAULT PLATE</h2>
+<div class="eq">CORAL  F 0.0545  k 0.0620  Du 1.00  Dv 0.50  dt 1.0
+lattice 256×144  two substeps per frame</div>
+<p class="note">Two substeps keep fronts moving at 60 fps without raising dt past the stability edge.</p>
+</div></div>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const cvs=$('#view'),ctx=cvs.getContext('2d',{alpha:false});
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MOB=matchMedia('(max-width:840px)').matches;
+let GW=256,GH=144;
+let U=new Float32Array(GW*GH).fill(1),V=new Float32Array(GW*GH),U2=new Float32Array(GW*GH),V2=new Float32Array(GW*GH);
+let SCRW=0,SCRH=0;
+const P={preset:0,F:0.0545,k:0.0620,Du:1.0,Dv:0.5,dt:1.0,drain:0};
+let run=!RM,fps=60,stepMs=0,act=0,massV=0,paint=false,pxp=0,pyp=0,br=4;
+window.__MASS=-1;window.__STEPN=0;
+const rnd=(a,b)=>a+Math.random()*(b-a);
+
+/* LUT bone→oxblood */
+const LUT=new Uint8Array(256*3);
+(function(){
+ const stops=[[0,[233,226,210]],[0.18,[214,200,176]],[0.42,[168,90,60]],[0.65,[138,30,30]],[0.85,[90,16,20]],[1,[24,8,10]]];
+ for(let i=0;i<256;i++){
+  const v=i/255;let a=stops[0],b=stops[stops.length-1];
+  for(let s=0;s<stops.length-1;s++)if(v>=stops[s][0]&&v<=stops[s+1][0]){a=stops[s];b=stops[s+1];break}
+  const f=(v-a[0])/Math.max(1e-6,b[0]-a[0]);
+  for(let c=0;c<3;c++)LUT[i*3+c]=Math.round(a[1][c]+(b[1][c]-a[1][c])*f);
+ }
+})();
+
+/* baths */
+const MODES=[
+ {name:'CORAL',F:0.0545,k:0.0620},
+ {name:'MITOSIS',F:0.0367,k:0.0649},
+ {name:'WORMS',F:0.0780,k:0.0610},
+ {name:'SOLITON',F:0.0300,k:0.0620},
+ {name:'LAVA',F:0.0140,k:0.0540},
+ {name:'U-SKATE',F:0.0620,k:0.0609}
+];
+function applyPreset(k,fresh=true){
+ P.preset=k;const md=MODES[k];
+ P.F=md.F;P.k=md.k;
+ syncUI();markModes();pushHash(true);
+ if(fresh)reseed();
+}
+
+/* URL state */
+let hashT=null;
+function enc(){return btoa(JSON.stringify({v:1,p:{m:P.preset,F:+P.F.toFixed(5),k:+P.k.toFixed(5),a:+P.Du.toFixed(2),b:+P.Dv.toFixed(2),d:+P.dt.toFixed(2)}})).replace(/=+$/,'')}
+function dec(h){try{const o=JSON.parse(atob(h));if(!o||o.v!==1)return false;const q=o.p||{};P.preset=Math.min(MODES.length-1,Math.max(0,q.m|0));P.F=Math.min(.08,Math.max(.005,+q.F||.0545));P.k=Math.min(.073,Math.max(.03,+q.k||.062));P.Du=Math.min(1.4,Math.max(.5,+q.a||1));P.Dv=Math.min(.7,Math.max(.2,+q.b||.5));P.dt=Math.min(1.2,Math.max(.4,+q.d||1));return true}catch(e){return false}}
+function pushHash(now){const go=()=>{try{history.replaceState(null,'','#'+enc())}catch(e){}};if(now){go();return}clearTimeout(hashT);hashT=setTimeout(go,500)}
+
+function reseed(){
+ U.fill(1);V.fill(0);t=0;
+ const nb=MOB?4:7;
+ for(let b=0;b<nb;b++){
+  const cx=(Math.random()*GW)|0,cy=(Math.random()*GH)|0;
+  const w=3+(Math.random()*5)|0,h=3+(Math.random()*5)|0;
+  for(let dy=0;dy<h;dy++)for(let dx=0;dx<w;dx++){
+   const x=(cx+dx)%GW,y=(cy+dy)%GH;
+   V[y*GW+x]=1;
+  }
+ }
+}
+let t=0;
+
+function substep(){
+ const F=P.F,k=P.k,Du=P.Du*P.dt,Dv=P.Dv*P.dt;
+ let actS=0;
+ for(let y=0;y<GH;y++){
+  const up=((y-1+GH)%GH)*GW,dn=((y+1)%GH)*GW,r=y*GW;
+  for(let x=0;x<GW;x++){
+   const l=(x-1+GW)%GW,rr=(x+1)%GW;
+   const uc=U[r+x];
+   const lapU=0.05*(U[up+l]+U[up+rr]+U[dn+l]+U[dn+rr])+0.2*(U[up+x]+U[dn+x]+U[r+l]+U[r+rr])-uc;
+   const vc=V[r+x];
+   const lapV=0.05*(V[up+l]+V[up+rr]+V[dn+l]+V[dn+rr])+0.2*(V[up+x]+V[dn+x]+V[r+l]+V[r+rr])-vc;
+   const uvv=uc*vc*vc;
+   let nu=uc+Du*lapU-uvv+F*(1-uc);
+   let nv=vc+Dv*lapV+uvv-(F+k)*vc;
+   nu=nu<0?0:nu>1?1:nu;
+   nv=nv<0?0:nv>1?1:nv;
+   U2[r+x]=nu;V2[r+x]=nv;
+   actS+=Math.abs(nv-vc);
+  }
+ }
+ const tu=U;U=U2;U2=tu;
+ const tv=V;V=V2;V2=tv;
+ act=actS/(GW*GH);
+}
+function step(){
+ const t0=performance.now();
+ if(paint){
+  const gx=(pxp/SCRW*GW)|0,gy=(pyp/SCRH*GH)|0;
+  const val=P.drain?0:1;
+  for(let dy=-br;dy<=br;dy++)for(let dx=-br;dx<=br;dx++){
+   if(dx*dx+dy*dy>br*br)continue;
+   const x=((gx+dx)%GW+GW)%GW,y=((gy+dy)%GH+GH)%GH;
+   V[y*GW+x]=val;if(val===1)U[y*GW+x]=Math.max(0,U[y*GW+x]-0.1);
+  }
+ }
+ substep();substep();
+ let m=0;
+ for(let i=0;i<V.length;i+=3)if(V[i]>0.15)m++;
+ massV=m/(GW*GH/3)*1;
+ t+=1;
+ stepMs=stepMs*0.85+(performance.now()-t0)*0.15;
+ window.__MASS=massV;window.__STEPN++;
+}
+let imgCvs=null,imgCtx=null,IMG=null;
+function render(){
+ if(!imgCvs){imgCvs=document.createElement('canvas');imgCvs.width=GW;imgCvs.height=GH;imgCtx=imgCvs.getContext('2d');IMG=imgCtx.createImageData(GW,GH)}
+ const d=IMG.data;
+ for(let i=0,e=0;i<V.length;i++,e+=4){
+  let v=V[i]*255|0;if(v>255)v=255;const c=v*3;
+  d[e]=LUT[c];d[e+1]=LUT[c+1];d[e+2]=LUT[c+2];d[e+3]=255;
+ }
+ imgCtx.putImageData(IMG,0,0);
+ ctx.imageSmoothingEnabled=true;
+ ctx.drawImage(imgCvs,0,0,SCRW,SCRH);
+ if(paint){
+  ctx.strokeStyle=P.drain?'rgba(43,26,18,.85)':'rgba(138,30,30,.9)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(pxp,pyp,br*(SCRW/GW),0,7);ctx.stroke();
+ }
+}
+function size(){
+ SCRW=innerWidth;SCRH=innerHeight;
+ cvs.width=SCRW;cvs.height=SCRH;
+}
+let rsT=null;
+addEventListener('resize',()=>{clearTimeout(rsT);rsT=setTimeout(size,120)});
+
+/* faders */
+const FL=[
+ {k:'F',lab:'FEED F',min:0.005,max:0.08,st:0.0005,f:v=>(+v).toFixed(4)},
+ {k:'k',lab:'KILL k',min:0.03,max:0.073,st:0.0005,f:v=>(+v).toFixed(4)},
+ {k:'Du',lab:'DIFFUSION U',min:0.5,max:1.4,st:0.05,f:v=>(+v).toFixed(2)},
+ {k:'Dv',lab:'DIFFUSION V',min:0.2,max:0.7,st:0.05,f:v=>(+v).toFixed(2)},
+ {k:'dt',lab:'DT',min:0.4,max:1.2,st:0.05,f:v=>(+v).toFixed(2)}
+];
+const outs={};
+function buildFaders(){
+ const host=$('#faders');host.innerHTML='';
+ for(const s of FL){
+  const d=document.createElement('div');d.className='fad';
+  d.innerHTML='<label><span>'+s.lab+'</span><output></output></label>';
+  const inp=document.createElement('input');inp.type='range';inp.min=s.min;inp.max=s.max;inp.step=s.st;inp.value=P[s.k];
+  const out=d.querySelector('output');out.textContent=s.f(P[s.k]);outs[s.k]={inp,out,f:s.f};
+  inp.addEventListener('input',()=>{P[s.k]=+inp.value;out.textContent=s.f(inp.value);if(P.preset!==6){markModes()};pushHash();});
+  d.appendChild(inp);host.appendChild(d);
+ }
+}
+function syncUI(){for(const k in outs){outs[k].inp.value=P[k];outs[k].out.textContent=outs[k].f(P[k])}}
+function markModes(){$$('#modes button').forEach((b,i)=>b.classList.toggle('on',i===P.preset))}
+function buildModes(){
+ const host=$('#modes');
+ MODES.forEach((m,i)=>{
+  const b=document.createElement('button');b.textContent=m.name;
+  b.addEventListener('click',()=>applyPreset(i));host.appendChild(b);
+ });
+}
+
+/* toast */
+let toastT=null;
+function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),1500)}
+
+/* operate */
+function togglePause(){run=!run;$('#bpause').textContent=run?'HOLD':'RUN';if(!run)render()}
+$('#bpause').addEventListener('click',togglePause);
+$('#breset').addEventListener('click',()=>{reseed();toast('RESEEDED');if(!run)render()});
+$('#brnd').addEventListener('click',()=>{
+ const pick=MODES[(Math.random()*MODES.length)|0];
+ P.F=Math.max(.005,pick.F+rnd(-.004,.004));P.k=Math.max(.03,pick.k+rnd(-.002,.002));
+ P.Du=rnd(.7,1.2);P.Dv=rnd(.3,.6);
+ syncUI();reseed();toast('BATH RE-DERIVED');pushHash(true);
+});
+$('#bshare').addEventListener('click',()=>{pushHash(true);toast('STATE IN ADDRESS BAR')});
+$('#bclr').addEventListener('click',()=>{V.fill(0);toast('DRAINED');if(!run)render()});
+$('#bnotes').addEventListener('click',()=>{$('#ntab1').click()});
+addEventListener('keydown',e=>{
+ if(e.code==='Space'){e.preventDefault();togglePause()}
+ else if(e.key==='r'||e.key==='R')$('#breset').click();
+ else if(e.key==='h'||e.key==='H')$('#brnd').click();
+ else if(e.key==='m'||e.key==='M')applyPreset((P.preset+1)%MODES.length);
+ else if(e.key==='c'||e.key==='C')$('#bshare').click();
+ else if(e.key==='p'||e.key==='P'){P.drain=P.drain?0:1;toast(P.drain?'BRUSH: DRAIN':'BRUSH: DEPOSIT')}
+ else if(e.key>='1'&&e.key<='6'){const kk=+e.key-1;if(kk<MODES.length)applyPreset(kk)}
+});
+$('#ntab1').addEventListener('click',()=>showPage('pg-plate',0));
+$('#ntab2').addEventListener('click',()=>showPage('pg-method',1));
+function showPage(id,tabIdx){
+ const pg=$('#'+id),open=pg.classList.contains('on');
+ $$('.page').forEach(p=>p.classList.remove('on'));
+ $('#ntab1').classList.remove('on');$('#ntab2').classList.remove('on');
+ if(!open){pg.classList.add('on');$(tabIdx===0?'#ntab1':'#ntab2').classList.add('on')}
+}
+cvs.addEventListener('pointerdown',e=>{paint=true;pxp=e.clientX;pyp=e.clientY;cvs.setPointerCapture(e.pointerId)});
+cvs.addEventListener('pointermove',e=>{if(paint){pxp=e.clientX;pyp=e.clientY}});
+cvs.addEventListener('pointerup',()=>paint=false);
+cvs.addEventListener('pointercancel',()=>paint=false);
+$('#mob').addEventListener('click',()=>{const p=$('#panel');p.classList.toggle('open');$('#mob').textContent=p.classList.contains('open')?'CLOSE':'PANEL'});
+
+/* loop */
+let last=performance.now(),ema=16.7,hudT=0;
+function loop(now){
+ const ms=now-last;last=now;ema+=(ms-ema)*0.06;fps=1000/Math.max(1,ema);
+ if(run){step();render()}
+ if(now-hudT>260){hudT=now;
+  $('#fps').textContent=Math.round(fps)+' FPS';
+  $('#hgr').textContent=GW+'x'+GH;
+  $('#hmv').textContent=(massV*100).toFixed(1)+'%';
+  $('#hac').textContent=act.toExponential(1);
+  $('#hms').textContent=stepMs.toFixed(1)+' ms';
+  $('#hmo').textContent=MODES[P.preset]?MODES[P.preset].name:'CUSTOM';
+ }
+ requestAnimationFrame(loop);
+}
+
+/* boot */
+const hh0=location.hash.slice(1);let had=false;
+if(hh0.length>6){try{had=dec(hh0)}catch(e){had=false}}
+size();buildFaders();buildModes();
+if(had){syncUI();markModes();reseed();pushHash(true)}
+else applyPreset(0);
+if(RM){for(let i=0;i<220;i++)substep();render();$('#bpause').textContent='RUN'}
+else requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0b0c">
+<title>STUDY No. 14 · Molecular Dynamics — JAWAD, Computational Studies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230a0b0c'/><circle cx='6' cy='6' r='3' fill='%23dbe2e8'/><circle cx='11' cy='11' r='2.2' fill='%238fa0ab'/></svg>">
+<style>
+:root{--onyx:#0a0b0c;--panel:rgba(16,18,20,.92);--line:rgba(190,205,215,.14);--line2:rgba(190,205,215,.30);--ice:#dbe2e8;--ice-hi:#f4f7f9;--ice-dim:rgba(190,205,215,.55);--txt:#e4e8eb;--dim:#8b959c;--faint:#5f686e}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--onyx);color:var(--txt);font:13px/1.55 Georgia,'Times New Roman',serif;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#15181b,#0a0b0c);flex-wrap:wrap;z-index:5}
+.gem{width:9px;height:9px;background:linear-gradient(135deg,#f4f7f9,#8494a0);transform:rotate(45deg);flex:none}
+.brand{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.brand .name{font:italic 700 19px Didot,'Bodoni MT','Playfair Display','Times New Roman',serif;color:var(--ice-hi);letter-spacing:.04em}
+.brand .sub{font:700 8px 'Courier New',monospace;letter-spacing:.34em;color:var(--dim);text-transform:uppercase}
+.badge{font:700 9px 'Courier New',monospace;color:var(--ice);border:1px solid var(--line2);padding:4px 10px;letter-spacing:.3em;text-transform:uppercase;background:rgba(190,205,215,.05)}
+.tabs{margin-left:auto;display:flex;gap:2px}
+.tabs button{background:none;border:none;border-bottom:1px solid transparent;color:var(--dim);padding:6px 12px;cursor:pointer;font:700 9px 'Courier New',monospace;letter-spacing:.3em;text-transform:uppercase}
+.tabs button:hover{color:var(--ice)}
+.tabs button.on{color:var(--ice);border-bottom-color:var(--ice)}
+main{flex:1;display:grid;grid-template-columns:288px 1fr;min-height:0}
+aside{border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(20,23,26,.55),rgba(10,11,12,.25));padding:14px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.grp{border:1px solid var(--line);padding:12px;background:var(--panel);display:flex;flex-direction:column;gap:8px;position:relative}
+.grp::before{content:"";position:absolute;top:-1px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(226,235,239,.38),transparent)}
+.lab{font:700 8.5px 'Courier New',monospace;letter-spacing:.28em;color:var(--faint);text-transform:uppercase}
+.lab b{color:var(--ice);font-variant-numeric:tabular-nums}
+.lab.sm{margin-top:2px}
+.row{display:flex;gap:4px;flex-wrap:wrap}
+.row button{flex:1}
+button{background:transparent;border:1px solid var(--line);color:var(--dim);padding:7px 10px;cursor:pointer;font:700 9px 'Courier New',monospace;letter-spacing:.2em;text-transform:uppercase}
+button:hover{border-color:var(--ice-dim);color:var(--ice-hi)}
+button.pri{background:linear-gradient(180deg,#e8edf1,#98a5ae);border-color:#7f8e99;color:#101417}
+button.pri:hover{color:#101417;filter:brightness(1.06)}
+button.wide{width:100%}
+select,input[type=range]{width:100%}
+select{background:#14171a;border:1px solid var(--line);color:var(--txt);padding:6px;font:12px Georgia,serif}
+input[type=range]{-webkit-appearance:none;appearance:none;height:16px;background:transparent;cursor:ew-resize}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--line2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height:8px;margin-top:-4px;background:linear-gradient(135deg,#f4f7f9,#8494a0);border:0;transform:rotate(45deg)}
+input[type=range]::-moz-range-track{height:1px;background:var(--line2)}
+input[type=range]::-moz-range-thumb{width:7px;height:7px;background:linear-gradient(135deg,#f4f7f9,#8494a0);border:0;border-radius:0;transform:rotate(45deg)}
+input[type=checkbox]{accent-color:#c6d5dc;width:14px;height:14px}
+.ck{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--txt);cursor:pointer}
+.note{font:italic 11.5px/1.6 Georgia,serif;color:var(--dim)}
+.stage{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;background:#08090b}
+canvas.view{flex:1;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.stage::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;background:radial-gradient(120% 92% at 50% 42%,transparent 52%,rgba(0,0,0,.55) 100%)}
+.stage::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;opacity:.45;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E")}
+.hud{position:absolute;top:12px;left:14px;display:flex;flex-direction:column;gap:6px;pointer-events:none;z-index:3}
+.chiprow{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:rgba(12,14,16,.78);border:1px solid var(--line);padding:4px 9px;font:700 8.5px 'Courier New',monospace;color:var(--faint);letter-spacing:.22em}
+.chip b{color:var(--ice);font-size:11px;font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.chip b.g{color:var(--ice-hi)} .chip b.v{color:#c0ced6}
+#spark1{background:rgba(12,14,16,.78);border:1px solid var(--line);width:196px;height:38px}
+.hint{position:absolute;right:14px;bottom:10px;font:700 8.5px/1.9 'Courier New',monospace;color:var(--faint);letter-spacing:.18em;text-align:right;pointer-events:none;z-index:3;text-transform:uppercase}
+footer{padding:9px 18px;border-top:1px solid var(--line);color:var(--faint);font:700 8.5px 'Courier New',monospace;letter-spacing:.3em;text-transform:uppercase;display:flex;gap:10px;flex-wrap:wrap;background:#0d0f11}
+footer b{color:var(--ice)}
+.doc{padding:30px;overflow:auto;max-width:860px}
+.doc h2{font:italic 400 26px Didot,'Bodoni MT','Playfair Display',Georgia,serif;color:var(--ice-hi);letter-spacing:.02em;margin:6px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.doc h3{font:700 9px 'Courier New',monospace;letter-spacing:.32em;color:var(--ice);margin:22px 0 8px;text-transform:uppercase}
+.doc p,.doc li{font:14px/1.75 Georgia,serif;color:#adb5bb}
+.doc b{color:var(--ice-hi);font-weight:400}
+.doc ul{margin:6px 0 6px 18px}
+.doc .f{font:12.5px/2 'Courier New',monospace;color:var(--ice);background:rgba(190,205,215,.05);border:1px solid var(--line);border-left:2px solid var(--ice);padding:11px 14px;margin:10px 0;overflow-x:auto;white-space:pre}
+.doc table{border-collapse:collapse;margin:10px 0;font-size:12.5px}
+.doc td,.doc th{border:1px solid var(--line);padding:5px 10px;text-align:left;color:#adb5bb}
+.doc th{color:var(--faint);font:700 8.5px 'Courier New',monospace;letter-spacing:.24em;text-transform:uppercase}
+.doc td k{color:var(--ice);font-style:normal;font-family:'Courier New',monospace;font-size:11px}
+@media(max-width:880px){main{grid-template-columns:1fr;grid-template-rows:minmax(320px,52vh) minmax(0,1fr)}aside{order:2;border-right:0;border-top:1px solid var(--line)}}
+#toast{position:fixed;left:50%;bottom:52px;transform:translateX(-50%);background:#101417;border:1px solid var(--ice);color:var(--ice-hi);padding:8px 16px;font:700 9px 'Courier New',monospace;letter-spacing:.26em;text-transform:uppercase;opacity:0;transition:opacity .25s;pointer-events:none;z-index:99}
+#toast.show{opacity:1}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+<span class="gem"></span>
+<div class="brand"><span class="name">JAWAD</span><span class="sub">Systems Laboratory · Computational Studies</span></div>
+<span class="badge">STUDY No. 14 · MOLECULAR DYNAMICS</span>
+<nav class="tabs">
+<button data-tab="viz" class="on">PLATE</button>
+<button data-tab="concept">NOTES</button>
+<button data-tab="about">RECORD</button>
+</nav>
+</header>
+<main>
+<aside id="side">
+<div class="grp">
+<div class="lab">PAIR POTENTIAL</div>
+<select id="pot">
+<option value="lj">Lennard-Jones 12-6</option>
+<option value="soft">soft-sphere (repulsion only)</option>
+</select>
+</div>
+<div class="grp">
+<div class="lab">PARTICLES · <b id="vN">600</b></div>
+<input type="range" id="n" min="50" max="2000" value="600">
+<div class="lab sm">THERMOSTAT T* · <b id="vT">0.80</b></div>
+<input type="range" id="t" min="0" max="300" value="80">
+<div class="lab sm">TIME SCALE · <b id="vDt">1.00</b>×</div>
+<input type="range" id="dt" min="10" max="250" value="100">
+</div>
+<div class="grp">
+<div class="row">
+<button id="bPause" class="pri">PAUSE</button>
+<button id="bReset">RESET</button>
+</div>
+<div class="row">
+<button id="bLattice">LATTICE</button>
+<button id="bRandom">RANDOM</button>
+<button id="bChill">CHILL</button>
+</div>
+<label class="ck"><input type="checkbox" id="trails"> motion trails</label>
+</div>
+<div class="grp">
+<button id="bShare" class="wide pri">SHARE THIS STATE</button>
+<div class="note">the URL hash carries potential, count, temperature and speed. Reload restores.</div>
+</div>
+<div class="grp">
+<div class="lab">READING THE PLATE</div>
+<div class="note">each sphere is lit from above-left; its sheen tracks speed — steel ≈ frozen, ice ≈ flowing, white ≈ hot. Raise T* to melt a lattice; lower to crystallise.</div>
+</div>
+</aside>
+<div class="stage" id="stage">
+<canvas id="cv" class="view"></canvas>
+<div class="hud">
+<div class="chiprow">
+<span class="chip">FPS <b id="hFps">–</b></span>
+<span class="chip">STEPS <b id="hIt">0</b></span>
+<span class="chip">T* MEASURED <b class="g" id="hT">–</b></span>
+<span class="chip">KE <b class="v" id="hKe">–</b></span>
+<span class="chip">STEP <b id="hMs">–</b></span>
+</div>
+<canvas id="spark1" width="392" height="76"></canvas>
+<div class="chip"><span id="hStat">equilibrating</span></div>
+</div>
+<div class="hint">drag = grab &amp; fling spheres · hold = gather cloud<br>space hold · r reset · l lattice · g random · 1/2 potential</div>
+</div>
+</main>
+<section id="tab-concept" class="doc" hidden>
+<h2>One Pair Potential, Many Phases</h2>
+<p>Melting, crystallisation, pressure, evaporation: all of it follows from one loop. Compute pairwise forces, integrate positions, repeat. Newton's equations, hundreds of spheres, one interaction law: strong repulsion when squeezed, weak attraction when close.</p>
+<h3>1 · THE PAIR INTERACTION</h3>
+<div class="f">U(r) = 4ε [ (σ/r)^12 − (σ/r)^6 ]
+r = centre-to-centre distance
+σ = sphere diameter (our length unit)
+ε = attraction depth (our energy unit)</div>
+<p>The (σ/r)^12 term is a hard repulsive wall: no overlap. The −(σ/r)^6 term is a van der Waals-type attraction. Differentiate U for the force used by the integrator:</p>
+<div class="f">F(r) = −dU/dr = (24ε / r) [ 2(σ/r)^12 − (σ/r)^6 ]
+F &gt; 0 pushes apart (r &lt; 2^(1/6)σ) · F &lt; 0 pulls together (r &gt; that)</div>
+<p><b>Soft-sphere</b> mode removes the attractive term: pure (σ/r)^12 repulsion. No condensation. Use it as a control against LJ.</p>
+<h3>2 · STEPPING TIME — VELOCITY VERLET</h3>
+<p>Symplectic integrator: energy error oscillates instead of drifting, so the fluid runs millions of steps without blowing up:</p>
+<div class="f">v(t+½dt) = v(t) + ½·a(t)·dt          (half kick)
+x(t+dt)  = x(t) + v(t+½dt)·dt         (drift)
+a(t+dt)  = F(x(t+dt)) / m             (new forces)
+v(t+dt)  = v(t+½dt) + ½·a(t+dt)·dt    (second half kick)</div>
+<h3>3 · THE CELL LIST — FINDING NEIGHBOURS IN O(N)</h3>
+<p>All-pairs costs O(N²): 2,000 spheres = ~2M checks per step. Instead, tile the box into cells one cutoff wide. A sphere interacts only with neighbours in its 3×3 cell block:</p>
+<div class="f">cutoff rc = 2.5σ   (U beyond rc ≈ 0.016ε — negligible)
+grid cell size = rc → each sphere inspects ≤ a handful of others
+total work per step: O(N)   ← this is the whole trick</div>
+<h3>4 · TEMPERATURE &amp; THE THERMOSTAT</h3>
+<p>Temperature = mean kinetic energy per sphere (2D, kB = m = 1):</p>
+<div class="f">T* = (1/N) Σ ½ v²      (2 degrees of freedom, m = kB = 1)
+rescale:  v ← λ·v ,   λ = √( 1 + (dt/τ)(T₀/T* − 1) )
+T₀ = your slider target · τ = coupling time (gentle, not jarring)</div>
+<p>T* = 0: the crystal anneals into place. T* high: the lattice sublimates. The <b>target</b>-vs-<b>measured</b> readout gap shows the thermostat coupling.</p>
+<h3>5 · WHAT TO TRY</h3>
+<ul>
+<li><b>Melting:</b> LATTICE at T* = 0.1, raise to 1.5. Hexagonal order dissolves.</li>
+<li><b>Freezing:</b> 400 spheres, T* = 0.05. Hexagonal domains grow.</li>
+<li><b>Evaporation:</b> few spheres, LJ, low density. Droplets form.</li>
+<li><b>Control:</b> same scene, soft-sphere mode. No droplets.</li>
+</ul>
+<h3>6 · THE LIGHT</h3>
+<p>Rendering adds no physics. Each sphere is a pre-lit sprite: one specular highlight offset up-left, body tone set by its speed bucket, terminator falling to the dark. Seven buckets, seven sprites, one draw call each — the cost of light is nil.</p>
+</section>
+<section id="tab-about" class="doc" hidden>
+<h2>Build Record</h2>
+<p>Single self-contained sheet. No frameworks, no fonts, no images, no build step. Plain JavaScript throughout.</p>
+<h3>ENGINEERING NOTES</h3>
+<ul>
+<li>State in flat <b>Float32Array</b>s (x, y, vx, vy, ax, ay); cache-friendly, zero per-frame allocation.</li>
+<li>Forces: <b>linked-cell grid</b>, two passes per step; each pair visited once (Newton's third law).</li>
+<li><b>Velocity Verlet</b>, one force evaluation per step; forces reused between half-kicks.</li>
+<li>Thermostat: velocity-rescale coupling, applied once per frame.</li>
+<li>Rendering: spheres batched into <b>speed buckets</b>, each bucket one pre-lit sprite; radius scales with density.</li>
+<li>Fixed timestep with accumulator: at 30 fps the physics keeps real time; only the render rate drops.</li>
+<li><b>Interaction:</b> pointer applies a soft radial spring to nearby spheres; momentum conserved after release.</li>
+<li><b>Reduced motion:</b> the OS reduce-motion flag renders one static equilibrated frame.</li>
+</ul>
+<h3>CONTROLS</h3>
+<table>
+<tr><th>INPUT</th><th>ACTION</th></tr>
+<tr><td><k>drag</k></td><td>grab spheres — spring to pointer, fling on release</td></tr>
+<tr><td><k>SPACE</k></td><td>hold / resume</td></tr>
+<tr><td><k>R</k></td><td>reset (same init mode)</td></tr>
+<tr><td><k>L</k></td><td>re-seed as hexagonal lattice</td></tr>
+<tr><td><k>G</k></td><td>re-seed randomly</td></tr>
+<tr><td><k>1 / 2</k></td><td>Lennard-Jones / soft-sphere</td></tr>
+<tr><td><k>T</k></td><td>nudge temperature slider</td></tr>
+</table>
+<h3>PERFORMANCE BUDGET</h3>
+<p>2,000 spheres ≈ 6–8k pair interactions per step, ~1–2 ms of script, plus one batched sprite draw. The readout shows live step time: double the spheres, step time roughly doubles — O(N), not O(N²).</p>
+</section>
+<footer><b>JAWAD — SYSTEMS LABORATORY</b><span>STUDY No. 14 · MOLECULAR DYNAMICS</span><span>COMPUTATIONAL STUDIES</span><span>SINGLE FILE</span></footer>
+<script>
+'use strict';
+window.__errors__=[];addEventListener('error',e=>window.__errors__.push(String(e&&e.message||e)));
+const $=s=>document.querySelector(s);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const dpr=Math.min(2,devicePixelRatio||1);
+/* ---------- world ---------- */
+const potEl=$('#pot');
+let pot='lj',N=600,targetT=0.8,dtScale=1.0,trails=false;
+let X,Y,VX,VY,AX,AY;
+let L=1;               /* box side, scaled to canvas aspect below */
+let stepCount=0,paused=false,measT=0,stepMs=0;
+const EPS=1,SIG=1,RC=2.5,SIG2=SIG*SIG,RC2=RC*RC;
+const ecut=4*EPS*(Math.pow(SIG/RC,12)-Math.pow(SIG/RC,6));
+function alloc(n){N=n;X=new Float32Array(n);Y=new Float32Array(n);VX=new Float32Array(n);VY=new Float32Array(n);AX=new Float32Array(n);AY=new Float32Array(n);}
+/* hexagonal-ish lattice with slight jitter, then thermal velocities */
+/* position-based overlap removal: push pairs to >=0.975 sigma, iterate to fixpoint */
+function relaxOverlaps(){
+for(let it=0;it<60;it++){
+let moved=false;
+const target=0.975,min2=0.9025;
+for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){
+let dx=X[j]-X[i],dy=Y[j]-Y[i];
+const d2=dx*dx+dy*dy;
+if(d2<min2){
+const d=Math.sqrt(d2)||1e-4;
+const push=(target-d)*0.5;
+dx/=d;dy/=d;
+X[i]-=dx*push;Y[i]-=dy*push;
+X[j]+=dx*push;Y[j]+=dy*push;
+moved=true;
+}
+}
+if(!moved)break;
+}
+for(let i=0;i<N;i++){X[i]=clamp(X[i],0.3,L-0.3);Y[i]=clamp(Y[i],0.3,L-0.3);}
+}
+function seed(mode){
+/* keep density constant when N changes: box grows with sqrt(N) */
+L=clamp(Math.round(Math.sqrt(N)*1.1),20,100);
+const margin=1.2;let i=0;
+const spacing=Math.sqrt(L*L*0.80/Math.max(1,N));
+if(mode==='random'){
+/* jittered lattice: disordered but bounded separation */
+const j=0.32*spacing;
+const cols=Math.max(1,Math.floor((L-2*margin)/spacing));
+const rows=Math.ceil(N/cols);
+for(let r=0;r<rows&&i<N;r++)for(let c=0;c<cols&&i<N;c++){
+const stagger=(r%2)*0.5*spacing;
+X[i]=margin+spacing*0.6+c*spacing+stagger+(Math.random()-0.5)*j*2;
+Y[i]=margin+spacing*0.6+r*spacing*0.87+(Math.random()-0.5)*j*2;
+i++;}
+}else{
+const cols=Math.max(1,Math.floor((L-2*margin)/spacing));
+const rows=Math.ceil(N/cols);
+for(let r=0;r<rows&&i<N;r++)for(let c=0;c<cols&&i<N;c++){
+const stagger=(r%2)*0.5*spacing;
+X[i]=margin+spacing*0.6+c*spacing+stagger;
+Y[i]=margin+spacing*0.6+r*spacing*0.87;
+i++;}
+}
+for(;i<N;i++){X[i]=margin+Math.random()*(L-2*margin);Y[i]=margin+Math.random()*(L-2*margin);}
+for(let k=0;k<N;k++){X[k]=clamp(X[k],0.3,L-0.3);Y[k]=clamp(Y[k],0.3,L-0.3);}
+relaxOverlaps();
+for(let k=0;k<N;k++){const a=Math.random()*6.2832,s=Math.sqrt(targetT)*2.2;
+VX[k]=Math.cos(a)*s;VY[k]=Math.sin(a)*s;}
+AX.fill(0);AY.fill(0);stepCount=0;
+forces();
+}
+/* ---------- cell list ---------- */
+let cellSize=RC,ncx=1,ncy=1,heads=null,next=null;
+function buildGrid(){
+ncx=Math.max(1,Math.floor(L/cellSize));
+ncy=ncx; /* square box */
+heads=new Int32Array(ncx*ncy).fill(-1);
+next=new Int32Array(N);
+for(let i=0;i<N;i++){
+let cx=(X[i]/L*ncx)|0,cy=(Y[i]/L*ncy)|0;
+cx=clamp(cx,0,ncx-1);cy=clamp(cy,0,ncy-1);
+const c=cy*ncx+cx;next[i]=heads[c];heads[c]=i;}
+}
+/* ---------- forces ---------- */
+function forces(){
+buildGrid();
+AX.fill(0);AY.fill(0);
+let ke=0;
+const useLJ=pot==='lj';
+for(let i=0;i<N;i++){
+const xi=X[i],yi=Y[i];
+const cx=clamp((xi/L*ncx)|0,0,ncx-1),cy=clamp((yi/L*ncy)|0,0,ncy-1);
+let axi=0,ayi=0;
+for(let oy2=-1;oy2<=1;oy2++){
+const yy=cy+oy2;if(yy<0||yy>=ncy)continue;
+for(let ox2=-1;ox2<=1;ox2++){
+const xx=cx+ox2;if(xx<0||xx>=ncx)continue;
+let j=heads[yy*ncx+xx];
+while(j>=0){
+if(j>i){
+let dx=xi-X[j],dy=yi-Y[j];
+const r2=dx*dx+dy*dy;
+if(r2<RC2&&r2>1e-8){
+const inv2=SIG2/r2,inv6=inv2*inv2*inv2;
+let fr;
+if(useLJ){fr=24*EPS*inv6*(2*inv6-1)/r2;}
+else{fr=12*EPS*inv6*inv6/r2;}
+const inv=Math.sqrt(1/r2);
+const fx=fr*dx,fy=fr*dy;
+axi+=fx;ayi+=fy;AX[j]-=fx;AY[j]-=fy;
+}
+}
+j=next[j];
+}
+}
+}
+AX[i]+=axi;AY[i]+=ayi;
+ke+=0.5*(VX[i]*VX[i]+VY[i]*VY[i]);
+}
+measT=ke/N;
+return ke;
+}
+/* ---------- velocity verlet + thermostat ---------- */
+let kePrev=1;
+function step(dt){
+const half=0.5*dt;
+for(let i=0;i<N;i++){VX[i]+=half*AX[i];VY[i]+=half*AY[i];X[i]+=VX[i]*dt;Y[i]+=VY[i]*dt;}
+/* walls */
+for(let i=0;i<N;i++){
+if(X[i]<0.4){X[i]=0.4;VX[i]=Math.abs(VX[i]);}
+else if(X[i]>L-0.4){X[i]=L-0.4;VX[i]=-Math.abs(VX[i]);}
+if(Y[i]<0.4){Y[i]=0.4;VY[i]=Math.abs(VY[i]);}
+else if(Y[i]>L-0.4){Y[i]=L-0.4;VY[i]=-Math.abs(VY[i]);}
+}
+const ke=forces();
+for(let i=0;i<N;i++){VX[i]+=half*AX[i];VY[i]+=half*AY[i];}
+/* gentle rescale thermostat */
+if(targetT>0.001&&measT>1e-6){
+const lam=Math.sqrt(clamp(1+0.02*(targetT/measT-1),0.9,1.1));
+for(let i=0;i<N;i++){VX[i]*=lam;VY[i]*=lam;}
+}else if(targetT<=0.001){
+/* chill: exponential velocity quench toward zero */
+const q=Math.pow(0.995,dtScale);
+for(let i=0;i<N;i++){VX[i]*=q;VY[i]*=q;}
+}
+kePrev=ke;stepCount++;
+}
+/* ---------- canvas ---------- */
+const stage=$('#stage'),cv=$('#cv'),ctx=cv.getContext('2d');
+let boxPx=600;
+function fit(){const r=stage.getBoundingClientRect();cv.width=Math.max(2,(r.width*dpr)|0);cv.height=Math.max(2,(r.height*dpr)|0);if(RM)draw();}
+new ResizeObserver(fit).observe(stage);
+/* pre-lit sphere sprites, one per speed bucket: light from upper left */
+const B=7,cols=['#31404b','#4a5d69','#69808d','#8fa6b2','#b3c6cf','#d5e2e8','#f6fafc'];
+let sprites=[],spriteR=-1;
+function makeSprites(r){
+sprites=[];
+for(let b=0;b<B;b++){
+const s=document.createElement('canvas');s.width=s.height=Math.ceil(r*2)+2;
+const c=s.getContext('2d'),R=r*0.96,cx=s.width/2,cy=s.width/2;
+const g=c.createRadialGradient(cx-R*0.42,cy-R*0.48,R*0.12,cx,cy,R);
+g.addColorStop(0,'#ffffff');
+g.addColorStop(0.22,cols[b]);
+g.addColorStop(0.78,cols[Math.max(0,b-2)]);
+g.addColorStop(1,'#0c0f11');
+c.fillStyle=g;c.beginPath();c.arc(cx,cy,R,0,6.2832);c.fill();
+sprites.push(s);}
+spriteR=r;}
+function draw(){
+const W=cv.width/dpr,H=cv.height/dpr;
+ctx.setTransform(dpr,0,0,dpr,0,0);
+if(trails&&!RM){ctx.fillStyle='rgba(8,9,11,0.28)';ctx.fillRect(0,0,W,H);}
+else{ctx.fillStyle='#08090b';ctx.fillRect(0,0,W,H);}
+boxPx=Math.min(W,H)-16;
+const bx=(W-boxPx)/2,by=(H-boxPx)/2,s=boxPx/L;
+ctx.strokeStyle='rgba(190,205,215,0.25)';ctx.lineWidth=1.5;ctx.strokeRect(bx,by,boxPx,boxPx);
+ctx.save();ctx.beginPath();ctx.rect(bx,by,boxPx,boxPx);ctx.clip();
+const r=clamp(boxPx/Math.sqrt(N)*0.42,1.4,7);
+if(r!==spriteR)makeSprites(r);
+/* speed buckets: one pre-lit sprite per bucket */
+const buckets=[];
+for(let b=0;b<B;b++)buckets.push([]);
+for(let i=0;i<N;i++){
+const sp=Math.sqrt(VX[i]*VX[i]+VY[i]*VY[i]);
+let b=(sp*1.35)|0;if(b>=B)b=B-1;
+buckets[b].push((bx+X[i]*s),(by+Y[i]*s));
+}
+for(let b=0;b<B;b++){const arr=buckets[b],sp=sprites[b];
+for(let k=0;k<arr.length;k+=2)ctx.drawImage(sp,arr[k]-r,arr[k+1]-r);}
+/* pointer field */
+if(ptr.active){ctx.strokeStyle='rgba(213,226,232,0.5)';ctx.lineWidth=1.5;
+ctx.beginPath();ctx.arc(bx+ptr.x*s,by+ptr.y*s,ptr.rad*s,0,6.2832);ctx.stroke();}
+ctx.restore();
+}
+/* ---------- pointer interaction ---------- */
+const ptr={active:false,x:0,y:0,rad:3.5,grab:false};
+function ptrPos(e){const r=cv.getBoundingClientRect();
+const s=boxPx/L;
+ptr.x=clamp((e.clientX-r.left-(r.width-boxPx)/2)/s,0,L);
+ptr.y=clamp((e.clientY-r.top-(r.height-boxPx)/2)/s,0,L);}
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptrPos(e);ptr.active=true;ptr.grab=true;});
+cv.addEventListener('pointermove',e=>{if(ptr.active)ptrPos(e);});
+addEventListener('pointerup',()=>{ptr.active=false;ptr.grab=false;});
+function applyPointer(dt){
+if(!ptr.active)return;
+const s=boxPx/L;
+for(let i=0;i<N;i++){
+let dx=ptr.x-X[i],dy=ptr.y-Y[i];
+const d2=dx*dx+dy*dy,R=ptr.rad;
+if(d2<R*R){
+const d=Math.sqrt(d2)||1e-4,f=ptr.grab?8:2;
+VX[i]+=dx/d*f*dt*(1-d/R);VY[i]+=dy/d*f*dt*(1-d/R);
+}
+}
+}
+/* ---------- HUD ---------- */
+const hFps=$('#hFps'),hIt=$('#hIt'),hT=$('#hT'),hKe=$('#hKe'),hMs=$('#hMs'),hStat=$('#hStat');
+class Spark{constructor(cv2,color){this.cv=cv2;this.c=cv2.getContext('2d');this.d=[];this.cap=90;this.color=color;}
+push(v){this.d.push(v);if(this.d.length>this.cap)this.d.shift();this.draw();}
+draw(){const c=this.c,w=this.cv.width,h=this.cv.height;c.clearRect(0,0,w,h);
+if(this.d.length<2)return;let mn=Infinity,mx=-Infinity;
+for(const v of this.d){if(v<mn)mn=v;if(v>mx)mx=v;}
+if(mx-mn<1e-9)mx=mn+1e-9;
+c.strokeStyle=this.color;c.lineWidth=2;c.beginPath();
+for(let i=0;i<this.d.length;i++){const x=i/(this.cap-1)*w,y=h-5-((this.d[i]-mn)/(mx-mn))*(h-10);i?c.lineTo(x,y):c.moveTo(x,y);}
+c.stroke();}}
+const spark1=new Spark($('#spark1'),'#c6d5dc');
+let hudAcc=0,sparkAcc=0,lastT=performance.now(),fpsV=60,sub=0;
+/* ---------- controls ---------- */
+const elN=$('#n'),elT=$('#t'),elDt=$('#dt'),elTr=$('#trails');
+elN.oninput=()=>{const n=+elN.value;$('#vN').textContent=n;if(n!==N){alloc(n);seed(initMode);}};
+elT.oninput=()=>{targetT=+elT.value/100;$('#vT').textContent=targetT.toFixed(2);};
+elDt.oninput=()=>{dtScale=+elDt.value/100;$('#vDt').textContent=dtScale.toFixed(2);};
+elTr.onchange=()=>{trails=elTr.checked;};
+let pausedBtn=$('#bPause');
+pausedBtn.onclick=()=>{paused=!paused;pausedBtn.textContent=paused?'RESUME':'PAUSE';};
+let initMode='lattice';
+$('#bReset').onclick=()=>seed(initMode);
+$('#bLattice').onclick=()=>{initMode='lattice';seed('lattice');};
+$('#bRandom').onclick=()=>{initMode='random';seed('random');};
+$('#bChill').onclick=()=>{elT.value=5;targetT=0.05;$('#vT').textContent='0.05';};
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600);}
+$('#bShare').onclick=()=>{saveHash();try{navigator.clipboard.writeText(location.href).then(()=>toast('STATE COPIED TO URL'),()=>toast('STATE WRITTEN TO URL'));}catch(err){toast('STATE WRITTEN TO URL');}};
+potEl.onchange=()=>{pot=potEl.value;};
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+const k=e.key.toLowerCase();
+if(k===' '){e.preventDefault();paused=!paused;pausedBtn.textContent=paused?'RESUME':'PAUSE';}
+else if(k==='r')seed(initMode);
+else if(k==='l'){initMode='lattice';seed('lattice');}
+else if(k==='g'){initMode='random';seed('random');}
+else if(k==='1'){pot='lj';potEl.value='lj';}
+else if(k==='2'){pot='soft';potEl.value='soft';}
+else if(k==='t'){elT.value=clamp(+elT.value+(e.shiftKey?30:10),0,300);elT.oninput();}});
+/* ---------- URL hash state ---------- */
+function saveHash(){const o={p:pot,n:N,t:Math.round(targetT*100),d:Math.round(dtScale*100),m:initMode};
+history.replaceState(null,'','#'+Object.entries(o).map(([k2,v])=>k2+'='+v).join('&'));}
+function loadHash(){if(location.hash.length<3)return;
+const o={};location.hash.replace(/^#/,'').split('&').forEach(p=>{const kv=p.split('=');if(kv[0])o[kv[0]]=kv.slice(1).join('=');});
+try{
+if(o.p&&['lj','soft'].includes(o.p)){pot=o.p;potEl.value=pot;}
+if(o.n){const n=clamp(+o.n,50,2000);alloc(n);elN.value=n;$('#vN').textContent=n;}
+if(o.t!==undefined){targetT=clamp(+o.t,0,300)/100;elT.value=+o.t;$('#vT').textContent=targetT.toFixed(2);}
+if(o.d!==undefined){dtScale=clamp(+o.d,10,250)/100;elDt.value=+o.d;$('#vDt').textContent=dtScale.toFixed(2);}
+if(o.m)initMode=o.m==='random'?'random':'lattice';
+}catch(err){}}
+setInterval(saveHash,3000);
+/* ---------- main loop ---------- */
+function frame(now){if(!RM)requestAnimationFrame(frame);
+const dtms=Math.min(50,now-lastT)||16.6;lastT=now;
+fpsV=fpsV*0.93+(1000/dtms)*0.07;
+if(!paused){
+const t0=performance.now();
+const dt=0.004*dtScale;
+const steps=2;
+for(let s2=0;s2<steps;s2++){applyPointer(dt);step(dt);}
+stepMs=stepMs*0.9+(performance.now()-t0)*0.1;
+}
+draw();
+hudAcc+=dtms/1000;sparkAcc+=dtms/1000;
+if(hudAcc>0.15){hudAcc=0;
+hFps.textContent=Math.round(fpsV);
+hIt.textContent=stepCount;
+hT.textContent=measT.toFixed(3);
+hKe.textContent=(measT*N).toFixed(0);
+hMs.textContent=stepMs.toFixed(1)+' ms';
+hStat.textContent=paused?'held':(Math.abs(measT-targetT)<0.12*targetT?'equilibrated: T*='+measT.toFixed(2):'thermostat coupling: T*='+measT.toFixed(2));}
+if(sparkAcc>0.12){sparkAcc=0;spark1.push(measT);}
+}
+/* ---------- init ---------- */
+loadHash();
+fit();
+alloc(N);
+seed(initMode);
+if(RM){let g=0;while(g++<400)step(0.004);draw();
+addEventListener('pointerdown',()=>setTimeout(draw,30));}
+else requestAnimationFrame(frame);
+window.__LAB_READY__=true;
+window.__LAB__={get steps(){return stepCount;},get T(){return measT;}};
+
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+document.querySelectorAll('section.doc').forEach(el=>el.hidden=true);
+document.querySelectorAll('main,footer').forEach(el=>el.hidden=(b.dataset.tab!=='viz'));
+if(b.dataset.tab!=='viz'){document.querySelector('#tab-'+b.dataset.tab).hidden=false;}
+if(typeof fit==='function')fit();
+}));
+</script>
+<div id="toast"></div>
+</body>
+</html>

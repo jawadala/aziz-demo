@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0d0a09"/>
+<title>Study No. 19 · Avalanche Vault — JAWAD, Computational Studies</title>
+<style>
+:root{--bg:#0d0a09;--ink:#ece4da;--dim:#a2938a;--faint:#6e625c;--haz:#d98d6a;--hazdim:rgba(217,141,106,.4);--line:#241c18}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:13px/1.5 "Courier New",ui-monospace,monospace;display:flex;flex-direction:column;overflow:hidden}
+main{flex:1;min-height:0;position:relative}
+.view{position:absolute;inset:0;display:none;overflow:auto}
+.view.on{display:block}
+/* ---- masthead ---- */
+.mast{display:flex;align-items:stretch;border-bottom:1px solid var(--line);flex-wrap:wrap;z-index:5;background:rgba(10,8,7,.92)}
+.mast .cell{padding:10px 18px;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}
+.mast .cell:last-child{border-right:0;margin-left:auto;border-left:1px solid var(--line);flex-direction:row;align-items:center;gap:8px}
+.mast .no{font-size:8.5px;letter-spacing:.42em;color:var(--faint);text-transform:uppercase;margin-bottom:5px}
+.mast h1{font:400 26px/1 Didot,"Bodoni MT","Bodoni 72","Playfair Display",Georgia,serif;letter-spacing:.02em;color:#f7c9a8;text-transform:none}
+.mast .desc{font-size:10px;color:var(--dim);letter-spacing:.08em}
+.tabs{display:flex}
+.tab{background:none;border:0;border-left:1px solid var(--line);color:var(--dim);cursor:pointer;font:bold 9px "Courier New",monospace;letter-spacing:.34em;padding:10px 18px;text-transform:uppercase}
+.tab:hover{color:var(--ink)}
+.tab.on{color:#140d09;background:linear-gradient(180deg,#e8b294,#b97a55)}
+/* ---- console column ---- */
+.demo{position:absolute;inset:0;display:flex;flex-direction:column;padding:14px;gap:12px;overflow:auto}
+.panel{border:1px solid var(--line);background:rgba(16,12,10,.88);padding:0;box-shadow:0 20px 44px rgba(0,0,0,.4)}
+.panel h3{font-size:9px;letter-spacing:.32em;color:var(--faint);text-transform:uppercase;padding:9px 14px 8px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
+.panel h3 em{font-style:normal;color:var(--hazdim);letter-spacing:.14em}
+.panel .body{padding:12px 14px}
+/* ---- controls ---- */
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lab{font-size:9px;letter-spacing:.3em;color:var(--faint);text-transform:uppercase}
+textarea{width:100%;background:#0a0706;border:1px solid var(--line);color:var(--ink);padding:9px 11px;font:13px/1.55 "Courier New",monospace;resize:vertical;min-height:52px;outline:none;border-radius:0}
+textarea:focus{border-color:var(--haz)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:110px;height:14px;background:transparent;cursor:ew-resize}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:rgba(217,141,106,.3)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:9px;height:9px;margin-top:-4.5px;background:linear-gradient(135deg,#f7c9a8,#a05f3d);border:0;transform:rotate(45deg)}
+input[type=range]::-moz-range-track{height:1px;background:rgba(217,141,106,.3)}
+input[type=range]::-moz-range-thumb{width:8px;height:8px;background:linear-gradient(135deg,#f7c9a8,#a05f3d);border:0;border-radius:0;transform:rotate(45deg)}
+.btn{padding:6px 12px;border:1px solid var(--line);background:#151009;color:var(--dim);cursor:pointer;font:bold 9px "Courier New",monospace;letter-spacing:.24em;text-transform:uppercase;border-radius:0}
+.btn:hover{border-color:var(--haz);color:#f7c9a8}
+.btn.on{background:linear-gradient(180deg,#e8b294,#b97a55);border-color:#b97a55;color:#140d09}
+.seg{display:flex;border:1px solid var(--line)}
+.seg .btn{border:0;border-right:1px solid var(--line)}
+.seg .btn:last-child{border-right:0}
+/* ---- digest blocks ---- */
+.hash{font:bold 15px/1.7 "Courier New",monospace;letter-spacing:.16em;word-break:break-all;padding:10px 12px;background:#0a0706;border:1px solid var(--line);border-left:3px solid var(--dim);white-space:pre-wrap}
+.hash.A{border-left-color:#cfd6dd}
+.hash.B{border-left-color:var(--haz)}
+.hash .same{color:var(--faint)}
+.hash .diff{color:#140d09;background:linear-gradient(180deg,#f0b28c,#c98257);font-weight:700}
+.digram{font-size:10px;color:var(--dim);letter-spacing:.14em}
+.digram b{color:var(--haz)}
+.stat{font-size:11px;color:var(--dim);letter-spacing:.06em}
+.stat b{color:var(--ink)}
+.stat .warn{color:var(--haz)}
+#grid{width:296px;max-width:100%;border:1px solid var(--line);display:block;background:#0a0706;cursor:grab;touch-action:none}
+#grid.orbit{cursor:grabbing}
+.keys{margin-top:8px;padding-top:7px;border-top:1px dashed var(--line);font-size:9px;letter-spacing:.12em;color:var(--faint);text-transform:uppercase}
+.keys b{color:var(--dim)}
+/* ---- manual pages ---- */
+.prose{max-width:820px;margin:0 auto;padding:28px 24px 70px}
+.prose h2{font:400 26px Didot,"Bodoni MT",Georgia,serif;color:#f7c9a8;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:16px;letter-spacing:.02em}
+.prose h3{font-size:10px;letter-spacing:.3em;color:var(--haz);margin:26px 0 6px;text-transform:uppercase}
+.prose p,.prose li{font-size:12.5px;line-height:1.75;color:var(--dim);margin:7px 0}
+.prose b{color:var(--ink)}
+.prose ul{padding-left:16px;list-style:square}
+.math{font:12.5px/1.7 "Courier New",monospace;color:var(--ink);background:#0a0706;border:1px solid var(--line);border-left:2px solid var(--haz);padding:10px 14px;margin:12px 0;overflow-x:auto;white-space:pre}
+.kbd{display:inline-block;border:1px solid var(--line);border-bottom-width:2px;padding:0 5px;font:bold 10px "Courier New",monospace;color:#f7c9a8}
+footer{border-top:1px solid var(--line);background:var(--bg);color:var(--faint);font-size:8.5px;letter-spacing:.32em;text-transform:uppercase;display:flex;justify-content:space-between;gap:12px;padding:8px 18px;flex-wrap:wrap}
+footer b{color:var(--dim)}
+@media(max-width:720px){input[type=range]{width:84px}.mast .desc{display:none}.mast h1{font-size:20px}}
+</style>
+</head>
+<body>
+<header class="mast">
+  <div class="cell">
+    <span class="no">COMPUTATIONAL STUDIES · STUDY No. 19</span>
+    <h1>Avalanche Vault</h1>
+  </div>
+  <div class="cell"><span class="desc">SHA-256 / SHA-1 · one flipped bit, 256 output bits measured</span><span class="digram" style="letter-spacing:.18em">ALG <b id="h-alg">SHA-256</b> · DIFF <b id="h-diff">–</b>% · RATE <b id="h-rate">–</b>/ROUND</span></div>
+  <div class="cell">
+    <div class="tabs">
+      <button class="tab on" data-v="demo">BENCH</button>
+      <button class="tab" data-v="concept">THEORY</button>
+      <button class="tab" data-v="about">SPEC</button>
+    </div>
+  </div>
+</header>
+<main>
+  <section class="view on" id="view-demo"><div class="demo">
+    <div class="panel">
+      <h3><span>Input register</span><em>FLIP ONE BIT · MEASURE THE DIVERGENCE</em></h3>
+      <div class="body">
+        <div class="row" style="margin-bottom:6px"><span class="lab">message A</span><span class="digram" id="dlgA"></span></div>
+        <textarea id="inA" spellcheck="false">The quick brown fox jumps over the lazy dog</textarea>
+        <div class="row" style="margin:6px 0">
+          <span class="lab">message B</span><span class="digram" id="dlgB"></span>
+          <span style="flex:1"></span>
+          <span class="lab">edit</span>
+          <button class="btn" id="b-flip">Flip bit</button>
+          <button class="btn" id="b-sync">B = A</button>
+        </div>
+        <textarea id="inB" spellcheck="false">The quick brown fox jumps over the lazy dob</textarea>
+        <div class="row" style="margin-top:9px">
+          <span class="lab">algorithm</span>
+          <div class="seg" id="algs">
+            <button class="btn on" data-a="256">SHA-256</button>
+            <button class="btn" data-a="1">SHA-1</button>
+            <button class="btn" data-a="both">Both</button>
+          </div>
+          <span class="lab">sweep</span>
+          <input type="range" id="r-spd" min="0.25" max="3" step="0.25" value="1"><output id="o-spd" class="digram">1.0×</output>
+          <button class="btn" id="b-pause">Halt</button>
+          <button class="btn" id="b-reset">Reset</button>
+          <button class="btn" id="b-rand">Roll pair</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3><span>Digests</span><em>ORANGE = DISAGREEMENT</em></h3>
+      <div class="body">
+        <div class="hash A" id="digA">…</div>
+        <div class="hash B" id="digB" style="margin-top:6px">…</div>
+        <div class="row" style="margin-top:9px">
+          <span class="stat">bit flips <b id="s-flip">–</b>/len</span>
+          <span class="stat">hamming <b id="s-ham">–</b></span>
+          <span class="stat">ideal ≈ 50% ± 6</span>
+          <span class="stat">verdict <b id="s-verdict">–</b></span>
+          <span class="stat" style="margin-left:auto">2<sup>256</sup> ≈ 1.16×10<sup>77</sup> keyspace</span>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3><span>XOR bit-plane · 16×16</span><em>RAISED CELL = DISAGREEMENT · DRAG TO TURN · SCROLL TO LENS</em></h3>
+      <div class="body row" style="align-items:flex-start;gap:18px">
+        <canvas id="grid" width="256" height="256"></canvas>
+        <div class="keys" style="border:0;margin:0;padding:0;max-width:330px">
+          <b>type</b> in either box — both digests recompute per keystroke<br/>
+          <b>drag</b> the wall to turn it · <b>scroll</b> on it to lens<br/>
+          <b>F</b> flip one random bit of B · <b>N</b> roll a fresh pair<br/>
+          <b>space</b> halt sweep · <b>R</b> reset inputs · sweep fader scales reveal rate<br/>
+          state (texts, algorithm, sweep) persists in the URL hash
+        </div>
+      </div>
+    </div>
+  </div></section>
+  <section class="view" id="view-concept"><div class="prose">
+    <h2>Theory — avalanche behaviour</h2>
+    <p>A cryptographic hash maps any message to a fixed 256-bit fingerprint. Its defining property, the
+    <b>avalanche effect</b>: flip one input bit and roughly half the output bits flip, unpredictably.
+    This bench measures that property directly.</p>
+    <h3>1 · Padding — any message to 512-bit blocks</h3>
+    <div class="math">pad(msg): append 0x80, zeros, then 64-bit big-endian message length
+→ total length ≡ 0 (mod 512)</div>
+    <p>The message becomes N blocks of sixteen 32-bit words W[0..15].</p>
+    <h3>2 · Message schedule — 16 words stretched to 64</h3>
+    <div class="math">σ₀(x) = ROTR⁷(x) ⊕ ROTR¹⁸(x) ⊕ SHR³(x)
+σ₁(x) = ROTR¹⁷(x) ⊕ ROTR¹⁹(x) ⊕ SHR¹⁰(x)
+W[t] = σ₁(W[t−2]) + W[t−7] + σ₀(W[t−15]) + W[t−16]     (mod 2³²)</div>
+    <p>Rotations pull old bits into new words. Local change starts to spread here.</p>
+    <h3>3 · Compression — 64 mixing rounds</h3>
+    <div class="math">Σ₀ = ROTR²(e)⊕ROTR¹³(e)⊕ROTR²²(e)     Σ₁ = ROTR⁶(e)⊕ROTR¹¹(e)⊕ROTR²⁵(e)
+ch  = (e ∧ f) ⊕ (¬e ∧ h)               maj = (a∧b) ⊕ (a∧c) ⊕ (b∧c)
+T₁ = h + Σ₁ + ch + K[t] + W[t]          T₂ = Σ₀ + maj
+(a,b,c,d,e,f,g,h) ← (T₁+T₂, a, b, c, d+T₁, e, f, g)</div>
+    <p>Additions mod 2³² carry; carries propagate; every round feeds the next. After 64 rounds the eight
+    working registers blend the entire message.</p>
+    <h3>4 · The avalanche</h3>
+    <div class="math">Δ = digestA ⊕ digestB   →   256 bits
+expected |Δ| ≈ 128 (binomial n=256, p=½, σ≈8)</div>
+    <p>Two near-identical messages are hashed, the digest bit-planes XORed, and the result painted 16×16.
+    Around 128 lit cells: the algorithm is doing its work. Flip a bit repeatedly and watch the verdict move
+    around the ideal. Measured randomness.</p>
+    <h3>5 · The vault wall</h3>
+    <p>The bit-plane is rendered as a raised wall of drawers: agreeing bits sit recessed in dark sockets,
+    disagreeing bits rise — bright copper where the digest bit is 1, deep copper where it is 0 — depth-sorted
+    back to front. The wall hangs on a gimbal: drag to turn it (it coasts when released), scroll to lens,
+    and it sways on its own when idle. The sweep lifts the wall row by row.</p>
+    <h3>6 · SHA-1, the degraded variant</h3>
+    <p>Same Merkle–Damgård shape: 80 rounds, five 32-bit registers, four mixing functions per step. Its
+    avalanche reads healthy on this bench. The known weakness is theoretical collision attacks — hence
+    256-bit digests as the default.</p>
+  </div></section>
+  <section class="view" id="view-about"><div class="prose">
+    <h2>Spec — build record</h2>
+    <p>One self-contained HTML file, zero dependencies. Both hash cores are written in this page — plain
+    JavaScript on 32-bit words, no WebCrypto. Nothing about the computation is hidden.</p>
+    <h3>Inside</h3>
+    <ul>
+      <li><b>sha256(msg)</b> — padding, 64-word message schedule, 64-round compression, 8-word state; checked against the standard vectors (empty string, "abc", the 55/56-byte block boundary).</li>
+      <li><b>sha1(msg)</b> — 80-round variant with the four-step f/g mixing functions, also vector-checked.</li>
+      <li><b>Diff engine</b> — per-digit hex diff marking, 256/160-bit XOR bit-plane, Hamming distance, animated sweep reveal.</li>
+      <li><b>Vault wall</b> — one drawer per digest bit, raised where the two digests disagree; tone carries bit value; drag/scroll gimbal with inertia and idle sway.</li>
+      <li><b>Reduced motion</b> — <span class="kbd">prefers-reduced-motion</span> paints the final state immediately, no sweep.</li>
+    </ul>
+    <h3>Interactions</h3>
+    <ul>
+      <li>Type into either box — both digests recompute live per keystroke.</li>
+      <li><b>Flip bit</b> — <span class="kbd">F</b> flips one uniformly chosen bit of message B in place; the avalanche re-rolls.</li>
+      <li><span class="kbd">Space</span> halt · <span class="kbd">R</span> reset inputs · <span class="kbd">N</span> roll the pair.</li>
+      <li>Algorithm selector: SHA-256 / SHA-1 / Both. Sweep fader scales the reveal.</li>
+      <li>State (texts, algorithm, sweep) persists in the URL hash for sharing.</li>
+    </ul>
+    <h3>Budget</h3>
+    <p>Hashing a short message costs a few microseconds. The bench re-hashes per keystroke and idles below 1%
+    CPU; the animation budget goes to the reveal, not the math.</p>
+  </div></section>
+</main>
+<footer><span><b>JAWAD — COMPUTATIONAL STUDIES</b> · unit 19/20 · zero dependencies</span><span>crypto section · integrity series</span></footer>
+<script>
+(()=>{'use strict';
+const errors=[];addEventListener('error',e=>errors.push(String(e.message||e)));
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* ============ SHA-256 core (32-bit, big-endian) ============ */
+const K256=new Uint32Array([
+0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+const rotr=(x,n)=>(x>>>n)|(x<<(32-n));
+function sha256(bytes){
+ const len=bytes.length;const bitLen=len*8;
+ const padded=new Uint8Array(((((len+9)+63)>>6)<<6));
+ padded.set(bytes);padded[len]=0x80;
+ const dv=new DataView(padded.buffer);dv.setUint32(padded.length-4,bitLen>>>0);dv.setUint32(padded.length-8,Math.floor(bitLen/4294967296));
+ let h0=0x6a09e667,h1=0xbb67ae85,h2=0x3c6ef372,h3=0xa54ff53a,h4=0x510e527f,h5=0x9b05688c,h6=0x1f83d9ab,h7=0x5be0cd19;
+ const W=new Uint32Array(64);
+ for(let off=0;off<padded.length;off+=64){
+  for(let t=0;t<16;t++)W[t]=dv.getUint32(off+t*4);
+  for(let t=16;t<64;t++){const s0=rotr(W[t-15],7)^rotr(W[t-15],18)^(W[t-15]>>>3);const s1=rotr(W[t-2],17)^rotr(W[t-2],19)^(W[t-2]>>>10);W[t]=(W[t-16]+s0+W[t-7]+s1)>>>0;}
+  let a=h0,b=h1,c=h2,d=h3,e=h4,f=h5,g=h6,h=h7;
+  for(let t=0;t<64;t++){
+   const S1=rotr(e,6)^rotr(e,11)^rotr(e,25);const ch=(e&f)^(~e&g);
+   const T1=(h+S1+ch+K256[t]+W[t])>>>0;
+   const S0=rotr(a,2)^rotr(a,13)^rotr(a,22);const maj=(a&b)^(a&c)^(b&c);
+   const T2=(S0+maj)>>>0;
+   h=g;g=f;f=e;e=(d+T1)>>>0;d=c;c=b;b=a;a=(T1+T2)>>>0;}
+  h0=(h0+a)>>>0;h1=(h1+b)>>>0;h2=(h2+c)>>>0;h3=(h3+d)>>>0;h4=(h4+e)>>>0;h5=(h5+f)>>>0;h6=(h6+g)>>>0;h7=(h7+h)>>>0;}
+ const out=new Uint8Array(32);const odv=new DataView(out.buffer);
+ odv.setUint32(0,h0);odv.setUint32(4,h1);odv.setUint32(8,h2);odv.setUint32(12,h3);
+ odv.setUint32(16,h4);odv.setUint32(20,h5);odv.setUint32(24,h6);odv.setUint32(28,h7);
+ return out;}
+/* ============ SHA-1 core ============ */
+function sha1(bytes){
+ const len=bytes.length;const bitLen=len*8;
+ const padded=new Uint8Array(((((len+9)+63)>>6)<<6));
+ padded.set(bytes);padded[len]=0x80;
+ const dv=new DataView(padded.buffer);dv.setUint32(padded.length-4,bitLen>>>0);dv.setUint32(padded.length-8,Math.floor(bitLen/4294967296));
+ let h0=0x67452301,h1=0xefcdab89,h2=0x98badcfe,h3=0x10325476,h4=0xc3d2e1f0;
+ const W=new Uint32Array(80);
+ for(let off=0;off<padded.length;off+=64){
+  for(let t=0;t<16;t++)W[t]=dv.getUint32(off+t*4);
+  for(let t=16;t<80;t++){const x=(W[t-3]^W[t-8]^W[t-14]^W[t-16])>>>0;W[t]=((x<<1)|(x>>>31))>>>0;}
+  let a=h0,b=h1,c=h2,d=h3,e=h4;
+  for(let t=0;t<80;t++){
+   let f,k;
+   if(t<20){f=(b&c)|(~b&d);k=0x5a827999;}
+   else if(t<40){f=b^c^d;k=0x6ed9eba1;}
+   else if(t<60){f=(b&c)|(b&d)|(c&d);k=0x8f1bbcdc;}
+   else{f=b^c^d;k=0xca62c1d6;}
+   const temp=((((a<<5)|(a>>>27))>>>0)+(f>>>0)+(e>>>0)+(k>>>0)+(W[t]>>>0))>>>0;
+   e=d;d=c;c=((b<<30)|(b>>>2))>>>0;b=a;a=temp>>>0;}
+  h0=(h0+a)>>>0;h1=(h1+b)>>>0;h2=(h2+c)>>>0;h3=(h3+d)>>>0;h4=(h4+e)>>>0;}
+ const out=new Uint8Array(20);const odv=new DataView(out.buffer);
+ odv.setUint32(0,h0);odv.setUint32(4,h1);odv.setUint32(8,h2);odv.setUint32(12,h3);odv.setUint32(16,h4);
+ return out;}
+/* ---- self-test against standard vectors ---- */
+const enc=new TextEncoder();
+const hex=b=>[...b].map(x=>x.toString(16).padStart(2,'0')).join('');
+const V256={ '':'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'abc':'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad'};
+for(const m in V256){const g=hex(sha256(enc.encode(m)));if(g!==V256[m])errors.push('sha256 vector mismatch: '+m);}
+if(hex(sha1(enc.encode('abc')))!=='a9993e364706816aba3e25717850c26c9cd0d89d')errors.push('sha1 vector mismatch');
+if(hex(sha1(enc.encode('')))!=='da39a3ee5e6b4b0d3255bfef95601890afd80709')errors.push('sha1 empty mismatch');
+/* ============ state / hash ============ */
+const S={alg:'256',spd:1,paused:false};
+try{const p=new URLSearchParams(location.hash.slice(1));if(p.has('a'))S.alg=p.get('a');if(p.has('s'))S.spd=+p.get('s');if(p.has('t')){$('#inA').value=p.get('t');$('#inB').value=p.get('u');}}catch(e){}
+function saveHash(){const p=new URLSearchParams({a:S.alg,s:S.spd,t:$('#inA').value,u:$('#inB').value});history.replaceState(null,'','#'+p);}
+let H=null;
+function compute(){
+ const A=enc.encode($('#inA').value),B=enc.encode($('#inB').value);
+ const ha256=sha256(A),hb256=sha256(B),ha1=sha1(A),hb1=sha1(B);
+ H={A,B,ha256,hb256,ha1,hb1};
+ $('#dlgA').innerHTML=binDlg(A);$('#dlgB').innerHTML=binDlg(B);
+ renderDigests();renderGrid();}
+function binDlg(b){let s='';for(let i=0;i<Math.min(b.length,24);i++)s+=(b[i]>>7&1);return s+'… ('+b.length+' B)';}
+function digestFor(which){if(S.alg==='1')return which==='A'?H.ha1:H.hb1;return which==='A'?H.ha256:H.hb256;}
+function renderDigests(){
+ const bits=S.alg==='1'?160:256,digits=S.alg==='1'?40:64;
+ const da=digestFor('A'),db=digestFor('B');
+ let diff=0;const hexA=hex(da),hexB=hex(db);
+ let htmlA='',htmlB='';
+ for(let i=0;i<digits;i++){const cA=hexA[i],cB=hexB[i];const d=cA!==cB;if(d)diff++;
+  htmlA+=d?'<span class="diff">'+cA+'</span>':'<span class="same">'+cA+'</span>';
+  htmlB+=d?'<span class="diff">'+cB+'</span>':'<span class="same">'+cB+'</span>';}
+ $('#digA').innerHTML=htmlA;$('#digB').innerHTML=htmlB;
+ const xb=new Uint8Array(da.length);for(let i=0;i<da.length;i++)xb[i]=da[i]^db[i];
+ let ham=0;for(const v of xb)ham+=popcnt(v);
+ H.xor=xb;H.ham=ham;
+ $('#s-flip').textContent=bitDiff(H.A,H.B);
+ $('#s-ham').textContent=ham+' / '+bits+' ('+(100*ham/bits).toFixed(1)+'%)';
+ const pct=100*ham/bits,ok=Math.abs(pct-50)<18;
+ $('#s-verdict').textContent=ham===0?'identical':ok?'healthy avalanche':(pct<50?'weak-ish':'strong');
+ $('#s-verdict').style.color=ham===0?'#d98d6a':ok?'#ece4da':'#d98d6a';
+ $('#h-diff').textContent=(100*ham/bits).toFixed(1);}
+function popcnt(v){v=v-((v>>1)&0x55);v=(v&0x33)+((v>>2)&0x33);return(v+(v>>4)&0x0f);}
+function bitDiff(a,b){const n=Math.min(a.length,b.length);let d=Math.abs(a.length-b.length)*8;for(let i=0;i<n;i++)d+=popcnt(a[i]^b[i]);return d;}
+/* ============ avalanche grid ============ */
+const gcv=$('#grid'),gtx=gcv.getContext('2d');
+let sweep=1;
+/* ============ the vault wall: pseudo-3D bit plane ============ */
+const GCAM={yaw:0,pitch:.62,vY:0,zoom:1,drag:false,px:0,py:0};
+function drawGrid(f){
+ gtx.fillStyle='#0a0706';gtx.fillRect(0,0,256,256);
+ const yaw=GCAM.yaw,pitch=GCAM.pitch,scale=GCAM.zoom;
+ const cyw=Math.cos(yaw),syw=Math.sin(yaw),cp=Math.cos(pitch);
+ const bits=S.alg==='1'?160:256,n=16;
+ const cells=[];
+ for(let i=0;i<bits;i++){
+  const byte=i>>3;
+  const on=((H.xor[byte]>>(7-(i&7)))&1)===1;
+  const u=(i%n)/n-.5+.03125,w2=(i/n|0)/n-.5+.03125;
+  cells.push({i,x1:u*cyw-w2*syw,y1:u*syw+w2*cyw,on});}
+ cells.sort((a,b)=>a.y1-b.y1);
+ for(const c of cells){
+  if(c.i/bits>f)continue;
+  const px=128+c.x1*116*scale,py=124+c.y1*116*scale*cp;
+  const s2=12.4*scale;
+  /* recessed socket */
+  gtx.fillStyle=c.on?'#241812':'#140e0b';
+  gtx.fillRect(px-s2/2,py-s2/2,s2,s2);
+  if(c.on){
+   const digByte=(S.alg==='1'?digestFor('A'):H.ha256)[c.i>>3];
+   const v=(digByte>>(7-(c.i&7)))&1;
+   const h=(v?9:5.5)*scale;
+   /* side wall (depth), then raised top face with a lit edge */
+   gtx.fillStyle=v?'#8a4f30':'#6e4028';
+   gtx.fillRect(px-s2/2,py-s2/2,s2,h);
+   gtx.fillStyle=v?'#f7c9a8':'#d98d6a';
+   gtx.fillRect(px-s2/2,py-s2/2-h,s2,s2);
+   gtx.strokeStyle='rgba(255,231,204,.5)';gtx.lineWidth=1;
+   gtx.strokeRect(px-s2/2+.5,py-s2/2-h+.5,s2-1,s2-1);}}}
+/* vault-wall camera: drag to turn (inertia), scroll to lens */
+gcv.addEventListener('pointerdown',e=>{GCAM.drag=true;GCAM.px=e.clientX;GCAM.py=e.clientY;gcv.classList.add('orbit');gcv.setPointerCapture(e.pointerId);});
+gcv.addEventListener('pointermove',e=>{if(!GCAM.drag)return;
+ const dx=e.clientX-GCAM.px,dy=e.clientY-GCAM.py;GCAM.px=e.clientX;GCAM.py=e.clientY;
+ GCAM.yaw+=dx*.006;GCAM.vY=dx*.006;
+ GCAM.pitch=Math.max(.3,Math.min(1.1,GCAM.pitch+dy*.004));});
+gcv.addEventListener('pointerup',()=>{GCAM.drag=false;gcv.classList.remove('orbit');});
+gcv.addEventListener('pointerleave',()=>{GCAM.drag=false;gcv.classList.remove('orbit');});
+gcv.addEventListener('wheel',e=>{e.preventDefault();
+ GCAM.zoom=Math.max(.6,Math.min(1.6,GCAM.zoom*(e.deltaY<0?1.08:0.93)));},{passive:false});
+function renderGrid(){if(!H)return;drawGrid(RM?1:sweep);
+ $('#h-diff').textContent=(100*H.ham/(S.alg==='1'?160:256)).toFixed(1);}
+/* sweep animation */
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+ if(!S.paused&&!RM){
+  if(!GCAM.drag){GCAM.vY*=.95;GCAM.yaw+=GCAM.vY;
+   GCAM.yaw+=(Math.sin(now/1000*.33)*.16-GCAM.yaw)*.012;}
+  if(sweep<1)sweep=Math.min(1,sweep+dt*S.spd*.9);
+  drawGrid(sweep);}
+ requestAnimationFrame(loop);}
+/* ============ controls ============ */
+$('#inA').addEventListener('input',()=>{sweep=RM?1:0;compute();saveHash();});
+$('#inB').addEventListener('input',()=>{sweep=RM?1:0;compute();saveHash();});
+$$('#algs .btn').forEach(b=>b.addEventListener('click',()=>{
+ S.alg=b.dataset.a;$$('#algs .btn').forEach(x=>x.classList.toggle('on',x===b));
+ sweep=RM?1:0;compute();saveHash();}));
+function flipRandom(){
+ const ta=$('#inB'),bytes=enc.encode(ta.value);
+ if(!bytes.length)return;
+ const idx=(Math.random()*bytes.length)|0,bit=Math.random()<.5?7:Math.floor(Math.random()*8);
+ const mod=1<<bit;const nb=new Uint8Array(bytes);nb[idx]^=mod;
+ ta.value=new TextDecoder().decode(nb);
+ sweep=RM?1:0;compute();saveHash();}
+$('#b-flip').addEventListener('click',flipRandom);
+$('#b-sync').addEventListener('click',()=>{$('#inB').value=$('#inA').value;sweep=RM?1:0;compute();saveHash();});
+$('#b-pause').addEventListener('click',e=>{S.paused=!S.paused;e.target.textContent=S.paused?'Run':'Halt';});
+$('#b-reset').addEventListener('click',()=>{
+ $('#inA').value='The quick brown fox jumps over the lazy dog';
+ $('#inB').value='The quick brown fox jumps over the lazy dob';
+ S.alg='256';S.spd=1;$('#r-spd').value=1;$('#o-spd').textContent='1.0×';
+ $$('#algs .btn').forEach(x=>x.classList.toggle('on',x.dataset.a==='256'));
+ sweep=RM?1:0;compute();saveHash();});
+$('#b-rand').addEventListener('click',()=>{
+ const words='fox wolf wind star moon byte hash node wave echo grid flux quad neo arc zen'.split(' ');
+ const mk=()=>Array.from({length:5+((Math.random()*4)|0)},()=>words[(Math.random()*words.length)|0]).join(' ');
+ $('#inA').value=mk();$('#inB').value=$('#inA').value;flipRandom();});
+$('#r-spd').addEventListener('input',e=>{S.spd=+e.target.value;$('#o-spd').textContent=S.spd.toFixed(1)+'×';saveHash();});
+addEventListener('keydown',e=>{
+ if(e.target.tagName==='TEXTAREA'&&e.key!=='Escape')return;const k=e.key.toLowerCase();
+ if(k===' '){e.preventDefault();$('#b-pause').click();}
+ else if(k==='f')flipRandom();else if(k==='r')$('#b-reset').click();else if(k==='n')$('#b-rand').click();});
+$$('.tab').forEach(t=>t.addEventListener('click',()=>{$$('.tab').forEach(x=>x.classList.toggle('on',x===t));$$('.view').forEach(v=>v.classList.toggle('on',v.id==='view-'+t.dataset.v));}));
+/* boot */
+$('#o-spd').textContent=S.spd.toFixed(1)+'×';$('#r-spd').value=S.spd;
+$('#h-alg').textContent=S.alg==='both'?'SHA-256 + 1':S.alg==='1'?'SHA-1':'SHA-256';
+$$('#algs .btn').forEach(x=>x.classList.toggle('on',x.dataset.a===S.alg));
+compute();
+if(!RM)requestAnimationFrame(t=>{last=t;loop(t);});else drawGrid(1);
+window.__LAB__={S,errors,selftest(){return{sha256_abc:hex(sha256(enc.encode('abc'))),ok:errors.length===0};}};
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f0a">
+<link rel="icon" href="data:,">
+<title>SPECIMEN 01 — SOCIAL FIELD</title>
+<style>
+:root{--bg:#0a0f0a;--ph:#33ff66;--phd:#1a5c2e;--amb:#ffb000;--tx:#b9e6c3;--dim:#4e7a58;--ink:#03140a}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font:13px/1.45 "Courier New",ui-monospace,monospace;overflow:hidden}
+#view{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+#scan{position:fixed;inset:0;pointer-events:none;z-index:9;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px)}
+#vig{position:fixed;inset:0;pointer-events:none;z-index:9;background:radial-gradient(120% 90% at 50% 45%,transparent 60%,rgba(0,0,0,.5))}
+.reg{position:fixed;width:18px;height:18px;z-index:12;pointer-events:none;border:0 solid var(--phd)}
+.reg.tl{top:10px;left:10px;border-left-width:1px;border-top-width:1px}
+.reg.tr{top:10px;right:10px;border-right-width:1px;border-top-width:1px}
+.reg.bl{bottom:10px;left:10px;border-left-width:1px;border-bottom-width:1px}
+.reg.br{bottom:10px;right:10px;border-right-width:1px;border-bottom-width:1px}
+#rulx{position:fixed;top:0;left:0;right:0;height:14px;z-index:11;pointer-events:none;opacity:.5;
+ background:repeating-linear-gradient(90deg,var(--phd) 0 1px,transparent 1px 40px),repeating-linear-gradient(90deg,var(--phd) 0 1px,transparent 1px 200px)}
+#ruly{position:fixed;top:0;left:0;bottom:0;width:14px;z-index:11;pointer-events:none;opacity:.5;
+ background:repeating-linear-gradient(0deg,var(--phd) 0 1px,transparent 1px 40px),repeating-linear-gradient(0deg,var(--phd) 0 1px,transparent 1px 200px)}
+.plate{position:fixed;background:rgba(3,20,10,.9);border:1px solid var(--phd);z-index:15}
+#idplate{top:22px;left:22px;padding:8px 12px;max-width:320px}
+#idplate h1{font:bold 15px/1.2 "Courier New",monospace;color:var(--ph);letter-spacing:.18em}
+#idplate p{font:10px/1.6 "Courier New",monospace;color:var(--dim);letter-spacing:.12em;margin-top:3px}
+#hud{top:22px;right:22px;padding:8px 12px;min-width:170px;font:11px/1.7 "Courier New",monospace}
+#hud .row{display:flex;justify-content:space-between;gap:16px}
+#hud .row span{color:var(--dim)}
+#hud .row b{color:var(--ph);font-weight:bold}
+#fps{font:bold 20px/1.2 "Courier New",monospace;color:var(--ph)}
+#panel{right:22px;top:170px;bottom:56px;width:236px;padding:10px 12px;overflow-y:auto;scrollbar-width:thin}
+#panel h2{font:bold 10px/1 "Courier New",monospace;color:var(--amb);letter-spacing:.22em;margin:12px 0 7px}
+#panel h2:first-child{margin-top:0}
+.bat{display:flex;flex-direction:column;gap:3px}
+.bat button{display:flex;align-items:center;gap:8px;background:none;border:0;color:var(--dim);font:11px "Courier New",monospace;letter-spacing:.1em;text-align:left;padding:3px 4px;cursor:pointer}
+.bat button::before{content:"[ ]";color:var(--phd);letter-spacing:0}
+.bat button.on{color:var(--ph)}
+.bat button.on::before{content:"[■]";color:var(--ph)}
+.fad{margin:8px 0}
+.fad label{display:flex;justify-content:space-between;font:9px/1 "Courier New",monospace;color:var(--dim);letter-spacing:.14em;margin-bottom:3px}
+.fad output{color:var(--ph)}
+.fad input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:2px;background:var(--phd);outline:none}
+.fad input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:9px;height:16px;background:var(--ph);border:0;cursor:ew-resize}
+.fad input[type=range]::-moz-range-thumb{width:9px;height:16px;background:var(--ph);border:0;border-radius:0;cursor:ew-resize}
+#mx{width:100%;border:1px solid var(--phd);background:var(--ink);touch-action:none;cursor:crosshair}
+.note{font:italic 11px/1.5 Georgia,serif;color:var(--dim)}
+.btns{display:flex;flex-wrap:wrap;gap:5px}
+.btns button{flex:1 1 44%;background:none;border:1px solid var(--phd);color:var(--tx);font:10px "Courier New",monospace;letter-spacing:.12em;padding:6px 2px;cursor:pointer}
+.btns button:hover{border-color:var(--ph);color:var(--ph)}
+#manual{left:22px;bottom:22px;padding:8px 12px;font:10px/1.8 "Courier New",monospace;color:var(--dim);letter-spacing:.1em}
+#manual b{color:var(--ph);font-weight:normal;border:1px solid var(--phd);padding:0 4px}
+#toast{position:fixed;left:50%;bottom:60px;transform:translateX(-50%);background:var(--ink);border:1px solid var(--ph);color:var(--ph);padding:6px 14px;font:11px "Courier New",monospace;letter-spacing:.14em;opacity:0;transition:.2s;z-index:60;pointer-events:none}
+#toast.on{opacity:1}
+#mob{display:none}
+#pgnotes{position:fixed;top:16px;right:22px;z-index:45;display:flex;gap:6px}
+#pgnotes button{background:var(--ink);border:1px solid var(--phd);color:var(--dim);font:10px "Courier New",monospace;letter-spacing:.14em;padding:4px 10px;cursor:pointer}
+#pgnotes button.on{color:var(--ph);border-color:var(--ph)}
+.page{position:fixed;inset:0;overflow-y:auto;padding:60px 24px;display:none;background:var(--bg);z-index:40}
+.page.on{display:block}
+.wrap{max-width:640px;margin:0 auto}
+.page h1{font:bold 18px/1.3 "Courier New",monospace;color:var(--ph);letter-spacing:.2em;margin-bottom:4px}
+.page .cat{font:10px "Courier New",monospace;color:var(--dim);letter-spacing:.18em;margin-bottom:28px}
+.page h2{font:bold 11px "Courier New",monospace;color:var(--amb);letter-spacing:.2em;margin:24px 0 8px}
+.page p{color:var(--tx);margin:8px 0;font-size:12.5px}
+.page ul{margin:8px 0 8px 18px}
+.page li{margin:5px 0;font-size:12.5px}
+.eq{font:12px/1.7 "Courier New",monospace;color:var(--ph);background:rgba(26,92,46,.14);border-left:2px solid var(--phd);padding:10px 14px;margin:12px 0;white-space:pre;overflow-x:auto}
+@media(max-width:840px){
+ #panel{top:auto;bottom:52px;right:10px;left:auto;width:212px;max-height:46vh;transform:translateY(112%);transition:transform .25s}
+ #panel.open{transform:none}
+ #mob{display:block;position:fixed;right:10px;bottom:14px;z-index:46;background:var(--ink);border:1px solid var(--ph);color:var(--ph);font:10px "Courier New",monospace;letter-spacing:.14em;padding:6px 12px}
+ #idplate{max-width:250px}
+ #manual{display:none}
+ #hud{transform:scale(.85);transform-origin:top right}
+}
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+<div id="scan"></div><div id="vig"></div>
+<div class="reg tl"></div><div class="reg tr"></div><div class="reg bl"></div><div class="reg br"></div>
+<div id="rulx"></div><div id="ruly"></div>
+<div class="plate" id="idplate">
+ <h1>SOCIAL FIELD</h1>
+ <p>SPECIMEN 01 · N-BODY RULE TABLE<br>JAWAD — COMPUTATIONAL STUDIES</p>
+</div>
+<div class="plate" id="hud">
+ <div id="fps">--</div>
+ <div class="row"><span>AGENTS</span><b id="hagents">0</b></div>
+ <div class="row"><span>SPECIES</span><b id="hspec">0</b></div>
+ <div class="row"><span>T+</span><b id="htime">0.0</b></div>
+ <div class="row"><span>PRESET</span><b id="hmode">-</b></div>
+</div>
+<div class="plate" id="panel">
+ <h2>RULE TABLE PRESET</h2>
+ <div class="bat" id="modes"></div>
+ <h2>FIELD</h2>
+ <div id="faders"></div>
+ <h2>RULE MATRIX</h2>
+ <canvas id="mx" width="212" height="212"></canvas>
+ <p class="note">Cell = row species acting on column species. Up attract, down repel.</p>
+ <h2>OPERATE</h2>
+ <div class="btns">
+  <button id="bpause">HOLD</button>
+  <button id="breset">RESEED</button>
+  <button id="brnd">RE-DEAL</button>
+  <button id="bshare">STATE→URL</button>
+  <button id="bptr">FIELD: REPEL</button>
+  <button id="bnotes">NOTES</button>
+ </div>
+</div>
+<div class="plate" id="manual">
+ <b>SPACE</b> hold&nbsp; <b>R</b> reseed&nbsp; <b>H</b> re-deal&nbsp; <b>M</b> next&nbsp; <b>C</b> state&nbsp; <b>P</b> polarity&nbsp; <b>1-6</b> preset
+</div>
+<div id="pgnotes">
+ <button id="ntab1" class="on">PLATE NOTES</button>
+ <button id="ntab2">METHOD</button>
+</div>
+<button id="mob">PANEL</button>
+<div id="toast"></div>
+<!--PAGES-->
+</body>
+</html>
+<div class="page" id="pg-plate"><div class="wrap">
+<h1>PLATE NOTES — SPECIMEN 01</h1>
+<div class="cat">SOCIAL FIELD · N-BODY RULE TABLE · CATALOG 01/24</div>
+<p>Several thousand point masses. Six classes. One table of signed values: row class acts on column class, range −1.00 to +1.00. Negative repels, positive attracts, zero ignores.</p>
+<p>Local rule, applied every frame: stay one body-width apart, obey the table inside sensing radius, lose a fixed fraction of velocity per tick. Nothing else. No leader, no objective, no memory.</p>
+<h2>OBSERVED FORMS</h2>
+<ul>
+<li>Rotating cells with a defined boundary — short-range repulsion plus non-reciprocal pull.</li>
+<li>Trains: one class follows another at fixed offset. Directional chasing.</li>
+<li>Lattice sheets — quasi-symmetric table rows, near-equal pull on all sides.</li>
+<li>Gnawing fronts — a strongly attractive class eroding a repulsive one.</li>
+</ul>
+<p>Forms are not stored or replayed. They are the current table's steady behavior. Reweight one cell and the form renegotiates.</p>
+<h2>OPERATING NOTES</h2>
+<ul>
+<li>Drag on the field: injects a radial force well. Button cycles attract, repel, vortex.</li>
+<li>Matrix cells: drag vertically. The engine re-balances from the modified table in a few seconds.</li>
+<li>STATE→URL encodes table and faders into the address line. Reload restores the run.</li>
+<li>World is a torus. Left edge continuous with right. No boundary layer.</li>
+</ul>
+</div></div>
+<div class="page" id="pg-method"><div class="wrap">
+<h1>METHOD — SPECIMEN 01</h1>
+<div class="cat">FORCE LAW, INTEGRATOR, NEIGHBOR ENGINE</div>
+<h2>1 · PAIR FORCE</h2>
+<p>For a pair at normalized separation x = r / R with table entry F:</p>
+<div class="eq">x < β          f = x/β − 1          core, sign-independent
+β ≤ x ≤ 1      f = F·(1 − |2x−1−β|/(1−β))
+x > 1          f = 0</div>
+<p>β = 0.30 nominal. The core term ignores the table: it is volume exclusion. The outer term is a triangular profile, peak at band midpoint.</p>
+<h2>2 · INTEGRATION</h2>
+<div class="eq">v ← (v + Δt · Σf(r̂) · G) · (1 − λ)^Δt·60
+x ← x + v · Δt          semi-implicit, then toroidal wrap</div>
+<p>Semi-implicit Euler: velocity first, then position with the new velocity. Stable at contact stiffness where explicit Euler fires particles through each other. Friction λ applied as frame-rate-normalized power; identical feel at 30 and 144 Hz.</p>
+<h2>3 · NEIGHBOR ENGINE</h2>
+<p>Uniform hash grid, cell edge = R. Each body scans its 3×3 cell block only. Rebuild per frame into flat typed arrays, no allocation, no GC pause. Cost O(n) at bounded density; measured 4,000 bodies inside 2 ms per tick on integrated graphics.</p>
+<p>Difference vectors fold by half-world before squaring: d ← d − W·round(d/W). A particle near the left edge sees across the seam at full strength.</p>
+<h2>4 · STABILITY ENVELOPE</h2>
+<ul>
+<li>G · Δt above ≈ 0.05 ejects pairs from clusters. Observable as boiling.</li>
+<li>λ below 0.05 leaves undamped drift; structures shear apart.</li>
+<li>Radius R beyond 90px at fixed population starves the grid; sparse cells, thin structure.</li>
+</ul>
+<h2>5 · PARAMETERS, DEFAULT PLATE</h2>
+<div class="eq">population 1400   classes 6   R 42px   β 0.30
+G 1.00   λ 0.12   Δt 0.60   wrap on</div>
+<p class="note">Defaults tuned by hand against preset CONVOY. Parameters reproduce it from any seed within ~10s.</p>
+</div></div>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const cvs=$('#view'),ctx=cvs.getContext('2d',{alpha:false});
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MOB=matchMedia('(max-width:840px)').matches;
+const CLR=['#33ff66','#ffb000','#59d4ff','#ff5c7a','#c9ff4e','#e0e0e0'];
+const CAP=4200;
+const px=new Float32Array(CAP),py=new Float32Array(CAP),vx=new Float32Array(CAP),vy=new Float32Array(CAP),sp=new Uint8Array(CAP);
+let n=0,W=0,H=0;
+let M=new Float32Array(64);
+let gw=0,gh=0,head=null,nxt=new Int32Array(CAP);
+const P={preset:0,N:1400,S:6,R:42,beta:0.30,F:1.0,fr:0.12,dt:0.6,ptr:1};
+let run=!RM,t=0,fps=60,paint=null;
+let pxp=0,pyp=0;
+const PTRN=['FIELD: ATTRACT','FIELD: REPEL','FIELD: VORTEX'];
+const rnd=(a,b)=>a+Math.random()*(b-a);
+window.__GETSTATE=()=>({mass:0,steps:0});
+let stepCount=0,meanSpeed=0;
+
+/* ---------- presets ---------- */
+const MODES=[
+ {name:'CONVOY',S:5,gen:()=>{const m=new Float32Array(64);const d=[[0,.5,-.45,-.3,.25],[-.42,.1,.72,-.2,-.35],[-.5,-.35,.2,.7,-.25],[-.25,-.4,-.35,.12,.62],[.3,-.2,-.5,-.4,.2]];for(let i=0;i<5;i++)for(let j=0;j<5;j++)m[i*8+j]=d[i][j];return m},jit:.05},
+ {name:'CHAIN',S:6,gen:()=>{const m=new Float32Array(64);for(let i=0;i<6;i++)for(let j=0;j<6;j++)m[i*8+j]=i===j?.15:(j===(i+1)%6?.9:(j===(i+2)%6?.4:(i===(j+1)%6?-.55:-.1)));return m},jit:.04},
+ {name:'PACK',S:4,gen:()=>{const m=new Float32Array(64);const d=[[.1,.9,-.4,-.6],[-.85,.25,.7,-.3],[-.2,-.5,.35,.55],[-.5,-.2,-.4,.4]];for(let i=0;i<4;i++)for(let j=0;j<4;j++)m[i*8+j]=d[i][j];return m},jit:.05},
+ {name:'LATTICE',S:5,gen:()=>{const m=new Float32Array(64);for(let i=0;i<5;i++)for(let j=i;j<5;j++){const v=i===j?.35:rnd(-.55,.9);m[i*8+j]=v;m[j*8+i]=v}return m},jit:0},
+ {name:'DRIFT',S:6,gen:()=>{const m=new Float32Array(64);for(let i=0;i<6;i++)for(let j=0;j<6;j++)m[i*8+j]=i===j?.3:(j===(i+1)%6?.85:(j===(i+3)%6?.35:-.6));return m},jit:.06},
+ {name:'FREE',S:6,gen:()=>{const m=new Float32Array(64);for(let i=0;i<8;i++)for(let j=0;j<8;j++)m[i*8+j]=i>=6||j>=6?0:(i===j?rnd(-.3,.6):rnd(-1,1));return m},jit:0}
+];
+function applyPreset(k,fresh=true){
+ P.preset=k;const md=MODES[k];P.S=md.S;M=md.gen();
+ if(md.jit)for(let i=0;i<64;i++)if(M[i]!==0)M[i]=Math.max(-1,Math.min(1,M[i]+rnd(-md.jit,md.jit)));
+ syncUI();respec();markModes();drawMx();pushHash(true);
+ if(fresh)reseed();
+}
+function respec(){for(let i=0;i<n;i++)sp[i]=sp[i]%P.S}
+
+/* ---------- URL state ---------- */
+let hashT=null;
+function enc(){return btoa(JSON.stringify({v:2,p:{m:P.preset,N:P.N,S:P.S,R:P.R,b:P.beta,F:P.F,f:P.fr,d:P.dt,q:P.ptr},M:[...M].map(x=>Math.round(x*100))})).replace(/=+$/,'')}
+function dec(h){try{const o=JSON.parse(atob(h));if(!o||o.v!==2)return false;const q=o.p||{};P.preset=Math.min(MODES.length-1,Math.max(0,q.m|0));P.N=Math.min(CAP,Math.max(50,q.N|0));P.S=Math.min(8,Math.max(3,q.S|0));P.R=Math.min(90,Math.max(10,q.R|0));P.beta=Math.min(.5,Math.max(.05,+q.b||.3));P.F=Math.min(3,Math.max(0,+q.F||1));P.fr=Math.min(.6,Math.max(.02,+q.f||.12));P.dt=Math.min(1.2,Math.max(.1,+q.d||.6));P.ptr=Math.min(2,Math.max(0,q.q|0));if(Array.isArray(o.M)){M=new Float32Array(64);for(let i=0;i<64&&i<o.M.length;i++)M[i]=Math.max(-1,Math.min(1,(+o.M[i]||0)/100))}return true}catch(e){return false}}
+function pushHash(now){const go=()=>{try{history.replaceState(null,'','#'+enc())}catch(e){}};if(now){go();return}clearTimeout(hashT);hashT=setTimeout(go,500)}
+
+/* ---------- bodies ---------- */
+function reseed(){n=P.N;for(let i=0;i<n;i++){px[i]=Math.random()*W;py[i]=Math.random()*H;vx[i]=0;vy[i]=0;sp[i]=(Math.random()*P.S)|0}t=0;clearTrails()}
+function setN(){if(P.N>n)for(let i=n;i<P.N;i++){px[i]=Math.random()*W;py[i]=Math.random()*H;vx[i]=0;vy[i]=0;sp[i]=(Math.random()*P.S)|0}n=P.N}
+
+/* ---------- grid ---------- */
+function grid(){
+ const R=P.R;gw=Math.max(1,(W/R)|0);gh=Math.max(1,(H/R)|0);
+ if(!head||head.length!==gw*gh)head=new Int32Array(gw*gh);head.fill(-1);
+ for(let i=0;i<n;i++){
+  let cx=(px[i]/R)|0,cy=(py[i]/R)|0;
+  if(cx>=gw)cx=gw-1;if(cy>=gh)cy=gh-1;if(cx<0)cx=0;if(cy<0)cy=0;
+  const g=cy*gw+cx;nxt[i]=head[g];head[g]=i;
+ }
+}
+
+/* ---------- step ---------- */
+function step(){
+ grid();
+ const R=P.R,R2=R*R,b=P.beta,inv=1/(1-b),hw=W/2,hh=H/2;
+ const dec=Math.pow(Math.max(.35,1-P.fr),P.dt),k=P.F*P.dt;
+ const pr=130,pr2=pr*pr,useP=!!paint;
+ for(let i=0;i<n;i++){
+  const xi=px[i],yi=py[i],si=sp[i]*8;
+  let fx=0,fy=0;
+  let gx=(xi/R)|0,gy=(yi/R)|0;if(gx>=gw)gx=gw-1;if(gy>=gh)gy=gh-1;
+  for(let oy=-1;oy<=1;oy++){const yy=(gy+oy+gh)%gh,base=yy*gw;
+   for(let ox=-1;ox<=1;ox++){const xx=(gx+ox+gw)%gw;let j=head[base+xx];
+    while(j!==-1){
+     if(j!==i){
+      let dx=px[j]-xi;if(dx>hw)dx-=W;else if(dx<-hw)dx+=W;
+      let dy=py[j]-yi;if(dy>hh)dy-=H;else if(dy<-hh)dy+=H;
+      const r2=dx*dx+dy*dy;
+      if(r2<R2&&r2>1e-4){
+       const x=Math.sqrt(r2)/R;let f;
+       if(x<b)f=x/b-1;else f=M[si+sp[j]]*(1-Math.abs(2*x-1-b)*inv);
+       const inv2=1/Math.sqrt(r2);fx+=dx*inv2*f;fy+=dy*inv2*f;
+      }
+     }
+     j=nxt[j];
+    }
+   }
+  }
+  if(useP){
+   let dx=xi-pxp,dy=yi-pyp;const d2=dx*dx+dy*dy;
+   if(d2<pr2&&d2>1){const d=Math.sqrt(d2),u=1-d/pr;dx/=d;dy/=d;
+    if(P.ptr===0){fx-=dx*u*1.1;fy-=dy*u*1.1}
+    else if(P.ptr===1){fx+=dx*u*1.1;fy+=dy*u*1.1}
+    else{fx+=-dy*u*1.3;fy+=dx*u*1.3}
+   }
+  }
+  let nvx=(vx[i]+fx*k)*dec,nvy=(vy[i]+fy*k)*dec;
+  const s2=nvx*nvx+nvy*nvy;if(s2>64){const sc=8/Math.sqrt(s2);nvx*=sc;nvy*=sc}
+  vx[i]=nvx;vy[i]=nvy;
+  let X=xi+nvx*P.dt,Y=yi+nvy*P.dt;
+  if(X<0)X+=W;else if(X>=W)X-=W;if(Y<0)Y+=H;else if(Y>=H)Y-=H;
+  px[i]=X;py[i]=Y;
+ }
+ t+=P.dt;stepCount++;
+ let s=0,c=0;for(let i=0;i<n;i+=7){s+=Math.sqrt(vx[i]*vx[i]+vy[i]*vy[i]);c++}
+ meanSpeed=s/Math.max(1,c);
+}
+
+/* ---------- render ---------- */
+function render(){
+ ctx.fillStyle='rgba(10,15,10,0.30)';ctx.fillRect(0,0,W,H);
+ ctx.save();
+ ctx.shadowBlur=0;
+ for(let s=0;s<P.S;s++){
+  ctx.fillStyle=CLR[s];
+  ctx.globalAlpha=.92;
+  for(let i=0;i<n;i++)if(sp[i]===s)ctx.fillRect(px[i]-1.3,py[i]-1.3,2.6,2.6);
+ }
+ ctx.globalAlpha=1;
+ ctx.restore();
+ if(paint){
+  ctx.strokeStyle='rgba(51,255,102,.6)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.arc(pxp,pyp,pr0,0,7);ctx.stroke();
+ }
+}
+let pr0=130;
+function clearTrails(){ctx.fillStyle='#0a0f0a';ctx.fillRect(0,0,W,H)}
+
+/* ---------- faders ---------- */
+const FL=[
+ {k:'N',lab:'POPULATION',min:100,max:4000,st:50,f:v=>''+(v|0)},
+ {k:'S',lab:'CLASSES',min:3,max:8,st:1,f:v=>''+(v|0)},
+ {k:'R',lab:'RADIUS PX',min:10,max:90,st:1,f:v=>''+(v|0)},
+ {k:'beta',lab:'CORE BETA',min:0.05,max:0.5,st:0.01,f:v=>(+v).toFixed(2)},
+ {k:'F',lab:'GAIN',min:0,max:3,st:0.05,f:v=>(+v).toFixed(2)},
+ {k:'fr',lab:'FRICTION',min:0.02,max:0.6,st:0.01,f:v=>(+v).toFixed(2)},
+ {k:'dt',lab:'DT',min:0.1,max:1.2,st:0.05,f:v=>(+v).toFixed(2)}
+];
+const outs={};
+function buildFaders(){
+ const host=$('#faders');host.innerHTML='';
+ for(const s of FL){
+  const d=document.createElement('div');d.className='fad';
+  d.innerHTML='<label><span>'+s.lab+'</span><output></output></label>';
+  const inp=document.createElement('input');inp.type='range';inp.min=s.min;inp.max=s.max;inp.step=s.st;inp.value=P[s.k];
+  const out=d.querySelector('output');out.textContent=s.f(P[s.k]);outs[s.k]={inp,out,f:s.f};
+  inp.addEventListener('input',()=>{P[s.k]=+inp.value;out.textContent=s.f(inp.value);
+   if(s.k==='S')respec();if(s.k==='N')setN();
+   pushHash();if(RM||!run)render()});
+  d.appendChild(inp);host.appendChild(d);
+ }
+}
+function syncUI(){for(const k in outs){outs[k].inp.value=P[k];outs[k].out.textContent=outs[k].f(P[k])}}
+function markModes(){$$('#modes button').forEach((b,i)=>b.classList.toggle('on',i===P.preset))}
+function buildModes(){
+ const host=$('#modes');
+ MODES.forEach((m,i)=>{
+  const b=document.createElement('button');b.textContent=m.name;
+  b.addEventListener('click',()=>applyPreset(i));host.appendChild(b);
+ });
+}
+
+/* ---------- matrix editor ---------- */
+const mxc=$('#mx'),mxr=mxc.getContext('2d');let mxDown=false,mxHover=-1;
+function drawMx(){
+ const C=212,u=C/P.S;
+ mxr.fillStyle='#03140a';mxr.fillRect(0,0,C,C);
+ for(let r=0;r<P.S;r++)for(let c=0;c<P.S;c++){
+  const v=M[r*8+c];
+  mxr.fillStyle=v>=0?'rgba(51,255,102,'+(0.06+Math.abs(v)*0.8).toFixed(3)+')':'rgba(255,92,122,'+(0.06+Math.abs(v)*0.8).toFixed(3)+')';
+  mxr.fillRect(c*u+1,r*u+1,u-2,u-2);
+ }
+ for(let c=0;c<P.S;c++){
+  mxr.fillStyle=CLR[c];mxr.fillRect(c*u+1,0,u-2,2);mxr.fillRect(0,c*u+1,2,u-2);
+ }
+ if(mxHover>=0){const c=mxHover%8,r=(mxHover/8)|0;if(r<P.S&&c<P.S){mxr.strokeStyle='#ffb000';mxr.strokeRect(c*u+1,r*u+1,u-2,u-2)}}
+}
+function mxEdit(e){
+ const r=mxc.getBoundingClientRect(),u=C0/P.S;
+ const c=Math.min(P.S-1,Math.max(0,((e.clientX-r.left)*(C0/r.width)/u)|0));
+ const rr=Math.min(P.S-1,Math.max(0,((e.clientY-r.top)*(C0/r.height)/u)|0));
+ const fy=(e.clientY-r.top)*(C0/r.height)/(u*Math.max(1,P.S));
+ M[rr*8+c]=Math.max(-1,Math.min(1,fy*2-1));
+ if(P.preset!==5){P.preset=5;markModes()}
+ drawMx();pushHash();
+}
+const C0=212;
+mxc.addEventListener('pointerdown',e=>{mxDown=true;mxc.setPointerCapture(e.pointerId);mxEdit(e)});
+mxc.addEventListener('pointermove',e=>{const r=mxc.getBoundingClientRect(),u=C0/P.S;const c=Math.min(7,Math.max(0,((e.clientX-r.left)*(C0/r.width)/u)|0)),rr=Math.min(7,Math.max(0,((e.clientY-r.top)*(C0/r.height)/u)|0));mxHover=rr*8+c;if(mxDown)mxEdit(e);else drawMx()});
+mxc.addEventListener('pointerup',()=>mxDown=false);
+mxc.addEventListener('pointerleave',()=>{if(!mxDown){mxHover=-1;drawMx()}});
+
+/* ---------- toast ---------- */
+let toastT=null;
+function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),1500)}
+
+/* ---------- operate ---------- */
+function togglePause(){run=!run;$('#bpause').textContent=run?'HOLD':'RUN';if(!run&&RM)render()}
+$('#bpause').addEventListener('click',togglePause);
+$('#breset').addEventListener('click',()=>{reseed();toast('RESEEDED');if(RM||!run)render()});
+$('#brnd').addEventListener('click',()=>{M=MODES[P.preset].gen();const a=P.preset===3?0.22:0.15;for(let i=0;i<64;i++)if(M[i]!==0)M[i]=Math.max(-1,Math.min(1,M[i]+rnd(-a,a)));if(P.preset!==5){P.preset=5;markModes()}drawMx();toast('TABLE RE-DEALT');pushHash(true)});
+$('#bshare').addEventListener('click',()=>{pushHash(true);toast('STATE IN ADDRESS BAR')});
+$('#bptr').addEventListener('click',()=>{P.ptr=(P.ptr+1)%3;$('#bptr').textContent=PTRN[P.ptr];pushHash()});
+$('#bptr').textContent=PTRN[P.ptr];
+$('#bnotes').addEventListener('click',()=>{$('#ntab1').click()});
+addEventListener('keydown',e=>{
+ if(e.code==='Space'){e.preventDefault();togglePause()}
+ else if(e.key==='r'||e.key==='R')$('#breset').click();
+ else if(e.key==='h'||e.key==='H')$('#brnd').click();
+ else if(e.key==='m'||e.key==='M')applyPreset((P.preset+1)%MODES.length);
+ else if(e.key==='c'||e.key==='C')$('#bshare').click();
+ else if(e.key==='p'||e.key==='P')$('#bptr').click();
+ else if(e.key>='1'&&e.key<='6'){const k=+e.key-1;if(k<MODES.length)applyPreset(k)}
+});
+
+/* ---------- notes tabs ---------- */
+$$('.tab').forEach(tb=>tb.addEventListener('click',()=>{}));
+$('#ntab1').addEventListener('click',()=>showPage('pg-plate',0));
+$('#ntab2').addEventListener('click',()=>showPage('pg-method',1));
+function showPage(id,tabIdx){
+ const pg=$('#'+id),open=pg.classList.contains('on');
+ $$('.page').forEach(p=>p.classList.remove('on'));
+ $('#ntab1').classList.toggle('on',false);$('#ntab2').classList.toggle('on',false);
+ if(!open){pg.classList.add('on');$(tabIdx===0?'#ntab1':'#ntab2').classList.add('on')}
+}
+
+/* ---------- canvas pointer ---------- */
+cvs.addEventListener('pointerdown',e=>{paint=true;pxp=e.clientX;pyp=e.clientY;cvs.setPointerCapture(e.pointerId)});
+cvs.addEventListener('pointermove',e=>{if(paint){pxp=e.clientX;pyp=e.clientY}});
+cvs.addEventListener('pointerup',()=>paint=null);
+cvs.addEventListener('pointercancel',()=>paint=null);
+
+/* ---------- mobile ---------- */
+$('#mob').addEventListener('click',()=>{const p=$('#panel');p.classList.toggle('open');$('#mob').textContent=p.classList.contains('open')?'CLOSE':'PANEL'});
+
+/* ---------- resize ---------- */
+let rsT=null;
+function size(){
+ W=innerWidth;H=innerHeight;
+ const d=Math.min(2,devicePixelRatio||1);
+ cvs.width=(W*d)|0;cvs.height=(H*d)|0;
+ ctx.setTransform(d,0,0,d,0,0);
+ clearTrails();
+}
+addEventListener('resize',()=>{clearTimeout(rsT);rsT=setTimeout(()=>{size();head=null;if(RM||!run)render()},120)});
+
+/* ---------- loop ---------- */
+let last=performance.now(),ema=16.7,hudT=0;
+function loop(now){
+ const ms=now-last;last=now;ema+=(ms-ema)*0.06;fps=1000/Math.max(1,ema);
+ if(run){step();render()}
+ if(now-hudT>260){hudT=now;
+  $('#fps').textContent=Math.round(fps)+' FPS';
+  $('#hagents').textContent=n;
+  $('#hspec').textContent=P.S;
+  $('#htime').textContent=t.toFixed(1);
+  $('#hmode').textContent=MODES[P.preset].name;
+ }
+ window.__GETSTATE=()=>({speed:+meanSpeed.toFixed(3),steps:stepCount});
+ requestAnimationFrame(loop);
+}
+
+/* ---------- boot ---------- */
+const hh0=location.hash.slice(1);let had=false;
+if(hh0.length>8){try{had=dec(hh0)}catch(e){had=false}}
+size();buildFaders();buildModes();
+if(had){syncUI();markModes();drawMx();reseed();pushHash(true)}
+else applyPreset(0);
+if(RM){render();$('#bpause').textContent='RUN'}
+else requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

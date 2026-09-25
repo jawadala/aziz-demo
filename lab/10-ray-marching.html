@@ -1,0 +1,337 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a0a0b"><meta name="description" content="STYDYS No. 10. Signed distance fields, sphere tracing, brushed-platinum light on charcoal. Drag to orbit with inertia. Single file, no network."><title>STYDYS No. 10 — Marcheur — JAWAD</title>
+<style>
+:root{--bg:#0a0a0b;--pan:#111113;--mt:#c9ccd1;--mtb:#eceef1;--mtd:#87898f;--faint:#7c7e84;--line:rgba(200,204,210,.26);--line2:rgba(200,204,210,.13)}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:#e8e9ec;font:13.5px/1.55 "Courier New",ui-monospace,Menlo,monospace;display:flex;flex-direction:column;min-height:100dvh}
+button,select,input,kbd,.lb,.spec,.keys,footer,#st,.step b{font-family:"Courier New",ui-monospace,Menlo,monospace}
+main{flex:1;position:relative;min-height:52dvh}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#wm{position:absolute;top:26px;left:30px;border-left:1px solid var(--line);padding:2px 0 4px 18px;z-index:6;pointer-events:none}
+#wm .org{font-weight:700;font-size:9px;letter-spacing:.34em;color:var(--mtd)}
+#wm h1{font:italic 700 44px/1 Didot,'Bodoni MT','Playfair Display','Times New Roman',serif;letter-spacing:.01em;margin:8px 0 2px;color:#f2f3f5}
+#wm .no{font:700 12px/1 "Courier New",monospace;letter-spacing:.42em;color:var(--mt)}
+.spec{position:absolute;top:30px;right:30px;text-align:right;font-size:9px;line-height:2;letter-spacing:.22em;color:var(--faint);z-index:6;pointer-events:none}
+#keys{position:absolute;bottom:118px;left:30px;font-weight:700;font-size:8.5px;line-height:2;letter-spacing:.18em;color:var(--faint);z-index:6;pointer-events:none}
+#meta{position:absolute;bottom:118px;right:30px;text-align:right;z-index:6}
+#st{display:block;font-weight:700;font-size:10px;letter-spacing:.18em;color:var(--mt);font-variant-numeric:tabular-nums}
+#dock{position:absolute;left:0;right:0;bottom:0;display:flex;flex-wrap:wrap;align-items:stretch;border-top:1px solid var(--line2);background:linear-gradient(180deg,rgba(15,15,17,.80),rgba(11,11,12,.97));z-index:8}
+.dz{display:flex;flex-direction:column;gap:5px;padding:12px 16px;border-right:1px solid var(--line2);min-width:112px}
+.lb{font-weight:700;font-size:8.5px;letter-spacing:.26em;color:var(--mtd)}
+.step{display:flex;align-items:center;gap:7px}
+.step button{width:19px;height:19px;padding:0;line-height:1;background:transparent;border:1px solid var(--line);color:var(--mt);font:700 12px "Courier New",monospace;cursor:pointer}
+.step button:hover{background:var(--mt);color:#101012}
+.step b{font-weight:700;font-size:12px;min-width:38px;text-align:center;color:var(--mtb)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:96px;height:14px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--line2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;background:var(--mt);border:1px solid #101012;margin-top:-5px}
+input[type=range]::-moz-range-track{height:1px;background:var(--line2)}
+input[type=range]::-moz-range-thumb{width:9px;height:9px;background:var(--mt);border:1px solid #101012;border-radius:0}
+.bat{display:flex}
+.bat button{border-right-width:0;padding:6px 10px}
+.bat button:last-child{border-right-width:1px}
+.bat button.on{background:var(--mt);color:#101012;border-color:var(--mt)}
+select,button{background:transparent;color:#e8e9ec;border:1px solid var(--line);padding:6px 11px;font-weight:700;font-size:10px;letter-spacing:.14em;cursor:pointer}
+select:hover,button:hover{border-color:var(--mt);color:var(--mtb)}
+button.on{background:var(--mt);color:#101012;border-color:var(--mt)}
+button.sec{border-style:dashed}
+.ghost{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0}
+.sw{display:flex;align-items:center;gap:8px;font-weight:700;font-size:9px;letter-spacing:.2em;color:var(--faint);cursor:pointer;user-select:none}
+.sw input{-webkit-appearance:none;appearance:none;width:26px;height:14px;border:1px solid var(--line);background:transparent;position:relative;cursor:pointer;margin:0}
+.sw input::after{content:"";position:absolute;top:2px;left:2px;width:8px;height:8px;background:var(--mtd)}
+.sw input.on{border-color:var(--mt)}
+.sw input.on::after{left:14px;background:var(--mt)}
+.sw i{font-style:normal}
+.sw:hover{color:var(--mt)}
+.dz.swaps{flex-direction:row;align-items:center;gap:14px;flex-wrap:wrap}
+.dz.btns{flex-direction:row;align-items:center;gap:8px;flex-wrap:wrap}
+#meta .lnk{margin-top:6px}
+.scan{position:fixed;inset:0;pointer-events:none;z-index:32;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);opacity:.5}
+.mk{position:fixed;width:13px;height:13px;z-index:33;pointer-events:none;opacity:.4;background:linear-gradient(var(--mt),var(--mt)) center/1px 100% no-repeat,linear-gradient(var(--mt),var(--mt)) center/100% 1px no-repeat}
+.mk.tl{top:8px;left:18px}.mk.tr{top:8px;right:18px}.mk.bl{bottom:8px;left:18px}.mk.br{bottom:8px;right:18px}
+.vig{position:fixed;inset:0;pointer-events:none;z-index:30;background:radial-gradient(ellipse at 50% 42%,transparent 46%,rgba(0,0,0,.52) 100%)}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:31;opacity:.38;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E")}
+.vlab{position:fixed;writing-mode:vertical-rl;font-weight:700;font-size:8.5px;letter-spacing:.34em;color:var(--mtd);z-index:5;right:10px;top:34%;pointer-events:none}
+nav#tabs{display:flex;border-top:1px solid var(--line2);background:var(--pan);position:relative;z-index:8}
+#tabs button{border:0;border-right:1px solid var(--line2);background:transparent;color:var(--faint);padding:10px 22px;font-size:10px;letter-spacing:.26em}
+#tabs button.on{color:var(--mtb);border-bottom:1px solid var(--mt)}
+.pane{display:none;background:var(--pan);border:1px solid var(--line2);margin:20px 30px 22px;max-width:730px;padding:6px 28px 22px;font-size:13px}
+.pane.show{display:block}
+.pane h3{font-size:9.5px;font-weight:700;letter-spacing:.3em;color:var(--mt);margin:16px 0 7px}
+.pane p{margin:7px 0;color:#c8c9cd}
+.pane b{color:var(--mtb)}
+.pane .m{display:block;font-size:12px;background:#0c0c0e;border:1px solid var(--line2);padding:8px 11px;margin:9px 0;overflow-x:auto;white-space:nowrap;color:var(--mtb)}
+.pane ul{padding-left:18px}
+.pane li{margin:3px 0;color:#c8c9cd}
+kbd{border:1px solid var(--line);padding:0 5px;font-weight:700;font-size:10px;color:var(--mtb)}
+footer{border-top:1px solid var(--line2);padding:9px 30px;font-weight:700;font-size:8.5px;letter-spacing:.3em;color:var(--mtd);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;position:relative;z-index:8}
+@media(max-width:960px){.spec,.vlab,#keys{display:none}.dz{min-width:100px;padding:10px 12px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<main><canvas id="c"></canvas>
+<header id="wm">
+<div class="org">JAWAD · SYSTEMS LABORATORY</div>
+<h1>Marcheur</h1>
+<div class="no">STYDYS No. 10</div>
+</header>
+<div class="spec">SIGNED DISTANCE FIELDS · SPHERE TRACING<br>DRAG ORBIT · WHEEL DOLLY<br>AUTO-ORBIT AFTER 2.8 S IDLE</div>
+<div id="keys">SPACE RUN/HALT · R RESET · N SHUFFLE · S SHADOWS · A AUTO-ORBIT<br>1-4 SCENE · ARROWS ORBIT · +/- DOLLY</div>
+<div id="meta"><span id="st">booting</span><button id="cp" class="lnk" title="copy state link">LINK</button></div>
+<aside id="dock">
+<div class="dz"><span class="lb">SCENE</span><div class="bat" id="bat"><button type="button" data-v="garden" class="on">GARDEN</button><button type="button" data-v="meta">METABALL</button><button type="button" data-v="bulb">BULB</button><button type="button" data-v="gyroid">GYROID</button></div><select id="scene" class="ghost">
+<option value="garden">BLEND GARDEN</option><option value="meta">METABALL UNION</option>
+<option value="bulb">MANDELBULB</option><option value="gyroid">GYROID SHELL</option></select></div>
+<div class="dz"><span class="lb">STEPS</span><span class="step"><button id="aD" type="button">−</button><b id="v1">96</b><button id="aU" type="button">+</button></span><input id="s1" type="range" min="32" max="160" step="4" value="96"></div>
+<div class="dz"><span class="lb">MELT</span><span class="step"><button id="bD" type="button">−</button><b id="v2">0.40</b><button id="bU" type="button">+</button></span><input id="s2" type="range" min="0.05" max="1.2" step="0.01" value="0.4"></div>
+<div class="dz"><span class="lb">KEY LIGHT</span><span class="step"><button id="dD" type="button">−</button><b id="v4">126</b><button id="dU" type="button">+</button></span><input id="s4" type="range" min="0" max="360" step="1" value="126"></div>
+<div class="dz"><span class="lb">DRIFT</span><span class="step"><button id="cD" type="button">−</button><b id="v3">1.00</b><button id="cU" type="button">+</button></span><input id="s3" type="range" min="0" max="2" step="0.05" value="1"></div>
+<div class="dz"><span class="lb">PHASE</span><span class="step"><button id="eD" type="button">−</button><b id="v5">44</b><button id="eU" type="button">+</button></span><input id="s5" type="range" min="0" max="359" value="44"></div>
+<div class="dz"><span class="lb">RES</span><span class="step"><button id="fD" type="button">−</button><b id="v6">0.75</b><button id="fU" type="button">+</button></span><input id="s6" type="range" min="0.35" max="1" step="0.05" value="0.75"></div>
+<div class="dz swaps">
+<label class="sw"><input id="sh" type="checkbox" class="on" checked><i>SHADOWS</i></label>
+<label class="sw"><input id="aro" type="checkbox" class="on" checked><i>AUTO-ORBIT</i></label>
+</div>
+<div class="dz btns">
+<button id="pz">HALT</button><button id="rs">RESET</button><button id="rn" class="sec">SHUFFLE</button>
+</div>
+</aside>
+<div class="vig"></div><div class="grain"></div>
+<div class="vlab">NO. 10 · PLATINUM ON CHARCOAL · SDF MONOLITH</div>
+</main>
+<nav id="tabs"><button class="tab on" data-t="c">FIELD NOTES</button><button class="tab" data-t="a">SERVICE DATA</button></nav>
+<section id="pane-c" class="pane show">
+<h3>PRINCIPLE</h3>
+<p>No triangles. The scene is <b>one function</b> answering a single question from any point in space: distance to the nearest surface. The function never overstates; each step is the largest safe stride. A ray from the camera through every pixel repeats the stride until it touches matter or escapes.</p>
+<h3>FORMULATION</h3>
+<p>Signed distance field <span class="m">f(p) → ℝ</span>: negative inside matter, positive outside. From point p the largest step that cannot hit anything is exactly f(p).</p>
+<div class="m">repeat:  t ← t + f(ro + rd·t)   until f &lt; ε  (hit)  or  t &gt; tmax (miss)</div>
+<p>Primitives compose with min/max. The <b>MELT</b> control widens the polynomial bulge that fuses primitives:</p>
+<div class="m">smin(a,b,k):  h = clamp(.5 + .5(b−a)/k, 0, 1) →  mix(b,a,h) − k·h(1−h)</div>
+<div class="m">n = normalize( ∇f )   via central differences with step ε</div>
+<p>Soft shadows are a <b>second march</b> toward the key light: the pixel dims by how narrowly the ray clears intervening matter. No shadow maps. Four studies. GARDEN — torus, sphere and cube melted over a gridded floor. METABALL — six drifting masses under a wide melt constant. BULB — distance estimator iterating z → z⁸ + c in spherical coordinates. GYROID — a sin·cos lattice, thickened and clipped by a sphere.</p>
+</section>
+<section id="pane-a" class="pane">
+<h3>SERVICE DATA</h3>
+<ul>
+<li>Single file. No dependencies, no fonts, no images, no network calls.</li>
+<li>Renderer: one fragment shader on a fullscreen triangle; the CPU uploads 13 uniforms per frame.</li>
+<li><b>RES</b> scales the framebuffer 0.35–1.0× device pixels; integrated GPUs hold 60 fps.</li>
+<li>No WebGL: a <b>software raymarcher</b> takes over — same field functions, same loop, 96×72.</li>
+<li>Orbit inertia after release; auto-orbit after 2.8 s idle, toggle <kbd>A</kbd>.</li>
+<li>State lives in the URL hash. <b>LINK</b> copies it, camera included.</li>
+<li><b>prefers-reduced-motion</b>: single still frame; orbit redraws on demand.</li>
+</ul>
+<h3>KEYS</h3>
+<ul>
+<li><kbd>SPACE</kbd> run / halt · <kbd>R</kbd> reset · <kbd>N</kbd> shuffle · <kbd>S</kbd> shadows · <kbd>A</kbd> auto-orbit</li>
+<li><kbd>1</kbd>–<kbd>4</kbd> scene · <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> orbit · <kbd>+</kbd>/<kbd>−</kbd> dolly</li>
+</ul>
+<h3>PROVENANCE</h3>
+<p>STYDYS sheet No. 10. Concept, code, lighting: JAWAD.</p>
+</section>
+<footer><span>JAWAD · SYSTEMS LABORATORY</span><span>STYDYS No. 10 · SINGLE FILE · NO NETWORK</span></footer>
+<div class="scan"></div>
+<div class="mk tl"></div><div class="mk tr"></div><div class="mk bl"></div><div class="mk br"></div>
+<script>
+addEventListener('error',e=>{window.__err=(window.__err||[]).concat(String(e.message))});
+const $=i=>document.getElementById(i),cv=$('c'),st=$('st');
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SCN={garden:0,meta:1,bulb:2,gyroid:3},NAME=['Blend Garden','Metaball Union','Mandelbulb','Gyroid Shell'];
+let scene=0,steps=96,blend=.4,lightD=126,speed=1,hue=44,qual=.75,shadows=true;
+let seed=2.7,yaw=.65,pit=.34,zoom=5.2,T=0,paused=false,mode='gl';
+let vyaw=0,vpit=0,idleT=0,dragging=false,autoO=true;
+let W=0,H=0,gl=null,prog=null,U={};
+const VS='attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+const FS=`precision highp float;
+uniform vec2 uR;uniform float uT,uY,uP,uK,uH,uL,uS,uZ,uG;uniform int uN,uSc,uSh;
+mat2 rt(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
+float sdS(vec3 p,float r){return length(p)-r;}
+float sdO(vec3 p,vec2 t){vec2 q=vec2(length(p.xz)-t.x,p.y);return length(q)-t.y;}
+float sdB(vec3 p,vec3 b){vec3 q=abs(p)-b;return length(max(q,0.))+min(max(q.x,max(q.y,q.z)),0.);}
+float smn(float a,float b,float k){float h=clamp(.5+.5*(b-a)/k,0.,1.);return mix(b,a,h)-k*h*(1.-h);}
+float deB(vec3 p){vec3 z=p;float dr=1.,r=max(length(p),1e-4);
+for(int i=0;i<7;i++){if(r>2.4)break;float th=acos(clamp(z.z/r,-1.,1.))*8.,ph=atan(z.y,z.x)*8.;float zr=pow(r,8.);dr=pow(r,7.)*8.*dr+1.;z=zr*vec3(sin(th)*cos(ph),sin(th)*sin(ph),cos(th))+p;r=length(z);if(r>2.4)break;}
+return .5*log(r)*r/max(dr,1e-9);}
+float map(vec3 p){
+ if(uSc==2){vec3 q=p;q.xz=rt(uT*.2)*q.xz;q*=1.25;return deB(q)/1.25;}
+ if(uSc==3){vec3 q=p;q.xz=rt(uT*.25)*q.xz;float f=3.;
+  float g=sin(q.x*f)*cos(q.y*f)+sin(q.y*f)*cos(q.z*f)+sin(q.z*f)*cos(q.x*f);
+  return max(abs(g)/f-.045,length(p)-2.1);}
+ if(uSc==1){float d=p.y+1.2;float k=.85+uK;
+  for(int i=0;i<6;i++){float fi=float(i);
+   vec3 c=vec3(sin(uT*.9+fi*2.1+uS)*1.4,.62+.42*sin(uT*1.25+fi*1.3),cos(uT*.75+fi*1.7+uS)*1.4);
+   d=smn(d,sdS(p-c,.5+.13*sin(fi+uS)),k);}
+  return d;}
+ float d=p.y+1.;
+ vec3 q=p;q.xz=rt(uT*.5)*q.xz;
+ d=smn(d,sdO(q-vec3(0.,.9,0.),vec2(1.05,.32)),uK);
+ vec3 sp=p-vec3(sin(uS+uT*.7)*1.35,.62+.25*sin(uT*1.3),cos(uS*1.7+uT*.7)*1.35);
+ d=smn(d,sdS(sp,.55),uK);
+ vec3 b=p-vec3(-1.45,.55,-.3+.6*sin(uS));b.xz=rt(-uT*.7)*b.xz;
+ d=smn(d,sdB(b,vec3(.42)),uK);
+ return d;}
+vec3 nrm(vec3 p){vec2 e=vec2(.0015,0.);
+return normalize(vec3(map(p+e.xyy)-map(p-e.xyy),map(p+e.yxy)-map(p-e.yxy),map(p+e.yyx)-map(p-e.yyx)));}
+float shd(vec3 p,vec3 l){float s=1.,t=.06;
+for(int i=0;i<24;i++){float h=map(p+l*t);s=min(s,9.*h/t);t+=clamp(h,.06,.45);if(s<.015||t>11.)break;}return clamp(s,0.,1.);}
+vec3 pal(float t){vec3 w=vec3(1.);vec3 m=mix(vec3(.06,.06,.07),vec3(.30),clamp(uG,0.,1.));return mix(m,w,t);}
+void main(){
+ vec2 uv=(2.*gl_FragCoord.xy-uR)/uR.y;
+ float cp=cos(uP);
+ vec3 ro=vec3(-sin(uY)*uZ*cp,.5+uZ*sin(uP),-cos(uY)*uZ*cp);
+ vec3 fw=normalize(vec3(0.,.4,0.)-ro);vec3 rr=normalize(cross(fw,vec3(0.,1.,0.)));vec3 up=cross(rr,fw);
+ vec3 rd=normalize(fw*1.8+rr*uv.x+up*uv.y);
+ float t=0.;bool hit=false;
+ for(int i=0;i<160;i++){if(i>=uN)break;float d=map(ro+rd*t);if(d<.0012*max(t,1.)){hit=true;break;}t+=d;if(t>18.)break;}
+ vec3 sky=mix(vec3(.020,.020,.023),vec3(.062,.060,.055),clamp(uv.y*.5+.5,0.,1.));
+ vec3 col=sky;
+ if(hit){vec3 p=ro+rd*t;vec3 n=nrm(p);
+  vec3 ld=normalize(vec3(cos(uL),.75,sin(uL)));
+  float dif=max(dot(n,ld),0.);
+  float sh=uSh==1?shd(p+n*.02,ld):1.;
+  float fre=pow(clamp(1.+dot(n,rd),0.,1.),3.);
+  bool gnd=(uSc==0||uSc==1)&&p.y<-1.05;
+  vec3 alb=gnd?vec3(.030,.029,.027):pal(clamp(.24+.32*n.y+.16*sh+.05*sin(uS*3.1),0.,1.));
+  col=alb*(dif*sh*vec3(1.,.97,.90)*1.38+(.4+.4*n.y)*vec3(.085,.083,.078));
+  if(gnd){float g=max(step(.965,fract(p.x*.55)),step(.965,fract(p.z*.55)));col+=vec3(.75,.73,.68)*g*.085*sh;}
+  col+=fre*vec3(.85,.84,.80)*.42;
+  col=mix(col,sky,smoothstep(9.,18.,t));}
+ col=pow(max(col,0.),vec3(.4545));
+ col*=1.-.18*dot(uv,uv);
+ gl_FragColor=vec4(col,1.);}`;
+function smn(a,b,k){const h=Math.max(0,Math.min(1,.5+.5*(b-a)/k));return b+(a-b)*h-k*h*(1-h)}
+function mapp(x,y,z){switch(scene){
+case 1:{let d=y+1.2,k=.85+blend;
+ for(let i=0;i<6;i++){const cx=Math.sin(T*.9+i*2.1+seed)*1.4,cy=.62+.42*Math.sin(T*1.25+i*1.3),cz=Math.cos(T*.75+i*1.7+seed)*1.4;
+  d=smn(d,Math.hypot(x-cx,y-cy,z-cz)-(.5+.13*Math.sin(i+seed)),k)}
+ return d}
+case 2:{const w=T*.2,c=Math.cos(w),s=Math.sin(w);let px=(x*c-z*s)*1.25,py=y*1.25,pz=(x*s+z*c)*1.25;
+ let zx=px,zy=py,zz=pz,dr=1,r=Math.max(Math.hypot(px,py,pz),1e-4),r0=r;
+ for(let i=0;i<7;i++){if(r>2.4)break;const th=Math.acos(Math.max(-1,Math.min(1,zz/r)))*8,ph=Math.atan2(zy,zx)*8,zr=Math.pow(r,8);dr=Math.pow(r,7)*8*dr+1;
+  zx=zr*Math.sin(th)*Math.cos(ph)+px;zy=zr*Math.sin(th)*Math.sin(ph)+py;zz=zr*Math.cos(th)+pz;r=Math.hypot(zx,zy,zz)}
+ return .5*Math.log(r)*r0/Math.max(dr,1e-9)/1.25}
+case 3:{const w=T*.25,c=Math.cos(w),s=Math.sin(w);const qx=x*c-z*s,qz=x*s+z*c,f=3.;
+ const g=Math.sin(qx*f)*Math.cos(y*f)+Math.sin(y*f)*Math.cos(qz*f)+Math.sin(qz*f)*Math.cos(qx*f);
+ return Math.max(Math.abs(g)/f-.045,Math.hypot(x,y,z)-2.1)}
+default:{let d=y+1;const w=T*.5,c=Math.cos(w),s=Math.sin(w);
+ let qx=x*c-z*s,qz=x*s+z*c,l=Math.hypot(qx,qz)-1.05;d=smn(d,Math.hypot(l,y-.9)-.32,blend);
+ const sx=x-Math.sin(seed+T*.7)*1.35,sy=y-(.62+.25*Math.sin(T*1.3)),sz=z-Math.cos(seed*1.7+T*.7)*1.35;
+ d=smn(d,Math.hypot(sx,sy,sz)-.55,blend);
+ let bx=x+1.45,by=y-.55,bz=z-.3+.6*Math.sin(seed);const w2=-T*.7,c2=Math.cos(w2),s2=Math.sin(w2);
+ const rx=bx*c2-bz*s2,rz=bx*s2+bz*c2;bx=Math.abs(rx)-.42;by=Math.abs(by)-.42;bz=Math.abs(rz)-.42;
+ d=smn(d,Math.hypot(Math.max(bx,0),Math.max(by,0),Math.max(bz,0))+Math.min(Math.max(bx,Math.max(by,bz)),0),blend);
+ return d}}}
+function pal3(t){const w=1,m=.16;return[m+(w-m)*t,m+(w-m)*t,m+(w-m)*t]}
+function size(){const d=Math.min(devicePixelRatio||1,2);W=cv.clientWidth||innerWidth;H=cv.clientHeight||innerHeight;
+ const q=mode==='gl'?qual:1;cv.width=Math.max(64,Math.round(W*d*q));cv.height=Math.max(48,Math.round(H*d*q))}
+function initGL(){try{gl=cv.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'})||cv.getContext('experimental-webgl');if(!gl)return;
+ function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS)){window.__err=(window.__err||[]).concat(gl.getShaderInfoLog(o));return null}return o}
+ const v=sh(gl.VERTEX_SHADER,VS),f=sh(gl.FRAGMENT_SHADER,FS);if(!v||!f){gl=null;return}
+ prog=gl.createProgram();gl.attachShader(prog,v);gl.attachShader(prog,f);gl.linkProgram(prog);
+ if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){window.__err=(window.__err||[]).concat(gl.getProgramInfoLog(prog));gl=null;return}
+ gl.useProgram(prog);const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);
+ gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+ const lp=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(lp);gl.vertexAttribPointer(lp,2,gl.FLOAT,false,0,0);
+ ['uR','uT','uY','uP','uK','uH','uL','uS','uZ','uG','uN','uSc','uSh'].forEach(n=>U[n]=gl.getUniformLocation(prog,n));}catch(e){gl=null}}
+let swx=null,img=null;const SWW=96,SWH=72;
+function renderSW(){if(!swx){const t=document.createElement('canvas');t.width=SWW;t.height=SWH;swx=t.getContext('2d');img=swx.createImageData(SWW,SWH)}
+ const d=img.data,cp=Math.cos(pit);
+ const ro=[-Math.sin(yaw)*zoom*cp,.5+zoom*Math.sin(pit),-Math.cos(yaw)*zoom*cp];
+ let fw=[-ro[0],.4-ro[1],-ro[2]];const fl=Math.hypot(...fw)||1;fw=fw.map(a=>a/fl);
+ let rr=[fw[2],0,-fw[0]];const rl=Math.hypot(...rr)||1;rr=rr.map(a=>a/rl);
+ const up=[rr[1]*fw[2]-rr[2]*fw[1],rr[2]*fw[0]-rr[0]*fw[2],rr[0]*fw[1]-rr[1]*fw[0]];
+ const li=lightD*Math.PI/180,ld=[Math.cos(li),.75,Math.sin(li)],ll=Math.hypot(...ld);
+ let o=0;
+ for(let py=0;py<SWH;py++)for(let px=0;px<SWW;px++){
+  const ux=(2*px/SWW-1)*(SWW/SWH)/2,uy=-(2*py/SWH-1)/2;
+  let rd=[fw[0]*1.8+rr[0]*ux+up[0]*uy,fw[1]*1.8+rr[1]*ux+up[1]*uy,fw[2]*1.8+rr[2]*ux+up[2]*uy];
+  const rdl=Math.hypot(...rd);rd=rd.map(a=>a/rdl);
+  let t=0,hit=false;
+  for(let i=0;i<steps;i++){const dd=mapp(ro[0]+rd[0]*t,ro[1]+rd[1]*t,ro[2]+rd[2]*t);if(dd<.002*Math.max(t,1)){hit=true;break}t+=dd;if(t>18)break}
+  let col;
+  const f=Math.max(0,Math.min(1,uy*.5+.5)),sky=[6+7*f,6+7*f,7+6*f];
+  if(!hit)col=sky;
+  else{const p=[ro[0]+rd[0]*t,ro[1]+rd[1]*t,ro[2]+rd[2]*t],e=.004;
+   let n=[mapp(p[0]+e,p[1],p[2])-mapp(p[0]-e,p[1],p[2]),mapp(p[0],p[1]+e,p[2])-mapp(p[0],p[1]-e,p[2]),mapp(p[0],p[1],p[2]+e)-mapp(p[0],p[1],p[2]-e)];
+   const nl=Math.hypot(...n)||1;n=n.map(a=>a/nl);
+   const dif=Math.max(0,(n[0]*ld[0]+n[1]*ld[1]+n[2]*ld[2])/ll);
+   const gnd=(scene===0||scene===1)&&p[1]<-1.05;
+   const alb=gnd?[.03,.029,.027]:pal3(Math.min(1,.24+.32*n[1]+.16*(dif||0)+.05*Math.sin(seed*3.1)));
+   const amb=.4+.4*n[1];
+   col=[alb[0]*(dif*1.38+amb*.09),alb[1]*(dif*1.38+amb*.09),alb[2]*(dif*1.38+amb*.09)].map(v=>Math.pow(Math.max(0,Math.min(1.6,v)),.4545)*255)}
+  d[o++]=col[0];d[o++]=col[1];d[o++]=col[2];d[o++]=255}
+ swx.putImageData(img,0,0)}
+function draw(){if(mode==='gl'){gl.viewport(0,0,cv.width,cv.height);
+  gl.uniform2f(U.uR,cv.width,cv.height);gl.uniform1f(U.uT,T);gl.uniform1f(U.uY,yaw);gl.uniform1f(U.uP,pit);
+  gl.uniform1f(U.uK,blend);gl.uniform1f(U.uH,hue/360);gl.uniform1f(U.uL,lightD*Math.PI/180);gl.uniform1f(U.uS,seed);gl.uniform1f(U.uG,.62);
+  gl.uniform1f(U.uZ,zoom);gl.uniform1i(U.uN,steps);gl.uniform1i(U.uSc,scene);gl.uniform1i(U.uSh,shadows?1:0);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+ }else{renderSW();const X=cv.getContext('2d');X.imageSmoothingEnabled=true;X.drawImage(swx.canvas,0,0,cv.width,cv.height)}}
+let last=0,fc=0,ft=0,fps=0,swTick=0;
+function frame(ts){requestAnimationFrame(frame);const dt=Math.min(50,ts-last||16);last=ts;
+ if(!paused){T+=dt*.0004*speed}
+ vyaw*=.94;vpit*=.94;yaw+=vyaw;pit=Math.max(-.15,Math.min(1.2,pit+vpit));
+ idleT+=dt;if(autoO&&!dragging&&idleT>2800)yaw+=dt*5.4e-5;
+ if(mode!=='gl'){if((swTick=(swTick+1)%3)===0||paused)draw()}else draw();
+ fc++;ft+=dt;if(ft>500){fps=Math.round(fc*1000/ft);fc=0;ft=0;hud()}}
+function hud(){st.textContent=`${fps||0} FPS · ${cv.width}×${cv.height} · STEP ${steps} · ${NAME[scene].toUpperCase()}${mode==='gl'?'':' · SW RASTER'}`}
+function syncUI(){$('scene').value=Object.keys(SCN).find(k=>SCN[k]===scene);
+ const map={1:steps,2:blend,3:speed,4:lightD,5:hue,6:qual};
+ for(let i=1;i<=6;i++){$('s'+i).value=map[i]}
+ $('v1').textContent=steps;$('v2').textContent=blend.toFixed(2);$('v3').textContent=speed.toFixed(2);
+ $('v4').textContent=lightD;$('v5').textContent=hue;$('v6').textContent=qual.toFixed(2);
+ $('sh').classList.toggle('on',shadows);document.querySelectorAll('#bat button').forEach(b=>b.classList.toggle('on',b.dataset.v===Object.keys(SCN).find(k=>SCN[k]===scene)));const ao=$('aro');if(ao){ao.checked=autoO;ao.classList.toggle('on',autoO)}}
+function reset(){scene=0;steps=96;blend=.4;lightD=126;speed=1;hue=44;qual=.75;shadows=true;seed=2.7;yaw=.65;pit=.34;zoom=5.2;vyaw=vpit=0;paused=false;$('pz').textContent='HALT';$('pz').classList.remove('on');if(mode==='gl')size();syncUI();saveHash();draw()}
+function randomize(){seed=Math.random()*10;hue=(Math.random()*360)|0;lightD=(Math.random()*360)|0;blend=.1+Math.random()*.9;steps=48+4*((Math.random()*20)|0);
+ syncUI();saveHash();if(RM)draw()}
+for(let i=1;i<=6;i++){$('s'+i).oninput=e=>{const v=+e.target.value;if(i===1)steps=v;else if(i===2)blend=v;else if(i===3)speed=v;else if(i===4)lightD=v;else if(i===5)hue=v;else{qual=v;if(mode==='gl')size()}
+ $('v'+i).textContent=i===2?blend.toFixed(2):i===3?speed.toFixed(2):i===6?qual.toFixed(2):v;saveHash();if(RM)draw()}}
+$('scene').onchange=e=>{scene=SCN[e.target.value];saveHash();if(RM)draw()};
+document.querySelectorAll('#bat button').forEach(b=>b.addEventListener('click',()=>{$('scene').value=b.dataset.v;$('scene').dispatchEvent(new Event('change'))}));
+function stepBind10(inpId,dec,inc,by,fix){const inp=$(inpId);const bump=d=>{const v=Math.max(+inp.min,Math.min(+inp.max,+inp.value+d*by));inp.value=+v.toFixed(fix||0);inp.dispatchEvent(new Event('input'))};$(dec).onclick=()=>bump(-1);$(inc).onclick=()=>bump(1)}
+stepBind10('s1','aD','aU',4);stepBind10('s2','bD','bU',.05,2);stepBind10('s3','cD','cU',.1,2);stepBind10('s4','dD','dU',12);stepBind10('s5','eD','eU',12);stepBind10('s6','fD','fU',.05,2);
+$('sh').onclick=()=>{shadows=!shadows;$('sh').classList.toggle('on',shadows);saveHash();if(RM)draw()};
+$('aro').onchange=e=>{autoO=e.target.checked;$('aro').classList.toggle('on',autoO);idleT=0;saveHash()};
+$('pz').onclick=()=>{paused=!paused;$('pz').textContent=paused?'RUN':'HALT';$('pz').classList.toggle('on',paused)};
+$('rs').onclick=reset;$('rn').onclick=randomize;
+$('cp').onclick=async()=>{saveHash();try{await navigator.clipboard.writeText(location.href);st.textContent='LINK COPIED';setTimeout(hud,1200)}catch(e){st.textContent='LINK IS IN THE URL BAR'}};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===b));$('pane-c').classList.toggle('show',b.dataset.t==='c');$('pane-a').classList.toggle('show',b.dataset.t==='a')});
+let drag=null;
+cv.addEventListener('pointerdown',e=>{try{cv.setPointerCapture(e.pointerId)}catch(err){}drag=[e.clientX,e.clientY];cv.style.cursor='grabbing';dragging=true;idleT=0});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag[0],dy=e.clientY-drag[1];yaw-=dx*.006;pit=Math.max(-.15,Math.min(1.2,pit+dy*.005));vyaw=-dx*.0032;vpit=dy*.0026;drag=[e.clientX,e.clientY];idleT=0;saveHashSoon();if(RM)draw()});
+const dup=()=>{drag=null;dragging=false;cv.style.cursor='grab'};cv.addEventListener('pointerup',dup);cv.addEventListener('pointercancel',dup);
+cv.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(2.6,Math.min(11,zoom*(e.deltaY>0?1.08:.926)));saveHashSoon();if(RM)draw()},{passive:false});
+let hsT=null;function saveHashSoon(){clearTimeout(hsT);hsT=setTimeout(saveHash,300)}
+addEventListener('keydown',e=>{const tag=document.activeElement&&document.activeElement.tagName;if(/INPUT|TEXTAREA|SELECT/.test(tag||''))return;
+ const k=e.key;
+ if(e.code==='Space'){e.preventDefault();$('pz').click()}
+ else if(k==='r'||k==='R')reset();else if(k==='n'||k==='N')randomize();
+ else if(k==='s'||k==='S')$('sh').click();
+ else if(k==='a'||k==='A'){autoO=!autoO;idleT=0;syncUI()}
+ else if(k==='ArrowLeft'){yaw+=.08;e.preventDefault();saveHashSoon()}
+ else if(k==='ArrowRight'){yaw-=.08;e.preventDefault();saveHashSoon()}
+ else if(k==='ArrowUp'){pit=Math.min(1.2,pit+.05);e.preventDefault();saveHashSoon()}
+ else if(k==='ArrowDown'){pit=Math.max(-.15,pit-.05);e.preventDefault();saveHashSoon()}
+ else if(k==='+'||k==='='){zoom=Math.max(2.6,zoom*.9);saveHashSoon()}
+ else if(k==='-'){zoom=Math.min(11,zoom*1.11);saveHashSoon()}
+ else if(/^[1-4]$/.test(k)){scene=+k-1;syncUI();saveHash()}
+ else return;
+ if(RM)draw()});
+function saveHash(){try{const q=new URLSearchParams();
+ q.set('sc',Object.keys(SCN).find(k=>SCN[k]===scene));q.set('st',steps);q.set('li',lightD);q.set('bl',blend.toFixed(2));
+ q.set('sp',speed.toFixed(2));q.set('hu',hue);q.set('q',qual.toFixed(2));if(!shadows)q.set('sh','0');
+ q.set('yw',yaw.toFixed(2));q.set('pt',pit.toFixed(2));q.set('zm',zoom.toFixed(1));if(!autoO)q.set('ao','0');
+ history.replaceState(null,'','#'+q.toString())}catch(e){}}
+function loadHash(){try{const q=new URLSearchParams(location.hash.slice(1));if(![...q].length)return;
+ const s=q.get('sc');if(s&&SCN[s]!==undefined)scene=SCN[s];
+ steps=Math.max(32,Math.min(160,+q.get('st')||96));lightD=Math.max(0,Math.min(360,+q.get('li')||126));
+ blend=Math.max(.05,Math.min(1.2,+q.get('bl')||.4));speed=Math.max(0,Math.min(2,+q.get('sp')||1));
+ hue=Math.max(0,Math.min(359,+q.get('hu')||44));qual=Math.max(.35,Math.min(1,+q.get('q')||.75));
+ shadows=q.get('sh')!=='0';yaw=+q.get('yw')||.65;autoO=q.get('ao')!=='0';pit=Math.max(-.15,Math.min(1.2,+q.get('pt')||.34));
+ zoom=Math.max(2.6,Math.min(11,+q.get('zm')||5.2))}catch(e){}}
+size();initGL();if(!gl){mode='sw';size()}
+addEventListener('resize',()=>{size();draw()});
+loadHash();syncUI();draw();hud();
+if(RM){st.textContent=(mode==='gl'?'WEBGL':'SW RASTER')+' · REDUCED MOTION — STILL FRAME · ORBIT LIVE'}else requestAnimationFrame(frame);
+
+</script></body></html>

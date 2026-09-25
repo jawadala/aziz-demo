@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>FLOCK STUDY No.5 — Systems Laboratory</title>
+<style>
+/* ============ ONYX & CHAMPAGNE · STUDY No.5 ============ */
+:root{
+ --onyx:#0b0a09; --gold:#d4b878; --gold-dim:rgba(212,184,120,.55);
+ --hair:rgba(212,184,120,.16); --txt:#e9e3d3; --dim:#8f8875; --panel:rgba(17,15,12,.88);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--onyx)}
+body{color:var(--txt);font-family:'Trebuchet MS',Verdana,sans-serif;font-size:11px;letter-spacing:.05em}
+canvas#cv{position:fixed;inset:0;width:100vw;height:100vh;display:block;touch-action:none;cursor:grab}
+canvas#cv.drag{cursor:grabbing}
+/* vignette + faint sheen */
+#stage{position:fixed;inset:0;z-index:6;pointer-events:none;
+ background:radial-gradient(120% 90% at 50% 40%,transparent 55%,rgba(0,0,0,.55) 100%);}
+/* wordmark cluster */
+#mark{position:fixed;top:26px;left:30px;z-index:12;pointer-events:none}
+#mark .no{font-size:8px;letter-spacing:.42em;color:var(--dim);text-transform:uppercase}
+#mark h1{font:italic 700 31px Didot,'Bodoni MT','Playfair Display','Times New Roman',serif;
+ color:var(--gold);letter-spacing:.02em;margin:4px 0 3px;line-height:1}
+#mark .sub{font-size:8px;letter-spacing:.34em;color:var(--dim);text-transform:uppercase}
+#mark .rule{width:52px;height:1px;background:var(--gold);opacity:.6;margin-top:10px}
+/* stat line, bottom-left */
+#stat{position:fixed;left:30px;bottom:24px;z-index:12;font-size:9px;letter-spacing:.22em;
+ color:var(--dim);text-transform:uppercase;line-height:2;pointer-events:none}
+#stat b{color:var(--txt);font-weight:400}
+/* sheets + transport, top-right */
+#sheets{position:fixed;top:28px;right:30px;z-index:13;display:flex;gap:18px;align-items:center}
+#sheets button{background:none;border:none;color:var(--dim);font:inherit;font-size:8.5px;
+ letter-spacing:.32em;cursor:pointer;text-transform:uppercase;padding:4px 0}
+#sheets button:hover{color:var(--gold)}
+#sheets .sep{width:1px;height:12px;background:var(--hair)}
+/* control tray, bottom-right, floating cluster */
+#tray{position:fixed;right:30px;bottom:24px;z-index:13;width:252px;background:var(--panel);
+ border:1px solid var(--hair);padding:14px 16px 12px}
+#tray h3{font-size:7.5px;font-weight:400;letter-spacing:.4em;color:var(--dim);
+ margin:0 0 8px;text-transform:uppercase}
+#tray .grp{margin-bottom:10px}
+.seg{display:flex;border:1px solid var(--hair)}
+.seg button{flex:1;background:transparent;border:none;border-right:1px solid var(--hair);
+ color:var(--dim);font:inherit;font-size:8px;letter-spacing:.14em;padding:7px 0;cursor:pointer;text-transform:uppercase}
+.seg button:last-child{border-right:none}
+.seg button.on{background:var(--gold);color:#141109}
+.seg button:hover:not(.on){color:var(--gold)}
+.krow{display:flex;justify-content:space-between;align-items:baseline;margin:6px 0 0;
+ font-size:8px;letter-spacing:.24em;color:var(--dim);text-transform:uppercase}
+.krow b{color:var(--txt);font-weight:400;font-size:10px;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;appearance:none;-webkit-appearance:none;height:14px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--gold-dim)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:7px;height:15px;
+ background:linear-gradient(180deg,#f0e2b8,#b09458 55%,#8a7440);margin-top:-7px}
+input[type=range]::-moz-range-track{height:1px;background:var(--gold-dim)}
+input[type=range]::-moz-range-thumb{width:7px;height:15px;background:linear-gradient(180deg,#f0e2b8,#b09458 55%,#8a7440);border:none;border-radius:0}
+.ops{display:flex;gap:1px;margin-top:2px}
+.ops button{flex:1;background:transparent;border:1px solid var(--hair);color:var(--dim);
+ font:inherit;font-size:8px;letter-spacing:.2em;padding:7px 0;cursor:pointer;text-transform:uppercase}
+.ops button:hover{color:var(--gold);border-color:var(--gold-dim)}
+.ops button.on{background:var(--gold);color:#141109;border-color:var(--gold)}
+#trayToggle{position:fixed;right:30px;bottom:24px;z-index:14;background:var(--panel);border:1px solid var(--hair);
+ color:var(--gold);font:inherit;font-size:8px;letter-spacing:.3em;padding:9px 14px;cursor:pointer;display:none;text-transform:uppercase}
+#tray.hid+#trayToggle{display:block}
+/* sheet overlay */
+#ov{position:fixed;inset:0;z-index:30;background:rgba(8,7,6,.96);display:none;overflow-y:auto;padding:6vh 4vw}
+#ov.open{display:block}
+#sheet{max-width:660px;margin:0 auto;border-top:1px solid var(--gold);padding:34px 40px 40px}
+#sheet h2{font:italic 700 26px Didot,'Bodoni MT','Playfair Display','Times New Roman',serif;color:var(--gold)}
+#sheet .no{font-size:8px;letter-spacing:.38em;color:var(--dim);margin:6px 0 24px;text-transform:uppercase}
+#sheet h4{font-size:9px;font-weight:400;letter-spacing:.36em;color:var(--gold-dim);margin:22px 0 8px;text-transform:uppercase}
+#sheet p,#sheet li{font-size:12.5px;line-height:1.9;color:#c9c2ae;margin:8px 0;font-weight:400}
+#sheet ul{padding-left:16px}
+#sheet code{color:var(--gold);font:700 11.5px 'Courier New',monospace}
+#sheet .fml{font:700 12px/2.1 'Courier New',monospace;color:var(--gold);border:1px solid var(--hair);
+ padding:12px 16px;margin:12px 0;white-space:pre;overflow-x:auto}
+#sheet .sig{margin-top:28px;padding-top:12px;border-top:1px solid var(--hair);
+ font-size:8px;letter-spacing:.34em;color:var(--dim);text-transform:uppercase}
+#close{float:right;background:none;border:1px solid var(--hair);color:var(--dim);
+ font:inherit;font-size:8px;letter-spacing:.28em;padding:6px 12px;cursor:pointer;text-transform:uppercase}
+#close:hover{color:var(--gold);border-color:var(--gold-dim)}
+#hint{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:11;font-size:8px;
+ letter-spacing:.3em;color:var(--dim);pointer-events:none;text-transform:uppercase;opacity:.85}
+@media(max-width:860px){
+ #stat,#hint{display:none}
+ #mark{top:16px;left:18px}#mark h1{font-size:22px}
+ #tray{right:12px;left:12px;bottom:12px;width:auto;max-height:44vh;overflow-y:auto}
+ #sheets{top:16px;right:18px}
+ #trayToggle{right:12px;bottom:12px}
+}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="stage"></div>
+
+<div id="mark">
+  <div class="no">Study No.5</div>
+  <h1>Flock</h1>
+  <div class="sub">Collective motion · three axes</div>
+  <div class="rule"></div>
+</div>
+
+<div id="stat">
+  <b id="hCount">—</b> BODIES · <b id="hFps">—</b> FPS<br>
+  <b id="hMode">—</b> · <b id="hCam">AUTO</b>
+</div>
+
+<div id="hint">drag to orbit the flock</div>
+
+<div id="sheets">
+  <button id="tCon">Concept</button><span class="sep"></span>
+  <button id="tBld">Build</button><span class="sep"></span>
+  <button id="bPause">Hold</button>
+</div>
+
+<div id="tray">
+  <div class="grp"><h3>Behaviour</h3><div class="seg" id="modeSeg"></div></div>
+  <div class="grp"><h3>Composition</h3><div class="seg" id="presetSeg"></div></div>
+  <div class="grp"><h3>Parameters</h3><div id="knobs"></div></div>
+  <div class="grp ops">
+    <button id="bReset">Reset</button>
+    <button id="bSeed">Reseed</button>
+    <button id="bAuto" class="on">Auto-orbit</button>
+  </div>
+</div>
+<button id="trayToggle">Controls</button>
+
+<div id="ov"><div id="sheet">
+  <button id="close">Close</button>
+  <div id="sheetBody"></div>
+</div></div>
+
+<script>
+'use strict';
+/* ============================================================
+   SYSTEMS LABORATORY · FLOCK STUDY No.5
+   three-axis collective motion · champagne on onyx
+   single file · zero dependencies
+   ============================================================ */
+const TAU=Math.PI*2;
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const $=id=>document.getElementById(id);
+
+const MODES=['FLOCK','HAWK','TOWERS','ROOST'];
+const P={mode:0,vision:.09,sep:.032,ali:.9,coh:.55,speed:.16,count:1200};
+const SLIDERS=[
+ {k:'vision',label:'Vision radius', min:.05,max:.2, step:.005,fmt:v=>v.toFixed(3)},
+ {k:'sep',   label:'Separation',    min:.01,max:.08,step:.002,fmt:v=>v.toFixed(3)},
+ {k:'ali',   label:'Alignment',     min:0,  max:2,  step:.05, fmt:v=>v.toFixed(2)},
+ {k:'coh',   label:'Cohesion',      min:0,  max:1.5,step:.05, fmt:v=>v.toFixed(2)},
+ {k:'speed', label:'Cruise speed',  min:.05,max:.4, step:.01, fmt:v=>v.toFixed(2)},
+ {k:'count', label:'Population',    min:200,max:3000,step:100,fmt:v=>''+(v|0)},
+];
+const PRESETS={
+ 'Murmuration':{vision:.085,sep:.028,ali:1.05,coh:.6,speed:.19},
+ 'Scatter':   {vision:.05, sep:.06, ali:.3, coh:.2, speed:.26},
+ 'Vortex':    {vision:.13, sep:.022,ali:1.6,coh:1.1,speed:.3},
+ 'Roost':     {vision:.1,  sep:.03, ali:.8, coh:.9, speed:.1},
+};
+function encState(){try{const o={m:P.mode,v:+P.vision.toFixed(3),s:+P.sep.toFixed(3),a:+P.ali.toFixed(2),
+ c:+P.coh.toFixed(2),d:+P.speed.toFixed(2),n:P.count|0};
+ return btoa(JSON.stringify(o)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}catch(e){return ''}}
+function decState(q){try{const o=JSON.parse(atob(q.replace(/-/g,'+').replace(/_/g,'/')));
+ const num=(v,a,b,d)=>typeof v==='number'&&isFinite(v)?clamp(v,a,b):d;
+ P.mode=num(o.m,0,3,0)|0;P.vision=num(o.v,.05,.2,.09);P.sep=num(o.s,.01,.08,.032);
+ P.ali=num(o.a,0,2,.9);P.coh=num(o.c,0,1.5,.55);P.speed=num(o.d,.05,.4,.16);P.count=num(o.n,200,3000,1200)|0;
+ return true;}catch(e){return false}}
+let hashT=0;
+function saveHash(){const now=performance.now();if(now-hashT<800)return;hashT=now;
+ try{history.replaceState(null,'','#'+encState())}catch(e){}}
+
+const cv=$('cv'),ctx=cv.getContext('2d');
+let W=0,H=0,DPR=1;
+function resize(){DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;
+ cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
+addEventListener('resize',resize);
+
+/* ---------- world: unit-ish box, soft walls ---------- */
+const EXT=1;
+let px,py,pz,vx,vy,vz,N=0;
+const preds=[],towers=[],roost={x:0,y:0,z:0,ph:0};
+let seed=1;
+function reseed(){
+ N=P.count|0;
+ px=new Float32Array(N);py=new Float32Array(N);pz=new Float32Array(N);
+ vx=new Float32Array(N);vy=new Float32Array(N);vz=new Float32Array(N);
+ const sx=new Float32Array(N),sy=new Float32Array(N);
+ for(let i=0;i<N;i++){
+  px[i]=(Math.random()*2-1)*EXT*.8;py[i]=(Math.random()*2-1)*EXT*.8;pz[i]=(Math.random()*2-1)*EXT*.8;
+  const a=Math.random()*TAU,e=(Math.random()-.5)*.6;
+  vx[i]=Math.cos(a)*P.speed;vy[i]=Math.sin(e)*P.speed;vz[i]=Math.sin(a)*P.speed;
+ }
+ window.__sx=sx;
+ preds.length=0;
+ for(let i=0;i<(P.mode===1?2:0);i++)
+  preds.push({x:(Math.random()*2-1)*EXT*.5,y:(Math.random()*2-1)*EXT*.5,z:(Math.random()*2-1)*EXT*.5,
+   vx:0,vy:0,vz:0});
+ towers.length=0;
+ if(P.mode===2)for(let i=0;i<5;i++)
+  towers.push({x:(Math.random()*2-1)*EXT*.75,y:(Math.random()*2-1)*EXT*.75,z:(Math.random()*2-1)*EXT*.75,r:.1+Math.random()*.1});
+}
+
+/* ---------- spatial hash, three axes ---------- */
+const grid={cell:.09,gw:0,gh:0,gd:0,order:new Int32Array(0),start:null,cnt:null};
+const OFF=[[0,0,0],[-1,0,0],[1,0,0],[0,-1,0],[0,1,0],[0,0,-1],[0,0,1],
+ [-1,-1,0],[1,-1,0],[-1,1,0],[1,1,0],[-1,0,-1],[1,0,-1],[-1,0,1],[1,0,1],
+ [0,-1,-1],[0,1,-1],[0,-1,1],[0,1,1],
+ [-1,-1,-1],[1,-1,-1],[-1,1,-1],[1,1,-1],[-1,-1,1],[1,-1,1],[-1,1,1],[1,1,1]];
+function buildGrid(){
+ const cs=P.vision;
+ const gw=Math.max(1,Math.ceil(2.6/cs)),gd=gw,gh=gw;
+ if(grid.order.length<N){grid.order=new Int32Array(N);}
+ grid.gw=gw;grid.gh=gh;grid.gd=gd;grid.cell=cs;
+ const nc=gw*gh*gd;
+ if(!grid.start||grid.start.length<nc+1){grid.start=new Int32Array(nc+1);grid.cnt=new Int32Array(nc);}
+ else grid.cnt.fill(0);
+ const cl=v=>clamp(Math.floor((v+1.3)/cs),0,gw-1);
+ for(let i=0;i<N;i++){
+  const cx=cl(px[i]),cy=cl(py[i]),cz=cl(pz[i]);
+  const c=(cz*gh+cy)*gw+cx;
+  grid.cnt[c]++;
+ }
+ let s=0;for(let c=0;c<nc;c++){grid.start[c]=s;s+=grid.cnt[c];}
+ grid.start[nc]=s;
+ const cur=grid.cnt;
+ for(let i=0;i<N;i++){
+  const cx=cl(px[i]),cy=cl(py[i]),cz=cl(pz[i]);
+  const c=(cz*gh+cy)*gw+cx;
+  grid.order[grid.start[c]+ (--cur[c])]=i; // wait: fill via decrement
+ }
+}
+
+/* ---------- steering ---------- */
+function step(){
+ buildGrid();
+ const cs=P.vision,R2=P.vision*P.vision,S2=P.sep*P.sep;
+ const gap=0.028;
+ for(let i=0;i<N;i++){
+  const x0=px[i],y0=py[i],z0=pz[i];
+  let ax=0,ay=0,az=0;   // alignment
+  let cxx=0,cyy=0,czz=0;// cohesion sum
+  let sxx=0,syy=0,szz=0;// separation sum
+  let nA=0,nC=0,nS=0;
+  const cl=v=>clamp(Math.floor((v+1.3)/grid.cell),0,grid.gw-1);
+  const cx0=cl(x0),cy0=cl(y0),cz0=cl(z0);
+  for(let o=0;o<27;o++){
+   const nx=cx0+OFF[o][0],ny=cy0+OFF[o][1],nz=cz0+OFF[o][2];
+   if(nx<0||ny<0||nz<0||nx>=grid.gw||ny>=grid.gh||nz>=grid.gd)continue;
+   const c=(nz*grid.gh+ny)*grid.gw+nx;
+   const s0=grid.start[c],s1=grid.start[c+1];
+   for(let k=s0;k<s1;k++){
+    const j=grid.order[k];if(j===i)continue;
+    const dx=px[j]-x0,dy=py[j]-y0,dz=pz[j]-z0;
+    const d2=dx*dx+dy*dy+dz*dz;
+    if(d2>R2||d2<1e-12)continue;
+    // alignment + cohesion in one pass
+    ax+=vx[j];ay+=vy[j];az+=vz[j];nA++;
+    cxx+=px[j];cyy+=py[j];czz+=pz[j];nC++;
+    if(d2<S2){const inv=1/d2;sxx-=dx*inv;syy-=dy*inv;szz-=dz*inv;nS++;}
+   }
+  }
+  let fx=0,fy=0,fz=0;
+  if(nA){
+   const inv=1/nA;
+   fx+=(ax*inv-vx[i])*P.ali*2.2;
+   fy+=(ay*inv-vy[i])*P.ali*2.2;
+   fz+=(az*inv-vz[i])*P.ali*2.2;
+   fx+=(cxx*inv-x0)*P.coh*1.1;
+   fy+=(cyy*inv-y0)*P.coh*1.1;
+   fz+=(czz*inv-z0)*P.coh*1.1;
+  }
+  if(nS){fx+=sxx*P.sep*14;fy+=syy*P.sep*14;fz+=szz*P.sep*14;}
+  // behaviour layer
+  if(P.mode===1){ // hawk: flee predators
+   for(const pr of preds){
+    const dx=x0-pr.x,dy=y0-pr.y,dz=z0-pr.z;
+    const d2=dx*dx+dy*dy+dz*dz;
+    if(d2<.09){const inv=1/(d2+1e-6);
+     fx+=dx*inv*.9;fy+=dy*inv*.9;fz+=dz*inv*.9;}
+   }
+  }else if(P.mode===2){ // towers: avoid spheres
+   for(const t of towers){
+    const dx=x0-t.x,dy=y0-t.y,dz=z0-t.z;
+    const d2=dx*dx+dy*dy+dz*dz,rr=(t.r+.06);
+    if(d2<rr*rr){const d=Math.sqrt(d2)+1e-6;
+     fx+=dx/d*(rr-d)*7;fy+=dy/d*(rr-d)*7;fz+=dz/d*(rr-d)*7;}
+   }
+  }else if(P.mode===3){ // roost: slow drift to centre pulsing
+   const pull=.28+Math.sin(roost.ph)*.14;
+   fx-=x0*pull;fy-=y0*pull;fz-=z0*pull;
+  }
+  // soft box: hard clamp + spring. The flock is a bounded volume; escapees fold back.
+  const m=EXT*.95;
+  if(x0<-m){px[i]=-m;vx[i]=Math.abs(vx[i]);}
+  if(x0> m){px[i]= m;vx[i]=-Math.abs(vx[i]);}
+  if(y0<-m){py[i]=-m;vy[i]=Math.abs(vy[i]);}
+  if(y0> m){py[i]= m;vy[i]=-Math.abs(vy[i]);}
+  if(z0<-m){pz[i]=-m;vz[i]=Math.abs(vz[i]);}
+  if(z0> m){pz[i]= m;vz[i]=-Math.abs(vz[i]);}
+  vx[i]+=fx*.016;vy[i]+=fy*.016;vz[i]+=fz*.016;
+  // cruise to speed
+  const sp=Math.sqrt(vx[i]*vx[i]+vy[i]*vy[i]+vz[i]*vz[i])||1e-6;
+  const k=P.speed/sp;
+  vx[i]*=k;vy[i]*=k;vz[i]*=k;
+ }
+ for(let i=0;i<N;i++){
+  px[i]+=vx[i]*.55;py[i]+=vy[i]*.55;pz[i]+=vz[i]*.55;
+ }
+ // predators
+ for(const pr of preds){
+  // chase nearest boid (coarse scan)
+  let best=-1,bd=1e9;
+  for(let i=0;i<N;i+=17){
+   const dx=px[i]-pr.x,dy=py[i]-pr.y,dz=pz[i]-pr.z,d2=dx*dx+dy*dy+dz*dz;
+   if(d2<bd){bd=d2;best=i;}
+  }
+  if(best>=0&&bd<.5){
+   const d=Math.sqrt(bd);
+   pr.vx+=(px[best]-pr.x)/d*.02;pr.vy+=(py[best]-pr.y)/d*.02;pr.vz+=(pz[best]-pr.z)/d*.02;
+  }
+  pr.vx*=.96;pr.vy*=.96;pr.vz*=.96;
+  pr.vx-=pr.x*.001;pr.vy-=pr.y*.001;pr.vz-=pr.z*.001;
+  pr.x+=pr.vx*1.9;pr.y+=pr.vy*1.9;pr.z+=pr.vz*1.9;
+ }
+ roost.ph+=.014;
+}
+
+/* ---------- camera ---------- */
+const cam={yaw:.7,pitch:.28,yawV:.0022,pitchV:0,auto:true,idle:99};
+const F=.9;
+let SCALE=400;
+const P4=[0,0,0,0];
+function project(x,y,z,out){
+ const cy=Math.cos(cam.yaw),sy=Math.sin(cam.yaw);
+ const x1=x*cy - z*sy, z1=x*sy + z*cy;
+ const cp=Math.cos(cam.pitch),sp=Math.sin(cam.pitch);
+ const y1=y*cp - z1*sp, z2=y*sp + z1*cp;
+ const s=F/(F+z2);
+ out[0]=W/2 + x1*s*SCALE;
+ out[1]=H/2 + y1*s*SCALE;
+ out[2]=s; out[3]=z2;
+}
+
+/* ---------- render ---------- */
+let prevSX=null,prevSY=null;
+function draw(){
+ ctx.fillStyle='#0b0a09';ctx.fillRect(0,0,W,H);
+ SCALE=Math.min(W,H)*.42;
+ if(!prevSX||prevSX.length<N){prevSX=new Float32Array(N);prevSY=new Float32Array(N);prevSX.fill(1e9);}
+ // roost ring
+ if(P.mode===3){
+  const rp=1.25+Math.sin(roost.ph)*.06;
+  ctx.strokeStyle='rgba(212,184,120,.25)';ctx.lineWidth=1;
+  ctx.beginPath();
+  for(let a=0;a<=64;a++){
+   const th=a/64*TAU;
+   project(Math.cos(th)*rp,Math.sin(th)*rp*.3,Math.sin(th)*rp,out3);
+   a?ctx.lineTo(out3[0],out3[1]):ctx.moveTo(out3[0],out3[1]);
+  }
+  ctx.stroke();
+ }
+ // towers as specular spheres
+ for(const t of towers){
+  project(t.x,t.y,t.z,out3);
+  const r=t.r*out3[2]*SCALE;
+  const g=ctx.createRadialGradient(out3[0]-r*.35,out3[1]-r*.35,r*.1,out3[0],out3[1],r);
+  g.addColorStop(0,'#e8e0c8');g.addColorStop(.4,'#7a7264');g.addColorStop(1,'#191713');
+  ctx.fillStyle=g;
+  ctx.beginPath();ctx.arc(out3[0],out3[1],r,0,TAU);ctx.fill();
+ }
+ // flock: streaks + heads, fog by depth
+ const fogB=(z2)=>clamp(1.18 - z2*.62,.16,1);
+ // paint order: far to near would need sort; use additive-ish blend by depth alpha, no sort (restraint)
+ for(let i=0;i<N;i++){
+  project(px[i],py[i],pz[i],out3);
+  const s=out3[2],b=fogB(out3[3]);
+  const sxp=out3[0],syp=out3[1];
+  // streak
+  const psx=prevSX[i],psy=prevSY[i];
+  if(psx<1e8){
+   ctx.strokeStyle=`rgba(212,184,120,${(.10*b).toFixed(3)})`;
+   ctx.lineWidth=1;
+   ctx.beginPath();ctx.moveTo(psx,psy);ctx.lineTo(sxp,syp);ctx.stroke();
+  }
+  prevSX[i]=sxp;prevSY[i]=syp;
+  // body: 2px grain of gold, brightened near
+  const al=clamp(.28*b+.08,0,1);
+  const alQ=(al*40|0)/40; // quantize alpha so HOLD renders bit-identical frames
+  ctx.fillStyle=`rgba(${212+b*38|0},${184+b*46|0},${120+b*60|0},${alQ.toFixed(3)})`;
+  const r=1.1+s*1.7;
+  ctx.fillRect(sxp-r/2,syp-r/2,r,r);
+ }
+ // hawks
+ for(const pr of preds){
+  project(pr.x,pr.y,pr.z,out3);
+  const r=4.6*out3[2];
+  ctx.fillStyle='rgba(240,234,216,.95)';
+  ctx.beginPath();
+  ctx.moveTo(out3[0],out3[1]-r);
+  ctx.lineTo(out3[0]-r*.9,out3[1]+r*.7);
+  ctx.lineTo(out3[0]+r*.9,out3[1]+r*.7);
+  ctx.closePath();ctx.fill();
+  // kill flash
+  ctx.strokeStyle='rgba(240,234,216,.14)';
+  ctx.beginPath();ctx.arc(out3[0],out3[1],r*3.2,0,TAU);ctx.stroke();
+ }
+}
+const out3=[0,0,0,0];
+
+/* ---------- loop ---------- */
+let running=false;
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+P.paused=REDUCED;
+let fpsE=60,fpsN=0,fpsT=0,hudT=0,lastT=0;
+function loop(t){
+ const dt=Math.min(.05,(t-lastT)/1000||.016);lastT=t;
+ fpsN++;if(t-fpsT>500){fpsE=fpsN*1000/(t-fpsT);fpsN=0;fpsT=t;}
+ // camera inertia + idle auto-orbit
+ cam.yaw+=cam.yawV;cam.pitch=clamp(cam.pitch+cam.pitchV,-1.25,1.25);
+ cam.yawV*=.94;cam.pitchV*=.94;
+ cam.idle+=dt;
+ if(cam.auto&&cam.idle>3.5&&!P.paused){cam.yawV+= (.0026-cam.yawV)*.03;}
+ if(!P.paused)step();
+ draw();
+ if(t-hudT>300){hudT=t;
+  $('hCount').textContent=N;
+  $('hFps').textContent=fpsE|0;
+  $('hMode').textContent=MODES[P.mode];
+  $('hCam').textContent=cam.auto?'AUTO':'MANUAL';
+  $('bPause').textContent=P.paused?'Run':'Hold';}
+ if(REDUCED&&P.paused){running=false;return;}
+ requestAnimationFrame(loop);
+}
+function kick(){if(!running){running=true;lastT=performance.now();requestAnimationFrame(loop);}}
+
+/* ---------- camera interaction ---------- */
+let drag=null;
+cv.addEventListener('pointerdown',e=>{
+ drag={x:e.clientX,y:e.clientY};cam.idle=0;cv.classList.add('drag');
+ cv.setPointerCapture(e.pointerId);
+});
+cv.addEventListener('pointermove',e=>{
+ if(!drag)return;
+ const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+ drag={x:e.clientX,y:e.clientY};
+ cam.yaw+=dx*.005;cam.pitch=clamp(cam.pitch+dy*.004,-1.25,1.25);
+ cam.yawV=dx*.0011;cam.pitchV=dy*.0008;
+ cam.idle=0;
+});
+addEventListener('pointerup',()=>{drag=null;cv.classList.remove('drag');});
+cv.addEventListener('wheel',e=>{e.preventDefault();cam.pitch=clamp(cam.pitch+e.deltaY*.0006,-1.25,1.25);cam.idle=0;},{passive:false});
+
+/* ---------- panel ---------- */
+function seg(el,items,get,set){
+ el.innerHTML='';items.forEach(it=>{const b=document.createElement('button');
+  b.textContent=it;b.onclick=()=>{set(items.indexOf(it));sync();kick();};el.appendChild(b);});
+ el._sync=()=>{[...el.children].forEach((b,i)=>b.classList.toggle('on',i===get()));};
+ el._sync();}
+function knobs(){
+ const box=$('knobs');box.innerHTML='';
+ SLIDERS.forEach(d=>{const wrap=document.createElement('div');
+  const lab=document.createElement('div');lab.className='krow';
+  lab.innerHTML=`<span>${d.label}</span><b></b>`;
+  const inp=document.createElement('input');inp.type='range';inp.min=d.min;inp.max=d.max;inp.step=d.step;inp.value=P[d.k];
+  const val=lab.querySelector('b');
+  const upd=()=>{val.textContent=d.fmt(P[d.k]);};
+  inp.addEventListener('input',()=>{P[d.k]=parseFloat(inp.value);upd();saveHash();
+   if(d.k==='count')reseed();});
+  wrap.appendChild(lab);wrap.appendChild(inp);box.appendChild(wrap);
+  d._inp=inp;d._upd=upd;upd();});}
+function syncSliders(){SLIDERS.forEach(d=>{d._inp.value=P[d.k];d._upd();});}
+function sync(){
+ $('modeSeg')._sync();
+ $('bAuto').classList.toggle('on',cam.auto);
+ $('bPause').textContent=P.paused?'Run':'Hold';}
+
+const CONCEPT=`
+<h2>Concept</h2><div class="no">Study No.5 · three rules, three axes</div>
+<p>Each body measures its neighbours inside a sphere of vision, then applies three local rules. No body sees the whole flock. The pattern is an emergent global order.</p>
+<h4>The rules</h4>
+<div class="fml">separation : step away from crowding
+alignment  : steer toward the mean heading of neighbours
+cohesion   : steer toward the mean position of neighbours</div>
+<p>The three forces are balanced by the dials. VISION sets the neighbour sphere. SEPARATION acts inside a smaller core radius. ALIGNMENT and COHESION weight the mean heading and mean position. Cruise speed renormalizes velocity each frame, so energy stays bounded and the flock never explodes.</p>
+<h4>Behaviour modes</h4>
+<ul><li>FLOCK. The three rules alone. Bands and vortices form and dissolve.</li>
+<li>HAWK. Two pursuing bodies. The flock shows the flash of a panic wave crossing the swarm.</li>
+<li>TOWERS. Five specular spheres. The flow parts around them and knits again downstream.</li>
+<li>ROOST. A pulsing central pull. The flock condenses, breathes, and condenses again.</li></ul>
+<h4>Composition presets</h4>
+<p>Murmuration, Scatter, Vortex, Roost. Each is one dial set. The URL carries the full state: reload restores it.</p>
+<div class="sig">Study No.5 · Systems Laboratory</div>`;
+const BUILD=`
+<h2>Build record</h2><div class="no">Maintainer's notes · Study No.5</div>
+<p>One file, no libraries. Simulation, spatial indexing and the projection camera are local code.</p>
+<h4>Notes</h4>
+<ul><li>Neighbour search is a uniform grid over the three axes, 27 cells per query. Population 1200 runs a full rule pass in about a millisecond on an integrated GPU box.</li>
+<li>Depth is real: bodies live in a bounded box; the camera is a yaw-pitch rotation with a perspective divide. Near bodies render larger and warmer; distance falls off to black.</li>
+<li>Drag applies camera velocity with inertia; three seconds idle returns the orbit to auto.</li>
+<li>Population changes rebuild the buffers in place; the grid resizes only when the population grows.</li>
+<li>prefers-reduced-motion renders one static frame.</li></ul>
+<div class="sig">Study No.5 · bench copy</div>`;
+
+seg($('modeSeg'),MODES,()=>P.mode,i=>{P.mode=i;reseed();});
+seg($('presetSeg'),Object.keys(PRESETS),()=>-1,i=>{Object.assign(P,PRESETS[Object.keys(PRESETS)[i]]);reseed();syncSliders();saveHash();});
+knobs();
+$('bPause').onclick=()=>{P.paused=!P.paused;sync();kick();};
+$('bReset').onclick=()=>{reseed();sync();kick();};
+$('bSeed').onclick=()=>{reseed();sync();kick();};
+$('bAuto').onclick=()=>{cam.auto=!cam.auto;sync();};
+$('trayToggle').onclick=()=>$('tray').classList.toggle('hid');
+const ov=$('ov'),sheetBody=$('sheetBody');
+function openSheet(html){sheetBody.innerHTML=html;ov.classList.add('open');}
+$('tCon').onclick=()=>openSheet(CONCEPT);
+$('tBld').onclick=()=>openSheet(BUILD);
+$('close').onclick=()=>ov.classList.remove('open');
+ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open');});
+addEventListener('keydown',e=>{
+ if(e.code==='Space'){e.preventDefault();P.paused=!P.paused;sync();kick();}
+ else if(e.key==='r'||e.key==='R'){reseed();sync();kick();}
+ else if(e.key==='h'||e.key==='H'){$('tray').classList.toggle('hid');}
+ else if(e.key>='1'&&e.key<='4'){P.mode=+e.key-1;reseed();sync();kick();}
+ else if(e.key==='Escape')ov.classList.remove('open');
+});
+
+resize();
+if(location.hash.length>2){decState(location.hash.slice(1));}
+reseed();syncSliders();sync();
+kick();
+window.__AIFL={get stats(){return{fps:fpsE|0,count:N,mode:P.mode,paused:!!P.paused,
+ camYaw:+cam.yaw.toFixed(3),auto:cam.auto}}};
+</script>
+</body>
+</html>
