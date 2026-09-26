@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cedar Dental Clinic - Appointments Answered 24/7</title>
+<style>
+:root{--teal:#0e7c7b;--mint:#e6f4f1;--ink:#12312f;--white:#ffffff;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
+body{background:var(--mint);color:var(--ink);}
+header{background:var(--white);padding:1rem 5vw;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 12px rgba(18,49,47,.08);flex-wrap:wrap;gap:.4rem;}
+header h1{font-size:1.25rem;color:var(--teal);}
+header h1 span{color:var(--ink);font-weight:400;}
+.badge{background:var(--teal);color:#fff;border-radius:999px;padding:.35rem .9rem;font-size:.8rem;}
+.card{background:#fff;max-width:560px;margin:7vh auto;padding:2rem;border-radius:16px;box-shadow:0 10px 36px rgba(18,49,47,.14);}
+.card h2{font-size:1.45rem;margin-bottom:.4rem;}
+.card p.lead{color:#4a6360;margin-bottom:1.4rem;line-height:1.5;}
+.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.chips span{background:var(--mint);color:var(--teal);border-radius:999px;padding:.4rem .95rem;font-size:.83rem;font-weight:600;}
+.pulse{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--teal);position:relative;margin-right:.5rem;vertical-align:middle;}
+.pulse::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--teal);animation:p 1.6s ease-out infinite;}
+@keyframes p{0%{transform:scale(.5);opacity:1}100%{transform:scale(1.4);opacity:0}}
+.log{background:var(--mint);border-radius:12px;padding:1rem;font-size:.92rem;min-height:130px;line-height:1.6;margin-bottom:1.2rem;}
+.log .who{font-weight:700;color:var(--teal);}
+.slot{display:inline-block;background:#fff;border:1.5px solid var(--teal);color:var(--teal);border-radius:8px;padding:.3rem .7rem;margin:.15rem .2rem;font-size:.85rem;cursor:pointer;}
+.slot.sel{background:var(--teal);color:#fff;}
+.cta{display:inline-block;background:var(--teal);color:#fff;text-decoration:none;padding:.85rem 2rem;border-radius:10px;font-weight:600;}
+.cta:hover{filter:brightness(1.1);}
+footer{text-align:center;color:#6b8683;font-size:.8rem;margin:4vh 0 2vh;}
+@media(max-width:480px){.card{margin:4vh 4vw;padding:1.4rem;}.card h2{font-size:1.2rem;}}
+</style>
+</head>
+<body>
+<header><h1>CEDAR <span>DENTAL</span></h1><div class="badge">Demo - AI Front Desk</div></header>
+<div class="card">
+  <h2>Nobody misses an appointment again.</h2>
+  <p class="lead">Our AI front desk answers every call at 9pm on a Friday, in Arabic or English, checks the real schedule, and books the cleaning. Listen in:</p>
+  <div class="chips"><span><span class="pulse"></span>Live 24/7</span><span>AR + EN</span><span>Real calendar</span><span>WhatsApp confirmations</span></div>
+  <div class="log" id="t"></div>
+  <div id="slots"></div>
+  <a class="cta" href="#" onclick="return play()">Replay the call</a>
+</div>
+<footer>Cedar Dental is a fictional demo clinic. The front desk is not.</footer>
+<script>
+const lines=[
+ ["AI","Good evening, Cedar Dental. How can I help?"],
+ ["Caller","My tooth is killing me. Any chance of something tomorrow?"],
+ ["AI","I'm sorry to hear that. I see Dr. Haddad has 11:30 or 4:15 tomorrow - both for urgent checks. Which suits you?"],
+ ["Caller","Eleven thirty works."],
+ ["AI","Done - tomorrow 11:30 with Dr. Haddad. You'll get a WhatsApp confirmation now, and a reminder in the morning."],
+ ["Caller","Perfect, thank you!"]];
+const slots=['9:00','11:30','2:00','4:15'];
+let i=0,timer=null;
+function drawSlots(pick){
+  const s=document.getElementById('slots');s.innerHTML='';
+  slots.forEach(t=>{const b=document.createElement('span');b.className='slot'+(t===pick?' sel':'');b.textContent=t;s.appendChild(b);});
+}
+function step(){
+  if(i>=lines.length){i=0;timer=null;return;}
+  const [who,text]=lines[i];const el=document.getElementById('t');
+  el.innerHTML+=(el.innerHTML?'<br>':'')+'<span class="who">'+(who==='AI'?'AI Front Desk':'Patient')+':</span> '+text;
+  if(who==='AI'&&text.includes('11:30'))drawSlots('11:30');
+  el.scrollTop=el.scrollHeight;i++;timer=setTimeout(step,1500);
+}
+function play(){document.getElementById('t').innerHTML='';drawSlots('');i=0;if(timer)clearTimeout(timer);step();return false;}
+window.onload=play;
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Al Muna Law - Every Inquiry Answered, Confidentially</title>
+<style>
+:root{--slate:#1c2733;--bronze:#a8894f;--paper:#f7f5f0;--ink:#20262d;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Palatino Linotype',Palatino,Georgia,serif;}
+body{background:var(--paper);color:var(--ink);}
+header{background:var(--slate);color:#fff;padding:1.1rem 5vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.4rem;}
+header h1{font-size:1.2rem;letter-spacing:.14em;text-transform:uppercase;}
+header h1 em{color:var(--bronze);font-style:normal;}
+.tag{border:1px solid var(--bronze);color:var(--bronze);padding:.3rem .8rem;font-size:.78rem;letter-spacing:.05em;}
+.wrap{max-width:600px;margin:7vh auto;padding:0 4vw;}
+.card{background:#fff;border-top:4px solid var(--bronze);padding:2rem;box-shadow:0 8px 30px rgba(28,39,51,.12);}
+.card h2{font-size:1.5rem;margin-bottom:.5rem;}
+.card p.lead{color:#5a6068;margin-bottom:1.4rem;line-height:1.55;}
+.fine{font-size:.8rem;color:#8a8f96;margin-bottom:1.4rem;font-style:italic;}
+.intake{background:var(--paper);border-left:3px solid var(--bronze);padding:1rem;font-size:.92rem;min-height:140px;line-height:1.65;margin-bottom:1.2rem;}
+.intake .who{font-weight:700;color:var(--slate);}
+.intake .lock{color:var(--bronze);font-size:.8rem;}
+.fld{margin-bottom:.9rem;}
+.fld label{display:block;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:#5a6068;margin-bottom:.25rem;}
+.fld div{border:1px solid #d8d2c4;background:#fff;padding:.55rem .8rem;border-radius:4px;}
+.cta{display:inline-block;background:var(--slate);color:#fff;text-decoration:none;padding:.85rem 2.1rem;margin-top:.6rem;letter-spacing:.05em;}
+.cta:hover{background:#2a3a4c;}
+footer{text-align:center;color:#8a8f96;font-size:.78rem;margin:4vh 0 2vh;}
+@media(max-width:480px){.card{padding:1.3rem;}.card h2{font-size:1.2rem;}}
+</style>
+</head>
+<body>
+<header><h1>AL <em>MUNA</em> LAW</h1><div class="tag">Demo - AI Intake</div></header>
+<div class="wrap"><div class="card">
+  <h2>A case called at 10:40pm. It was captured.</h2>
+  <p class="lead">Missed calls are missed cases. Our AI intake answers every inquiry - in Arabic or English - screens it against your practice areas, and prepares the file before your team opens in the morning.</p>
+  <p class="fine">Demo conversation below. Confidentiality note read on every call.</p>
+  <div class="intake" id="t"></div>
+  <div class="fld"><label>Capture result - practice area</label><div>Labour dispute (unpaid wages, 8 months) - <b style="color:var(--bronze)">MATCHED: employment practice</b></div></div>
+  <div class="fld"><label>Urgency</label><div>High - limitation period flagged for partner review</div></div>
+  <a class="cta" href="#" onclick="return play()">Replay the intake call</a>
+</div></div>
+<footer>Al Muna Law is a fictional demo firm. The intake desk is not.</footer>
+<script>
+const lines=[
+ ["AI","Good evening, Al Muna Law. This call may be recorded for quality. How can I help you?"],
+ ["Caller","My employer hasn't paid me in eight months. I don't know what to do."],
+ ["AI","I understand. This concerns an employment and wages matter - that is one of the firm's practice areas. May I take a few details so a lawyer can review your case first thing?"],
+ ["Caller","Yes please."],
+ ["AI","Thank you. Your file is prepared and flagged urgent: unpaid wages across eight months may be subject to a filing deadline. A lawyer will contact you in the morning. You'll receive a reference number by SMS."],
+ ["Caller","Finally, someone answered. Thank you."]];
+let i=0,timer=null;
+function step(){
+  if(i>=lines.length){i=0;timer=null;return;}
+  const [who,text]=lines[i];const el=document.getElementById('t');
+  el.innerHTML+=(el.innerHTML?'<br>':'')+'<span class="who">'+(who==='AI'?'AI Intake':'Caller')+':</span> '+text;
+  if(i===4)el.innerHTML+='<br><span class="lock">- file locked, confidentiality notice sent -</span>';
+  el.scrollTop=el.scrollHeight;i++;timer=setTimeout(step,1600);
+}
+function play(){document.getElementById('t').innerHTML='';i=0;if(timer)clearTimeout(timer);step();return false;}
+window.onload=play;
+</script>
+</body>
+</html>

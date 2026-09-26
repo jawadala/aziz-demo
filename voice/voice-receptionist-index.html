@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Receptionist Demos - Pick Your Industry</title>
+<style>
+:root{--ink:#1a1d21;--muted:#6b7280;--line:#e5e7eb;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;}
+body{background:#fafafa;color:var(--ink);}
+header{text-align:center;padding:3.2rem 5vw 2rem;}
+header h1{font-size:1.7rem;margin-bottom:.5rem;}
+header p{color:var(--muted);max-width:520px;margin:0 auto;line-height:1.55;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.2rem;max-width:960px;margin:1.5rem auto;padding:0 4vw 3rem;}
+a.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.5rem;text-decoration:none;color:inherit;display:block;transition:transform .15s,box-shadow .15s;}
+a.card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.09);}
+.swatch{height:52px;border-radius:9px;margin-bottom:1rem;}
+.card h2{font-size:1.15rem;margin-bottom:.3rem;}
+.card p{color:var(--muted);font-size:.9rem;line-height:1.5;margin-bottom:.8rem;}
+.price{font-weight:700;font-size:.9rem;}
+.open{font-size:.85rem;color:#2563eb;margin-top:.5rem;display:inline-block;}
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding:1rem 0 2.5rem;}
+</style>
+</head>
+<body>
+<header>
+  <h1>One call your business never misses.</h1>
+  <p>Three working demos of the AI front desk - each answers, quotes, and books in Arabic or English, 24/7. Open one, watch the call happen.</p>
+</header>
+<div class="grid">
+  <a class="card" href="voice-receptionist-hotel.html">
+    <div class="swatch" style="background:linear-gradient(135deg,#0e1b2c,#c9a227);"></div>
+    <h2>Hotel - "Grand Horizon"</h2>
+    <p>Guest calls at midnight, books a sea-view double, WhatsApp confirmation sent. Direct bookings stop leaking to commission-taking aggregators.</p>
+    <div class="price">From $4,000 build + monthly care</div><br>
+    <span class="open">Watch the hotel call -></span>
+  </a>
+  <a class="card" href="voice-receptionist-clinic.html">
+    <div class="swatch" style="background:linear-gradient(135deg,#0e7c7b,#e6f4f1);"></div>
+    <h2>Clinic - "Cedar Dental"</h2>
+    <p>Toothache at 9pm Friday: the AI checks the real schedule, offers slots, books the urgent visit. No patient left on hold, ever.</p>
+    <div class="price">Install $1,500-3,000 + monthly care</div><br>
+    <span class="open">Watch the clinic call -></span>
+  </a>
+  <a class="card" href="voice-intake-lawfirm.html">
+    <div class="swatch" style="background:linear-gradient(135deg,#1c2733,#a8894f);"></div>
+    <h2>Law firm - "Al Muna Law"</h2>
+    <p>A case called at 10:40pm: screened against practice areas, flagged urgent, file ready by morning. Missed calls are missed cases.</p>
+    <div class="price">From $497/month, setup included</div><br>
+    <span class="open">Watch the intake call -></span>
+  </a>
+</div>
+<footer>Demo properties are fictional. The front desk is not. Every demo is a single file - works offline, any browser.</footer>
+</body>
+</html>
