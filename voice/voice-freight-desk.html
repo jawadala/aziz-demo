@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sahara Freight - Every Truck, One Screen</title>
+<style>
+:root{--dune:#e9b872;--night:#1f2233;--sky:#2e4a66;--sand:#f6efe4;--ink:#22252e;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,'Segoe UI',sans-serif;}
+body{background:var(--sand);color:var(--ink);}
+header{background:var(--night);color:#fff;padding:1.1rem 5vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;}
+header h1{font-size:1.2rem;letter-spacing:.1em;}
+header h1 span{color:var(--dune);}
+.badge{border:1px solid var(--dune);color:var(--dune);font-size:.75rem;padding:.32rem .8rem;border-radius:999px;}
+.hero{max-width:640px;margin:6vh auto 2rem;padding:0 4vw;}
+.hero h2{font-size:1.7rem;line-height:1.25;margin-bottom:.6rem;}
+.hero h2 em{color:var(--sky);font-style:normal;}
+.hero p{color:#5c6470;line-height:1.6;margin-bottom:1.2rem;}
+.chips{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:1.4rem;}
+.chip{border:1px solid #cfd3da;color:#5c6470;font-size:.75rem;padding:.34rem .8rem;border-radius:999px;}
+.track{background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(31,34,51,.12);padding:1.4rem;}
+.track h3{font-size:1rem;margin-bottom:1rem;letter-spacing:.04em;}
+.truck{display:flex;align-items:center;gap:.8rem;padding:.7rem;border:1px solid #e8e6df;border-radius:10px;margin-bottom:.6rem;font-size:.88rem;}
+.truck .dot{width:.6rem;height:.6rem;border-radius:50%;background:#43b581;flex-shrink:0;}
+.truck .dot.delay{background:#e6a23c;}
+.truck b{min-width:4.2em;}
+.truck .route{color:#5c6470;flex:1;}
+.truck .eta{font-weight:700;color:var(--sky);}
+.res{margin-top:1rem;background:var(--sand);border-left:4px solid var(--sky);border-radius:8px;padding:.9rem;font-size:.9rem;line-height:1.6;}
+.res b{color:var(--sky);}
+.cta{display:inline-block;margin-top:1.2rem;background:var(--sky);color:#fff;text-decoration:none;padding:.9rem 2rem;border-radius:9px;font-weight:600;}
+footer{text-align:center;color:#8a8f98;font-size:.78rem;margin:4vh 0 2vh;line-height:1.6;}
+@media(max-width:480px){.hero h2{font-size:1.3rem;}.track{padding:1rem;}}
+</style>
+</head>
+<body>
+<header><h1>SAHARA <span>FREIGHT</span></h1><div class="badge">AI FLEET DESK DEMO</div></header>
+<div class="hero">
+  <h2>Customer calls at 11pm: <em>"where is my shipment?"</em></h2>
+  <p>Dispatch went home. The AI fleet desk answers anyway - reads your live tracking
+  sheet, quotes the delay honestly, books the redelivery, and logs the ticket.
+  No more 6am voicemail archaeology.</p>
+  <div class="chips"><div class="chip">AR + EN</div><div class="chip">24/7 shipment answers</div><div class="chip">Reads your tracking sheet</div><div class="chip">Books redeliveries</div></div>
+  <div class="track">
+    <h3>LIVE FLEET SNAPSHOT (demo data)</h3>
+    <div class="truck"><span class="dot"></span><b>TRK-041</b><span class="route">Riyadh -> Jeddah, Makkah province</span><span class="eta">ETA 06:40</span></div>
+    <div class="truck"><span class="dot delay"></span><b>TRK-117</b><span class="route">Dammmam -> Riyadh, customs hold 2h</span><span class="eta">ETA 14:15</span></div>
+    <div class="truck"><span class="dot"></span><b>TRK-203</b><span class="route">Jeddah port -> Riyadh, 18t loaded</span><span class="eta">ETA 22:50</span></div>
+    <div class="res">The 11pm caller: shipment <b>TRK-117</b>. AI read the hold, quoted the
+    new <b>14:15</b> ETA, offered next-day redelivery slot - customer picked <b>09:00</b>,
+    ticket <b>#4471</b> logged to dispatch. Call length: <b>94 seconds</b>.</div>
+    <a class="cta" href="#" onclick="return false">Replay the call (demo)</a>
+  </div>
+</div>
+<footer>Sahara Freight is a fictional demo company. The fleet desk is not.<br>
+See all industries / كل القطاعات: <a href="voice/voice-receptionist-index.html" style="display:inline-block;color:#2563eb;font-size:1rem;padding:12px 6px;">jawadala.github.io/aziz-demo</a></footer>
+</body>
+</html>
