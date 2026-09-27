@@ -34,6 +34,11 @@ footer{text-align:center;color:#7a8477;font-size:.8rem;padding:0 4vw 2.5rem;line
   money. Send us one invoice XML - get a written gap report and a fixed
   price within 48 hours. جاهزية الفوترة الإلكترونية: تقرير فجوات بسعر ثابت خلال 48 ساعة</p>
 </header>
+<div class="proof-strip" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.8rem;max-width:640px;margin:1.5rem auto;padding:0 4vw;text-align:center;">
+  <div style="background:#fff;border-radius:10px;padding:.9rem;"><b style="font-size:1.3rem;">15</b><br><span style="font-size:.8rem;color:#57614f;">structural checks per invoice</span></div>
+  <div style="background:#fff;border-radius:10px;padding:.9rem;"><b style="font-size:1.3rem;">48h</b><br><span style="font-size:.8rem;color:#57614f;">written report, fixed price</span></div>
+  <div style="background:#fff;border-radius:10px;padding:.9rem;"><b style="font-size:1.3rem;">0</b><br><span style="font-size:.8rem;color:#57614f;">data leaves your machine (free tool)</span></div>
+</div>
 <div class="steps">
   <div class="step"><span class="n">1</span><h2>Send one invoice XML</h2><p>Any invoice your system already generates. One file is enough to audit.</p></div>
   <div class="step"><span class="n">2</span><h2>Written gap report</h2><p>15 structural checks: UUID, QR, PIH chain, VAT fields, arithmetic, rounding. Pass/fail, in plain language, AR/EN.</p></div>
@@ -54,7 +59,7 @@ footer{text-align:center;color:#7a8477;font-size:.8rem;padding:0 4vw 2.5rem;line
   <button onclick="build()">Build QR payload / إنشاء الرمز</button>
   <pre id="out">Payload appears here...</pre>
 </div>
-<p style="text-align:center;margin-top:1rem;"><a href="zatca-audit-free.zip" style="color:#157145;font-weight:600;">Download the free mini-audit / تحميل الفحص المجاني</a></p>
+<p style="text-align:center;margin-top:1rem;"><a href="zatca-audit-free.zip" style="color:#157145;font-weight:600;display:inline-block;padding:4px 0;min-height:24px;">Download the free mini-audit / تحميل الفحص المجاني</a></p>
 <footer>Fictional demo figures. The audit engine is not fictional: 15 rules,
 offline, deterministic. One link for hotels, clinics and law firms:
 jawadala.github.io/aziz-demo/voice.html</footer>
