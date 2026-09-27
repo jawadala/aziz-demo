@@ -38,7 +38,8 @@ footer{text-align:center;color:#5a6169;font-size:.78rem;margin:4vh 0 2vh;}
   <div class="fld">RESULT: <b>1 trial session booked</b> - Wed 6:30pm, coach Note assigned, free-weights intro. Upsell flagged: annual plan (caller asked about pricing twice).<br>OUTCOME: <b class="stat">+1 member pipeline, 0 staff minutes used</b></div>
   <a class="cta" href="#" onclick="return play()">REPLAY THE CALL</a>
 </div></div>
-<footer>Iron Yard is a fictional demo gym. The front desk is not.<p style="text-align:center;margin-top:1rem;"><a href="voice-receptionist-index.html" style="color:#2563eb;font-size:.9rem;">See all industries / كل القطاعات</a></p>
+<footer>Iron Yard is a fictional demo gym. The front desk is not.<p style="text-align:center;margin-top:1rem;"><a href="voice-receptionist-index.html" style="color:#2563eb;font-size:.9rem;display:inline-block;padding:4px 0;min-height:24px;">See all industries / كل القطاعات</a></p>
+<p style="text-align:center;font-size:.85rem;margin-top:.8rem;"><a href="../zatca-readiness.html" style="display:inline-block;color:#0e7c4f;font-size:.95rem;padding:10px 14px;">KSA? ZATCA e-invoice readiness check</a></p>
 </footer>
 <script>
 const lines=[
@@ -52,7 +53,7 @@ let i=0,timer=null;
 function step(){
   if(i>=lines.length){i=0;timer=null;return;}
   const [who,text]=lines[i];const el=document.getElementById('t');
-  el.innerHTML+=(el.innerHTML?'<br>':'')+'<span class="'+who+'">'+(who==='a'?'> ':'')+'</span><span class="'+(who==='a'?'a':'g')+'">'+text+'</span>';
+  el.innerHTML+=(el.innerHTML?'<br>':'')+'<span class="'+(who==='a'?'a':'g')+'">'+(who==='a'?'> ':'')+text+'</span>';
   el.scrollTop=el.scrollHeight;i++;timer=setTimeout(step,1700);
 }
 function play(){document.getElementById('t').innerHTML='';i=0;if(timer)clearTimeout(timer);step();return false;}
