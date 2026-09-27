@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<!-- ZATCA DEMO - 3-act slideshow (integration phase). MIT, ours. AR+EN captions,
+     real engine output embedded, keyboard navigable, reduced-motion safe. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZATCA 48h Gap Audit - Demo</title>
+<style>
+:root{--green:#157145;--sand:#f4f1ea;--ink:#14251c;--gold:#c9a227;--red:#b3402a;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,'Segoe UI',sans-serif;}
+body{background:var(--sand);color:var(--ink);}
+.slide{display:none;min-height:100vh;padding:4vh 6vw;}
+.slide.active{display:block;}
+.kicker{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--green);font-weight:700;}
+h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:.6rem 0 1rem;max-width:18ch;}
+h1 .ar{display:block;font-size:.55em;color:#57614f;margin-top:.5rem;}
+.term{background:var(--ink);color:#b8e6c9;border-radius:12px;padding:1.2rem 1.4rem;font-family:ui-monospace,monospace;font-size:.82rem;line-height:1.55;max-width:760px;white-space:pre-wrap;}
+.term .cmd{color:#e8d48b;}
+.term .fail{color:#ff9d85;}
+.term .ok{color:#7ee2a8;}
+.capt{margin-top:1.1rem;font-size:1.05rem;line-height:1.6;max-width:60ch;}
+.capt .ar{display:block;color:#57614f;margin-top:.3rem;}
+.nav{position:fixed;inset-inline:0;bottom:0;display:flex;gap:.6rem;justify-content:center;padding:1rem;background:linear-gradient(transparent,var(--sand) 40%);}
+.nav button{background:var(--green);color:#fff;border:none;border-radius:999px;padding:.6rem 1.4rem;font-size:.95rem;cursor:pointer;min-height:44px;}
+.price{font-size:1.4rem;font-weight:800;}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+<section class="slide active" id="s1">
+  <div class="kicker">Act 1 · المشكلة</div>
+  <h1>Non-compliant e-invoices get rejected.<span class="ar">الفواتير غير المطابقة تُرفض.</span></h1>
+  <p class="capt">ZATCA Phase 2 checks every invoice field: UUID, QR, PIH hash chain, VAT math. One broken field and the invoice bounces - or worse, you get flagged.<span class="ar">الفحص يشمل كل حقل: UUID ورمز QR وسلسلة التجزئة وضريبة القيمة المضافة. حقل واحد خاطئ وتُرفض الفاتورة.</span></p>
+</section>
+<section class="slide" id="s2">
+  <div class="kicker">Act 2 · المحرك</div>
+  <h1>The checker, live.<span class="ar">الفاحص مباشرة.</span></h1>
+  <div class="term"><span class="cmd">$ python3 zatca_audit.py --selftest</span>
+<span class="fail">FAIL BR-08</span> buyer party required
+<span class="fail">FAIL KSA-17</span> Seller VAT number must be 15 digits
+<span class="fail">FAIL KSA-10</span> QR code AdditionalDocumentReference required
+<span class="fail">FAIL KSA-11</span> PIH (hash of previous invoice) required
+<span class="fail">FAIL KSA-08</span> ext:UBLExtensions (signature/QR block) required
+<span class="fail">FAIL BR-16</span> At least one InvoiceLine required
+<span class="ok">selftest: bad invoice tripped 10 rules (expect >=5): PASS</span></div>
+  <p class="capt">15 structural rules, offline, deterministic. Your invoices never leave your machine.<span class="ar">15 قاعدة بنيوية، دون اتصال، وحتمية. فواصلك لا تغادر جهازك.</span></p>
+</section>
+<section class="slide" id="s3">
+  <div class="kicker">Act 3 · العرض</div>
+  <h1>Free audit today. Fixed in 48h.<span class="ar">تدقيق مجاني اليوم، وإصلاح خلال 48 ساعة.</span></h1>
+  <p class="capt">Send one invoice XML. Get a written gap report at a fixed price. We fix, hand over, done.</p>
+  <p class="capt"><span class="price">1,500 SAR</span> flat install · audit included · نافذة إصلاح 48 ساعة</p>
+  <p class="capt"><a href="https://jawadala.github.io/aziz-demo/zatca-readiness.html" style="color:var(--green);font-weight:700;">Start with the free tool / ابدأ بالأداة المجانية</a></p>
+</section>
+<div class="nav">
+  <button onclick="go(-1)">← Prev / السابق</button>
+  <button onclick="go(1)">Next / التالي →</button>
+</div>
+<script>
+let i=0;const S=[...document.querySelectorAll('.slide')];
+function go(d){S[i].classList.remove('active');i=(i+d+S.length)%S.length;S[i].classList.add('active');}
+addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1);});
+</script>
+</body>
+</html>
