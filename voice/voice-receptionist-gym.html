@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iron Yard Gym - Every Signup Call Answered</title>
+<style>
+:root{--char:#15181c;--lime:#c8f542;--grey:#8b939c;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Arial Black',Arial,system-ui,sans-serif;}
+body{background:#0d0f12;color:#e8eaed;}
+header{padding:1.1rem 5vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;background:var(--char);}
+header h1{font-size:1.15rem;letter-spacing:.18em;}
+header h1 span{color:var(--lime);}
+.badge{background:var(--lime);color:#0d0f12;font-size:.72rem;padding:.35rem .8rem;border-radius:999px;letter-spacing:.08em;}
+.wrap{max-width:600px;margin:6vh auto;padding:0 4vw;}
+.card{background:var(--char);border:1px solid #262b31;border-radius:16px;padding:2rem;box-shadow:0 10px 34px rgba(0,0,0,.5);}
+.card h2{font-size:1.45rem;line-height:1.25;margin-bottom:.6rem;}
+.card h2 em{color:var(--lime);font-style:normal;}
+.chips{display:flex;gap:.45rem;flex-wrap:wrap;margin:1rem 0 1.4rem;}
+.chip{border:1px solid #333a42;color:var(--grey);font-size:.74rem;padding:.32rem .75rem;border-radius:999px;letter-spacing:.06em;}
+.log{background:#0a0c0e;border-radius:10px;padding:1rem;font-family:ui-monospace,monospace;font-size:.86rem;line-height:1.7;min-height:230px;border:1px solid #20262c;}
+.log .a{color:var(--lime);}
+.log .g{color:#cfd6dd;}
+.log .stat{color:#6fc0ff;}
+.fld{margin-top:1rem;background:#0a0c0e;border:1px solid #20262c;border-radius:10px;padding:.9rem;font-family:ui-monospace,monospace;font-size:.84rem;}
+.fld b{color:var(--lime);}
+.cta{display:inline-block;margin-top:1.2rem;background:var(--lime);color:#0d0f12;font-weight:900;text-decoration:none;padding:.9rem 2rem;border-radius:10px;letter-spacing:.04em;}
+footer{text-align:center;color:#5a6169;font-size:.78rem;margin:4vh 0 2vh;}
+@media(max-width:480px){.card{padding:1.3rem;}.card h2{font-size:1.15rem;}}
+</style>
+</head>
+<body>
+<header><h1>IRON <span>YARD</span></h1><div class="badge">AI FRONT DESK DEMO</div></header>
+<div class="wrap"><div class="card">
+  <h2>January callers don't leave voicemails. <em>They join the gym that answers.</em></h2>
+  <div class="chips"><div class="chip">AR + EN</div><div class="chip">24/7</div><div class="chip">Trials booked instantly</div><div class="chip">Zero hold time</div></div>
+  <div class="log" id="t"></div>
+  <div class="fld">RESULT: <b>1 trial session booked</b> - Wed 6:30pm, coach Note assigned, free-weights intro. Upsell flagged: annual plan (caller asked about pricing twice).<br>OUTCOME: <b class="stat">+1 member pipeline, 0 staff minutes used</b></div>
+  <a class="cta" href="#" onclick="return play()">REPLAY THE CALL</a>
+</div></div>
+<footer>Iron Yard is a fictional demo gym. The front desk is not.</footer>
+<script>
+const lines=[
+ ["a","Iron Yard Gym, this is the front desk - how can I make you stronger tonight?"],
+ ["g","Hey, do you have free weights? And what's a membership cost?"],
+ ["a","Free-weights floor, squat racks, and coaching seven days a week. Day pass is 35 SAR, monthly 249 SAR, and this month the annual plan includes 2 free coaching sessions. Want to try it first?"],
+ ["g","Yeah, a trial sounds good - maybe Wednesday after work?"],
+ ["a","Wednesday 6:30pm is open - I've reserved it and assigned Coach Note for a free-weights intro. You'll get the confirmation on WhatsApp now. Anything else?"],
+ ["g","That was easy. See you Wednesday."]];
+let i=0,timer=null;
+function step(){
+  if(i>=lines.length){i=0;timer=null;return;}
+  const [who,text]=lines[i];const el=document.getElementById('t');
+  el.innerHTML+=(el.innerHTML?'<br>':'')+'<span class="'+who+'">'+(who==='a'?'> ':'')+'</span><span class="'+(who==='a'?'a':'g')+'">'+text+'</span>';
+  el.scrollTop=el.scrollHeight;i++;timer=setTimeout(step,1700);
+}
+function play(){document.getElementById('t').innerHTML='';i=0;if(timer)clearTimeout(timer);step();return false;}
+window.onload=play;
+</script>
+</body>
+</html>
