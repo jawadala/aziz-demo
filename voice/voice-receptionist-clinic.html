@@ -31,7 +31,7 @@ footer{text-align:center;color:#6b8683;font-size:.8rem;margin:4vh 0 2vh;}
 </style>
 </head>
 <body>
-<header><h1>CEDAR <span>DENTAL</span></h1><div class="badge">Demo - AI Front Desk</div></header>
+<header><h1>CEDAR <span>DENTAL</span></h1><div class="badge">Demo - Front Desk</div></header>
 <div class="card">
   <h2>Nobody misses an appointment again.</h2>
   <p class="lead">Our AI front desk answers every call at 9pm on a Friday, in Arabic or English, checks the real schedule, and books the cleaning. Listen in:</p>
@@ -60,7 +60,7 @@ function drawSlots(pick){
 function step(){
   if(i>=lines.length){i=0;timer=null;return;}
   const [who,text]=lines[i];const el=document.getElementById('t');
-  el.innerHTML+=(el.innerHTML?'<br>':'')+'<span class="who">'+(who==='AI'?'AI Front Desk':'Patient')+':</span> '+text;
+  el.innerHTML+=(el.innerHTML?'<br>':'')+'<span class="who">'+(who==='AI'?'Front Desk':'Patient')+':</span> '+text;
   if(who==='AI'&&text.includes('11:30'))drawSlots('11:30');
   el.scrollTop=el.scrollHeight;i++;timer=setTimeout(step,1500);
 }

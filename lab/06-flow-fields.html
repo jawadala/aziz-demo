@@ -451,7 +451,7 @@ resize();
 if(location.hash.length>2){decState(location.hash.slice(1));}
 reset();syncSliders();sync();
 kick();
-window.__AIFL={get stats(){return{fps:fpsE|0,n:N,mode:MODES[P.mode],simT:+simT.toFixed(1),meanV:meanV|0,evals,paused:!!P.paused}}};
+window.__FL={get stats(){return{fps:fpsE|0,n:N,mode:MODES[P.mode],simT:+simT.toFixed(1),meanV:meanV|0,evals,paused:!!P.paused}}};
 </script>
 </body>
 </html>

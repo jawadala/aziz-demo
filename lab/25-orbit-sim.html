@@ -500,7 +500,7 @@ resize();
 if(location.hash.length>2){decState(location.hash.slice(1));}
 scenario();syncSliders();sync();
 kick();
-window.__AIFL={get stats(){const E=totalE();
+window.__FL={get stats(){const E=totalE();
  return{fps:0,scen:SCEN[P.scen],bodies:bodies.length,days:+simDays.toFixed(1),
  drift:E0?+(((E-E0)/E0)*100).toExponential(2):0,keplerErr:kep.err,orbits:orbitsDone,paused:!!P.paused}}};
 </script>

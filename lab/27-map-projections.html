@@ -475,7 +475,7 @@ if(location.hash.length>2){decState(location.hash.slice(1));}
 seg($('pSeg'),PROJECTIONS.map(p=>p.label),()=>P.proj,i=>{P.proj=i;sync();});
 sync();syncSliders();
 kick();
-window.__AIFL={get stats(){return{proj:PROJECTIONS[P.proj].k,morph:+P.morph.toFixed(2),
+window.__FL={get stats(){return{proj:PROJECTIONS[P.proj].k,morph:+P.morph.toFixed(2),
  areaErr60:+areaError().toFixed(1),spin:P.spin,chains:COAST.length}}};
 </script>
 </body>

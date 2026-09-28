@@ -496,7 +496,7 @@ resize();
 if(location.hash.length>2){decState(location.hash.slice(1));}
 reset();syncSliders();sync();
 kick();
-window.__AIFL={get stats(){return{fps:60,gen,pop:creatures.length,fit:FITS[P.fit],
+window.__FL={get stats(){return{fps:60,gen,pop:creatures.length,fit:FITS[P.fit],
  best:creatures.length?+creatures[0].fit.toFixed(2):null,bestEver:+bestEver.toFixed(2),paused:!!P.paused}}};
 </script>
 </body>

@@ -505,7 +505,7 @@ resize();
 if(location.hash.length>2){decState(location.hash.slice(1));}
 buildNet();genData();syncSliders();sync();drawSpark();
 kick();
-window.__AIFL={get stats(){return{fps:fpsE|0,epoch,loss:+loss.toExponential(3),acc:+acc.toFixed(3),
+window.__FL={get stats(){return{fps:fpsE|0,epoch,loss:+loss.toExponential(3),acc:+acc.toFixed(3),
  net:Object.keys(ARCHS)[P.arch],act:ACTS[P.act],data:MODES[P.mode],n:Npts,synapses:NW,paused:!!P.paused,diverged}}};
 </script>
 </body>

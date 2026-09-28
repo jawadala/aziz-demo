@@ -531,7 +531,7 @@ resize();
 if(location.hash.length>2){decState(location.hash.slice(1));}
 reseed();syncSliders();sync();
 kick();
-window.__AIFL={get stats(){return{fps:fpsE|0,count:N,mode:P.mode,paused:!!P.paused,
+window.__FL={get stats(){return{fps:fpsE|0,count:N,mode:P.mode,paused:!!P.paused,
  camYaw:+cam.yaw.toFixed(3),auto:cam.auto}}};
 </script>
 </body>
