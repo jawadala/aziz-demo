@@ -912,7 +912,7 @@ body{background:var(--bg);color:var(--ink);}
     <div class="demo">
       <h3>Earcons, opt-in</h3>
       <p>State changes can ping - only after you ask. Sound is never the only channel: every tone ships with spoken text.</p>
-      <label class="switch"><input type="checkbox" data-s5-sound><span class="track" aria-hidden="true"></span>Enable sound cues</label>
+      <label class="switch"><input type="checkbox" data-s5-sound checked><span class="track" aria-hidden="true"></span>Sound cues on - click tones to hear them</label>
       <div class="row">
         <button type="button" class="btn" data-s5-tone="ok">Success tone</button>
         <button type="button" class="btn" data-s5-tone="err">Error tone</button>
@@ -945,6 +945,16 @@ body{background:var(--bg);color:var(--ink);}
   requirements per engagement.</p>
 </footer>
 
+<div class="dlg-backdrop" data-s5-backdrop>
+  <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="s5-dlg-h" data-s5-dlg>
+    <h3 id="s5-dlg-h">Dialogs that behave</h3>
+    <p class="dlg-note">Tab cycles inside this box. Escape returns you where you came from. The background is inert while this is open.</p>
+    <div class="row">
+      <button type="button" class="btn btn--fill" data-s5-dlg-close>Done</button>
+    </div>
+  </div>
+</div>
+<p class="sr-only" data-s5-live aria-live="polite"></p>
 <script>
 /* Section 4a: dual-calendar mirror (Umm al-Qura via Intl, UTC-pinned so the
    readout is identical in every timezone). Adapted from the kit pattern. */
@@ -1694,17 +1704,26 @@ addEventListener("load",async function(){
   var TONES = { ok: 880, err: 220, pend: 440 };
   var WORDS = { ok: "Success tone played", err: "Error tone played", pend: "Pending tone played" };
   document.querySelectorAll("[data-s5-sound]").forEach(function(t){
+    soundOn = t.checked; // default-on: visible, discoverable, gesture-safe
     t.addEventListener("change", function(){
       soundOn = t.checked;
-      if(soundOn && !audio){ try{ audio = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audio = null; } }
+      if(soundOn) ensureAudio();
       announce(soundOn ? "Sound cues enabled" : "Sound cues muted");
     });
   });
+  function ensureAudio(){
+    if(!audio){ try{ audio = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audio = null; } }
+    if(audio && audio.state === "suspended"){ try{ audio.resume(); }catch(e){} }
+    return audio;
+  }
   document.querySelectorAll("[data-s5-tone]").forEach(function(btn){
     btn.addEventListener("click", function(){
       var kind = btn.dataset.s5Tone;
       var state = document.querySelector("[data-s5-earcon-state]");
-      if(state) state.textContent = WORDS[kind] + (soundOn ? "" : " (sound is muted)");
+      // First click on a tone IS the user gesture: init/resume audio and
+      // sync the toggle so the sound state is never a silent mystery.
+      if(soundOn) ensureAudio();
+      if(state) state.textContent = WORDS[kind] + (soundOn ? "" : " (sound is muted - flip the toggle)");
       if(!soundOn || !audio) return;
       var o = audio.createOscillator(), g = audio.createGain();
       o.type = "sine"; o.frequency.value = TONES[kind];
