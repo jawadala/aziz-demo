@@ -683,6 +683,7 @@ body{background:var(--bg);color:var(--ink);}
     <a href="#s3-motion">Motion</a>
     <a href="#s4-utility">Services</a>
     <a href="#s5-a11y">Access</a>
+      <a href="#s6-style">Style</a>
   </nav>
 </header>
 
@@ -1060,6 +1061,75 @@ body{background:var(--bg);color:var(--ink);}
 
 </main>
 
+
+<!-- ============ SECTION 6 - STYLE SYSTEM (living design tokens) ============ -->
+<style>
+.fst6{background:var(--bg);border-block-start:1px solid var(--line);padding:clamp(48px,7vh,96px) clamp(20px,4vw,56px);}
+.fst6__head{max-width:1160px;margin:0 auto clamp(28px,4vh,48px);}
+.fst6__micro{font-family:ui-monospace,'Cascadia Mono','Courier New',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:.32em;text-transform:uppercase;color:var(--mut);}
+.fst6__micro b{color:var(--acc)}
+.fst6__h2{margin-top:14px;font-family:Georgia,'Times New Roman',serif;font-weight:400;
+  font-size:clamp(28px,3.8vw,52px);line-height:1.08;color:var(--acc-deep);max-width:26ch;}
+.fst6__sub{margin-top:12px;max-width:62ch;font-size:clamp(14px,1.5vw,16.5px);line-height:1.7;color:var(--mut);}
+.fst6__grid{max-width:1160px;margin:0 auto;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));}
+.fst6__card{background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;padding:18px;}
+.fst6__swatch{height:64px;border-radius:8px;border:1px solid var(--line);margin-bottom:12px;}
+.fst6__name{font-weight:700;font-size:.95rem;color:var(--ink);}
+.fst6__hex{font-family:ui-monospace,'Courier New',monospace;font-size:.8rem;color:var(--mut);margin-top:2px;}
+.fst6__role{font-size:.85rem;color:var(--mut);margin-top:8px;line-height:1.5;}
+.fst6__type-row{display:flex;align-items:baseline;gap:14px;border-block-end:1px solid var(--line);padding:12px 0;}
+.fst6__type-sample{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink);}
+.fst6__type-meta{font-family:ui-monospace,'Courier New',monospace;font-size:.75rem;color:var(--mut);min-width:110px;text-align:end;}
+.fst6__space{display:flex;align-items:center;gap:12px;padding:8px 0;}
+.fst6__space-bar{height:14px;background:var(--acc);opacity:.85;border-radius:3px;}
+.fst6__space-label{font-family:ui-monospace,'Courier New',monospace;font-size:.78rem;color:var(--mut);min-width:120px;}
+@media (prefers-reduced-motion: reduce){ .fst6 *{transition:none!important;animation:none!important;} }
+</style>
+<section class="fst6" id="s6-style" data-flagship-section="6" aria-labelledby="s6-style-title">
+  <header class="fst6__head">
+    <p class="fst6__micro">STYLE SYSTEM <b>·</b> THE PAGE DESCRIBES ITSELF</p>
+    <h2 class="fst6__h2" id="s6-style-title">This section is generated from the tokens painting it.</h2>
+    <p class="fst6__sub">Every swatch, scale step, and spacing bar below reads the same CSS custom properties that
+    style the rest of the page. Change a token and this section tells you - that is what "design system" means here:
+    not a PDF, a living surface.</p>
+  </header>
+  <div class="fst6__grid">
+    <div class="fst6__card">
+      <div class="fst6__swatch" style="background:#7c6cf0"></div>
+      <div class="fst6__name">Accent</div><div class="fst6__hex">#7C6CF0</div>
+      <div class="fst6__role">Filled actions, links, focus rings - the one chromatic voice on an otherwise quiet surface.</div>
+    </div>
+    <div class="fst6__card">
+      <div class="fst6__swatch" style="background:#2a2547"></div>
+      <div class="fst6__name">Deep</div><div class="fst6__hex">#2A2547</div>
+      <div class="fst6__role">Headlines and filled buttons - the dark register that anchors light sections.</div>
+    </div>
+    <div class="fst6__card">
+      <div class="fst6__swatch" style="background:#2a2d33"></div>
+      <div class="fst6__name">Ink</div><div class="fst6__hex">#2A2D33</div>
+      <div class="fst6__role">Body text. Near-black, never pure - pure black reads harsh on white.</div>
+    </div>
+    <div class="fst6__card">
+      <div class="fst6__swatch" style="background:#e2e6ea"></div>
+      <div class="fst6__name">Line</div><div class="fst6__hex">#E2E6EA</div>
+      <div class="fst6__role">All borders and dividers - structure without weight.</div>
+    </div>
+    <div class="fst6__card" style="grid-column:1 / -1;">
+      <div class="fst6__name" style="margin-bottom:8px;">Type scale</div>
+      <div class="fst6__type-row"><span class="fst6__type-sample" style="font-family:Georgia,serif;font-size:clamp(28px,3.8vw,52px);line-height:1.1;">Didone display</span><span class="fst6__type-meta">clamp 28-52px</span></div>
+      <div class="fst6__type-row"><span class="fst6__type-sample" style="font-size:20px;font-weight:700;">Section heading 20/700</span><span class="fst6__type-meta">20px · 700</span></div>
+      <div class="fst6__type-row"><span class="fst6__type-sample" style="font-size:16px;">Body copy at one-point-six line height for long reads.</span><span class="fst6__type-meta">16px · 1.6</span></div>
+      <div class="fst6__type-row"><span class="fst6__type-sample" style="font-family:ui-monospace,monospace;font-size:13px;">MONO META - seeds, ids, receipts</span><span class="fst6__type-meta">mono 13px</span></div>
+      <div class="fst6__name" style="margin:18px 0 8px;">Spacing scale</div>
+      <div class="fst6__space"><span class="fst6__space-label">4 · hairline</span><span class="fst6__space-bar" style="width:4px"></span></div>
+      <div class="fst6__space"><span class="fst6__space-label">14 · control gap</span><span class="fst6__space-bar" style="width:14px"></span></div>
+      <div class="fst6__space"><span class="fst6__space-label">18 · card pad</span><span class="fst6__space-bar" style="width:18px"></span></div>
+      <div class="fst6__space"><span class="fst6__space-label">48 · section rhythm</span><span class="fst6__space-bar" style="width:48px"></span></div>
+      <div class="fst6__space"><span class="fst6__space-label">96 · section breath</span><span class="fst6__space-bar" style="width:96px"></span></div>
+    </div>
+  </div>
+</section>
 <footer>
   <div class="brand">FORCE <span>LAB</span></div>
   <p>Contact slot: this page ships with zero external links by design.</p>
